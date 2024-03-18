@@ -62,3 +62,11 @@ Go the the directory where you want to install this project and enter `git clone
 1) Once the ruleset is inferred, the flow of a signal through the network is simulated. We sample the cells in the dataset and set the state of the nodes in the network to the expression of the cell (if the cell state for a gene is 1, we set the initial state of the node to 1). We then apply the rules synchronously across the network and keep track of the state of each node in the network. The network is simulated until a cycle of states called an attractor is found. 
 
 ![image](https://github.com/Luminarada80/scBONITA2/assets/140645994/e4863904-0f3c-406f-b22e-69acaddac292)
+
+2) Each of the nodes is iteratively knocked out (expression is forced to be 0 throughout the simulation) or knocked in (expression is forced to be 1 throughout the simulation). The network is simulated again for the same set of cell states and the attractors recorded. Once the knock out and knock in simulations are conducted for each node in the network, the importance of each node is scored by recording the number of nodes that are altered in the attractor cycle when the nodes are knocked out and knocked in compared to normal. The greater the number of differences, the more important the node is. If a node changes the signaling pattern of the network greatly when its expression is altered, then under- or over-expression of that gene will have a greater impact on the pathway compared to a node that does not change the signaling pattern greatly.
+
+   ![image](https://github.com/Luminarada80/scBONITA2/assets/140645994/1fb129d5-fd18-4293-beee-7afc571bfe2b)
+
+> In this example, knocking out node 3 does not alter the expression as much as knocking in node 3
+
+
