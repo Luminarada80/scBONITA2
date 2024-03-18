@@ -1,4 +1,4 @@
-# scBONITA2
+22# scBONITA2
 Infers Boolean molecular signaling networks using scRNAseq data and prior knowledge networks, performs attractor analysis, and calculates the importance of each node in the network
 
 ## Setup:
@@ -36,9 +36,29 @@ Go the the directory where you want to install this project and enter `git clone
 
 ### Rule Inference
 1) The network is loaded as a NetworkX object from the processed graphml file.
-2) The cells are clustered by randomly shuffling the columns of the dataset and binning the expression data for each gene based on whether the majority of the cells within the bin are 1 or 0.
-3) The genetic algorithm is ran to find a set of rules that has a low error. Each of the nodes in the network has other nodes signaling to it. These incoming nodes can be connected by Boolean rules, for example if node 1 and node 2 signal to node 3, the possibilities are that node 1 AND node 2 activate node 3 or that node 1 OR node 2 activates node 3. Each of the nodes could also be inhibitory, for example if node 1 is inhibitory the rule might be NOT node 1 AND node 2 or NOT node 1 OR node 2. The possibilities for each node are generated and one rule for each node is randomly sampled to create individuals for the genetic algorithm, and the error for each one of the rules is calculated by seeing if the predicted logic fits the data. For example, if the predicted rule is node 1 AND node 2 activate node 3, and the data for cell X is node 1 = 0, node 2 = 1, node 3 = 1, then that would be an error because for an AND rule, we would expect that 0 AND 1 = 0. We repeat this for each cell cluster in the dataset, adding up the total error as the fitness of the individual. The higher the error, the lower the fitness. The population for the genetic algorithm is made of many individual random rulesets, and over time the individuals with the lowest error are selected.
-4) Once the best individuals from the genetic algorithm are selected, a rule refinement method is performed on for each node in the best individuals, where the other rule possibilities are considered for nodes with a high error. This is done to optimize rules with high error that were not optimized during the genetic algorithm. The rulesets are formatted and output to the rules_output directory for the project.
+
+![image](https://github.com/Luminarada80/scBONITA2/assets/140645994/f44738a4-93d0-4266-8bd7-2f3376ffabbc)
+
+3) The cells are clustered by randomly shuffling the columns of the dataset and binning the expression data for each gene based on whether the majority of the cells within the bin are 1 or 0.
+
+![image](https://github.com/Luminarada80/scBONITA2/assets/140645994/15878e85-dbdf-4cd2-9eb3-aad8890ae2fb)
+
+4) The genetic algorithm is ran to find a set of rules that has a low error. Each of the nodes in the network has other nodes signaling to it. These incoming nodes can be connected by Boolean rules, for example if node 1 and node 2 signal to node 3, the possibilities are that node 1 AND node 2 activate node 3 or that node 1 OR node 2 activates node 3.
+
+![image](https://github.com/Luminarada80/scBONITA2/assets/140645994/d2970c94-294b-4906-b457-11b1190fe302)
+![image](https://github.com/Luminarada80/scBONITA2/assets/140645994/cd262972-b341-4d3f-966d-2a5f97e39fec)
+
+5) Each of the nodes could also be inhibitory, for example if node 1 is inhibitory the rule might be NOT node 1 AND node 2 or NOT node 1 OR node 2. The possibilities for each node are generated and one rule for each node is randomly sampled to create individuals for the genetic algorithm, and the error for each one of the rules is calculated by seeing if the predicted logic fits the data. For example, if the predicted rule is node 1 AND node 2 activate node 3, and the data for cell X is node 1 = 0, node 2 = 1, node 3 = 1, then that would be an error because for an AND rule, we would expect that 0 AND 1 = 0.
+
+![image](https://github.com/Luminarada80/scBONITA2/assets/140645994/c1265d4f-57ee-4931-a326-a500e5410189)
+
+6) We repeat this for each cell cluster in the dataset, adding up the total error as the fitness of the individual. The higher the error, the lower the fitness. The population for the genetic algorithm is made of many individual random rulesets, and over time the individuals with the lowest error are selected.
+
+![image](https://github.com/Luminarada80/scBONITA2/assets/140645994/419b6a32-f53c-4ef6-b6a7-27dd08c4ac71)
+
+9) Once the best individuals from the genetic algorithm are selected, a rule refinement method is performed on for each node in the best individuals, where the other rule possibilities are considered for nodes with a high error. This is done to optimize rules with high error that were not optimized during the genetic algorithm. The rulesets are formatted and output to the rules_output directory for the project.
 
 ### Importance Score Calculations
+1) Once the ruleset is inferred, the flow of a signal through the network is simulated. We sample the cells in the dataset and set the state of the nodes in the network to the expression of the cell (if the cell state for a gene is 1, we set the initial state of the node to 1). We then apply the rules synchronously across the network and keep track of the state of each node in the network. The network is simulated until a cycle of states called an attractor is found. 
 
+![image](https://github.com/Luminarada80/scBONITA2/assets/140645994/30033934-3a25-43e9-b36e-6609440843bb)
