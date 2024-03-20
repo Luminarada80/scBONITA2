@@ -248,7 +248,7 @@ def filter_attractors(dataframe):
 def hierarchical_clustering(distance_matrix, num_nodes, show_plot):
     """
     Clusters the distance matrix of the attractors using Hierarchical Agglomerative Clustering.
-    The cutoff for the clusters is set as <=20% the number of genes in the network. Returns the
+    The cutoff for the clusters is set as <=25% the number of genes in the network. Returns the
     clusters and allows for a dendrogram to be displayed.
     """
 
@@ -263,7 +263,7 @@ def hierarchical_clustering(distance_matrix, num_nodes, show_plot):
     # 'ward' is one of the methods for calculating the distance between the newly formed cluster
     Z = sch.linkage(condensed_distance_matrix, method='ward')
 
-    cutoff = 0.2 * num_nodes
+    cutoff = 0.25 * num_nodes
     clusters = sch.fcluster(Z, t=cutoff, criterion='distance')
 
     logging.info(f'\t\tClustering cutoff value = {round(cutoff, 2)} (<=20% * number of genes {num_nodes})')

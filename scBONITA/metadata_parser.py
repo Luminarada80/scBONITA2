@@ -31,7 +31,7 @@ def write_group(dataset_file, col_indices, output_path):
 def metadata_parser(metadata_file, metadata_sep, dataset_file, dataset_sep, cell_name_index, group_indices, header, overwrite):
     # If no arguments, prompt the user for the dataset and network name
     with open(metadata_file, 'r') as metadata_file:
-        if header:
+        if header == 'y':
             next(metadata_file)
 
         logging.info(f'\n----- Splitting Data Files -----')
@@ -45,6 +45,7 @@ def metadata_parser(metadata_file, metadata_sep, dataset_file, dataset_sep, cell
             line = line.strip()
             try:
                 cell_name = line.split(metadata_sep)[cell_name_index]
+
             except IndexError:
                 logging.error('\n\t!!!WARNING: Error with splitting the metadata file based on specified separator, check and re-try\n')
                 exit(1)
@@ -71,21 +72,24 @@ def metadata_parser(metadata_file, metadata_sep, dataset_file, dataset_sep, cell
             line_count = 1
             for line in datafile:
                 line = line.replace('"', '').strip().split(dataset_sep)
-
+                line = line[1:] # Skip the first column, not a cell
+                
                 # Append the column indices for each group to a dictionary
                 if line_count == 1:
                     for cell_index, cell in enumerate(line):
                         try:
-                            if not groups[cell] in cell_groups:
-                                cell_groups[groups[cell]] = []
-                            
-                            cell_groups[groups[cell]].append(cell_index)
+                            group_name = '_'.join(group for group in groups[cell])
+                            if not group_name in cell_groups:
+                                cell_groups[group_name] = [cell_index]
+                            else:
+                                cell_groups[group_name].append(cell_index)
 
-                        except KeyError:
+                        except KeyError as e:
+                            print(e)
                             continue
                 
                 line_count += 1
-        
+
         # Read in the dataset as a pandas dataframe for each group with only the group columns and write the files out as a csv
         dataset_paths = []
         dataset_groups = []
@@ -107,5 +111,5 @@ def metadata_parser(metadata_file, metadata_sep, dataset_file, dataset_sep, cell
                 else:
                     logging.info(f'\tUsing existing file')
     
-    return dataset_paths, dataset_groups
+    return dataset_paths, dataset_groups, cell_groups
     

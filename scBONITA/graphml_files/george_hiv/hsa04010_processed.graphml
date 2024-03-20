@@ -1,0 +1,4127 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d5" for="edge" attr.name="signal" attr.type="string"/>
+<key id="d4" for="edge" attr.name="type" attr.type="string"/>
+<key id="d3" for="edge" attr.name="subtype" attr.type="string"/>
+<key id="d2" for="edge" attr.name="color" attr.type="string"/>
+<key id="d1" for="node" attr.name="type" attr.type="string"/>
+<key id="d0" for="node" attr.name="name" attr.type="string"/>
+<graph edgedefault="directed"><node id="PPM1B">
+  <data key="d0">PPM1B</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="MAP4K4">
+  <data key="d0">MAP4K4</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="MAP3K14">
+  <data key="d0">MAP3K14</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="LAMTOR3">
+  <data key="d0">LAMTOR3</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="MAP2K2">
+  <data key="d0">MAP2K2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="MAP2K1">
+  <data key="d0">MAP2K1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="RAF1">
+  <data key="d0">RAF1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="BRAF">
+  <data key="d0">BRAF</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="RASA1">
+  <data key="d0">RASA1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="NF1">
+  <data key="d0">NF1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="RAPGEF2">
+  <data key="d0">RAPGEF2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="RASA2">
+  <data key="d0">RASA2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="GRB2">
+  <data key="d0">GRB2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="NR4A1">
+  <data key="d0">NR4A1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="MAPK7">
+  <data key="d0">MAPK7</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="MAP2K5">
+  <data key="d0">MAP2K5</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="NLK">
+  <data key="d0">NLK</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="ATF4">
+  <data key="d0">ATF4</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="ELK4">
+  <data key="d0">ELK4</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="ELK1">
+  <data key="d0">ELK1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="PPP5C">
+  <data key="d0">PPP5C</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="MAP2K6">
+  <data key="d0">MAP2K6</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="MAP2K3">
+  <data key="d0">MAP2K3</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="PPM1A">
+  <data key="d0">PPM1A</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="MAP3K4">
+  <data key="d0">MAP3K4</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="HSPB1">
+  <data key="d0">HSPB1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="MAP3K7">
+  <data key="d0">MAP3K7</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="MAP3K5">
+  <data key="d0">MAP3K5</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="MAP3K6">
+  <data key="d0">MAP3K6</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="MAP4K2">
+  <data key="d0">MAP4K2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="ECSIT">
+  <data key="d0">ECSIT</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="TRAF6">
+  <data key="d0">TRAF6</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="DAXX">
+  <data key="d0">DAXX</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="TRAF2">
+  <data key="d0">TRAF2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="CASP3">
+  <data key="d0">CASP3</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="TNFRSF1A">
+  <data key="d0">TNFRSF1A</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="TNF">
+  <data key="d0">TNF</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="MAPKAPK5">
+  <data key="d0">MAPKAPK5</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="MAP3K11">
+  <data key="d0">MAP3K11</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="MAP2K7">
+  <data key="d0">MAP2K7</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="MAP2K4">
+  <data key="d0">MAP2K4</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="CRK">
+  <data key="d0">CRK</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="MAPK8IP3">
+  <data key="d0">MAPK8IP3</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="FLNA">
+  <data key="d0">FLNA</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="MAP3K1">
+  <data key="d0">MAP3K1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="MAP3K8">
+  <data key="d0">MAP3K8</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="MAP4K1">
+  <data key="d0">MAP4K1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="MAP4K3">
+  <data key="d0">MAP4K3</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="FOS">
+  <data key="d0">FOS</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="SRF">
+  <data key="d0">SRF</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="TRADD">
+  <data key="d0">TRADD</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="MYD88">
+  <data key="d0">MYD88</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="ARAF">
+  <data key="d0">ARAF</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="RASGRF1"/>
+<node id="RASGRF2"/>
+<node id="NFKB1"/>
+<node id="NFKB2"/>
+<node id="RELA"/>
+<node id="RELB"/>
+<node id="IKBKB"/>
+<node id="IKBKG"/>
+<node id="PRKCA"/>
+<node id="PRKCB"/>
+<node id="PRKCG"/>
+<node id="RAP1A"/>
+<node id="RAP1B"/>
+<node id="HRAS"/>
+<node id="KRAS"/>
+<node id="NRAS"/>
+<node id="RRAS"/>
+<node id="RRAS2"/>
+<node id="MRAS"/>
+<node id="RASGRP1"/>
+<node id="RASGRP2"/>
+<node id="RASGRP3"/>
+<node id="RASGRP4"/>
+<node id="GNA12"/>
+<node id="GNG12"/>
+<node id="EGFR"/>
+<node id="ERBB2"/>
+<node id="ERBB3"/>
+<node id="ERBB4"/>
+<node id="FGFR1"/>
+<node id="FGFR2"/>
+<node id="FGFR3"/>
+<node id="FGFR4"/>
+<node id="NGFR"/>
+<node id="NTRK1"/>
+<node id="NTRK2"/>
+<node id="INSR"/>
+<node id="IGF1R"/>
+<node id="PDGFRA"/>
+<node id="PDGFRB"/>
+<node id="CSF1R"/>
+<node id="KIT"/>
+<node id="FLT3"/>
+<node id="FLT1"/>
+<node id="FLT4"/>
+<node id="KDR"/>
+<node id="MET"/>
+<node id="TEK"/>
+<node id="EPHA2"/>
+<node id="RET"/>
+<node id="CACNA1A"/>
+<node id="CACNA1B"/>
+<node id="CACNA1C"/>
+<node id="CACNA1D"/>
+<node id="CACNA1E"/>
+<node id="CACNA1F"/>
+<node id="CACNA1G"/>
+<node id="CACNA1H"/>
+<node id="CACNA1I"/>
+<node id="CACNA1S"/>
+<node id="CACNA2D1"/>
+<node id="CACNA2D2"/>
+<node id="CACNA2D3"/>
+<node id="CACNA2D4"/>
+<node id="CACNB1"/>
+<node id="CACNB2"/>
+<node id="CACNB3"/>
+<node id="CACNB4"/>
+<node id="CACNG1"/>
+<node id="CACNG2"/>
+<node id="CACNG3"/>
+<node id="CACNG4"/>
+<node id="CACNG5"/>
+<node id="CACNG6"/>
+<node id="CACNG7"/>
+<node id="CACNG8"/>
+<node id="RPS6KA5"/>
+<node id="RPS6KA4"/>
+<node id="MAPKAPK2"/>
+<node id="MAPKAPK3"/>
+<node id="MAP3K12"/>
+<node id="MAP3K13"/>
+<node id="MAP3K9"/>
+<node id="MAP3K10"/>
+<node id="MLK4"/>
+<node id="STK4"/>
+<node id="STK3"/>
+<node id="TGFBR2"/>
+<node id="TGFBR1"/>
+<node id="IL1R1"/>
+<node id="IL1RAP"/>
+<node id="TGFB1"/>
+<node id="TGFB2"/>
+<node id="TGFB3"/>
+<node id="IL1A"/>
+<node id="IL1B"/>
+<node id="RAC1"/>
+<node id="CDC42"/>
+<node id="RAC2"/>
+<node id="RAC3"/>
+<node id="PAK1"/>
+<node id="PAK2"/>
+<node id="MAP3K2"/>
+<node id="MAP3K3"/>
+<node id="MAPK8IP1"/>
+<node id="MAPK8IP2"/>
+<node id="EGF"/>
+<node id="TGFA"/>
+<node id="EREG"/>
+<node id="AREG"/>
+<node id="FGF1"/>
+<node id="FGF2"/>
+<node id="FGF19"/>
+<node id="FGF21"/>
+<node id="FGF23"/>
+<node id="BDNF"/>
+<node id="NTF3"/>
+<node id="NTF4"/>
+<node id="INS"/>
+<node id="IGF1"/>
+<node id="IGF2"/>
+<node id="PDGFA"/>
+<node id="PDGFB"/>
+<node id="CSF1"/>
+<node id="KITLG"/>
+<node id="FLT3LG"/>
+<node id="VEGFA"/>
+<node id="VEGFB"/>
+<node id="PGF"/>
+<node id="HGF"/>
+<node id="ANGPT1"/>
+<node id="ANGPT2"/>
+<node id="ANGPT4"/>
+<node id="GDNF"/>
+<node id="NRTN"/>
+<node id="ARTN"/>
+<node id="PSPN"/>
+<node id="IRAK1"/>
+<node id="IRAK4"/>
+<edge source="PPM1B" target="MAP3K7">
+  <data key="d2">red</data>
+  <data key="d3">inhibition/dephosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">i</data>
+</edge>
+<edge source="MAP4K4" target="MAP3K1">
+  <data key="d2">orange</data>
+  <data key="d3">phosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="MAP3K14" target="NFKB1">
+  <data key="d5">a</data>
+</edge>
+<edge source="MAP3K14" target="NFKB2">
+  <data key="d5">a</data>
+</edge>
+<edge source="MAP3K14" target="RELA">
+  <data key="d5">a</data>
+</edge>
+<edge source="MAP3K14" target="RELB">
+  <data key="d5">a</data>
+</edge>
+<edge source="MAP3K14" target="IKBKB">
+  <data key="d5">a</data>
+</edge>
+<edge source="MAP3K14" target="IKBKG">
+  <data key="d5">a</data>
+</edge>
+<edge source="LAMTOR3" target="MAP2K1">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="LAMTOR3" target="MAP2K2">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="RAF1" target="MAP2K1">
+  <data key="d2">orange</data>
+  <data key="d3">phosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="RAF1" target="MAP2K2">
+  <data key="d2">orange</data>
+  <data key="d3">phosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="BRAF" target="MAP2K1">
+  <data key="d2">orange</data>
+  <data key="d3">phosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="BRAF" target="MAP2K2">
+  <data key="d2">orange</data>
+  <data key="d3">phosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="RASA1" target="HRAS">
+  <data key="d5">i</data>
+</edge>
+<edge source="RASA1" target="KRAS">
+  <data key="d5">i</data>
+</edge>
+<edge source="RASA1" target="NRAS">
+  <data key="d5">i</data>
+</edge>
+<edge source="RASA1" target="RRAS">
+  <data key="d5">i</data>
+</edge>
+<edge source="RASA1" target="RRAS2">
+  <data key="d5">i</data>
+</edge>
+<edge source="RASA1" target="MRAS">
+  <data key="d5">i</data>
+</edge>
+<edge source="NF1" target="HRAS">
+  <data key="d5">i</data>
+</edge>
+<edge source="NF1" target="KRAS">
+  <data key="d5">i</data>
+</edge>
+<edge source="NF1" target="NRAS">
+  <data key="d5">i</data>
+</edge>
+<edge source="NF1" target="RRAS">
+  <data key="d5">i</data>
+</edge>
+<edge source="NF1" target="RRAS2">
+  <data key="d5">i</data>
+</edge>
+<edge source="NF1" target="MRAS">
+  <data key="d5">i</data>
+</edge>
+<edge source="RAPGEF2" target="HRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="RAPGEF2" target="KRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="RAPGEF2" target="NRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="RAPGEF2" target="RRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="RAPGEF2" target="RRAS2">
+  <data key="d5">a</data>
+</edge>
+<edge source="RAPGEF2" target="MRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="RASA2" target="HRAS">
+  <data key="d5">i</data>
+</edge>
+<edge source="RASA2" target="KRAS">
+  <data key="d5">i</data>
+</edge>
+<edge source="RASA2" target="NRAS">
+  <data key="d5">i</data>
+</edge>
+<edge source="RASA2" target="RRAS">
+  <data key="d5">i</data>
+</edge>
+<edge source="RASA2" target="RRAS2">
+  <data key="d5">i</data>
+</edge>
+<edge source="RASA2" target="MRAS">
+  <data key="d5">i</data>
+</edge>
+<edge source="GRB2" target="EGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="GRB2" target="ERBB2">
+  <data key="d5">a</data>
+</edge>
+<edge source="GRB2" target="ERBB3">
+  <data key="d5">a</data>
+</edge>
+<edge source="GRB2" target="ERBB4">
+  <data key="d5">a</data>
+</edge>
+<edge source="GRB2" target="FGFR1">
+  <data key="d5">a</data>
+</edge>
+<edge source="GRB2" target="FGFR2">
+  <data key="d5">a</data>
+</edge>
+<edge source="GRB2" target="FGFR3">
+  <data key="d5">a</data>
+</edge>
+<edge source="GRB2" target="FGFR4">
+  <data key="d5">a</data>
+</edge>
+<edge source="GRB2" target="NGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="GRB2" target="NTRK1">
+  <data key="d5">a</data>
+</edge>
+<edge source="GRB2" target="NTRK2">
+  <data key="d5">a</data>
+</edge>
+<edge source="GRB2" target="INSR">
+  <data key="d5">a</data>
+</edge>
+<edge source="GRB2" target="IGF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="GRB2" target="PDGFRA">
+  <data key="d5">a</data>
+</edge>
+<edge source="GRB2" target="PDGFRB">
+  <data key="d5">a</data>
+</edge>
+<edge source="GRB2" target="CSF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="GRB2" target="KIT">
+  <data key="d5">a</data>
+</edge>
+<edge source="GRB2" target="FLT3">
+  <data key="d5">a</data>
+</edge>
+<edge source="GRB2" target="FLT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="GRB2" target="FLT4">
+  <data key="d5">a</data>
+</edge>
+<edge source="GRB2" target="KDR">
+  <data key="d5">a</data>
+</edge>
+<edge source="GRB2" target="MET">
+  <data key="d5">a</data>
+</edge>
+<edge source="GRB2" target="TEK">
+  <data key="d5">a</data>
+</edge>
+<edge source="GRB2" target="EPHA2">
+  <data key="d5">a</data>
+</edge>
+<edge source="GRB2" target="RET">
+  <data key="d5">a</data>
+</edge>
+<edge source="MAPK7" target="NR4A1">
+  <data key="d2">orange</data>
+  <data key="d3">phosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="MAP2K5" target="MAPK7">
+  <data key="d2">orange</data>
+  <data key="d3">phosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="ELK4" target="FOS">
+  <data key="d2">green</data>
+  <data key="d3">expression</data>
+  <data key="d4">GErel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="ELK1" target="FOS">
+  <data key="d2">green</data>
+  <data key="d3">expression</data>
+  <data key="d4">GErel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="PPP5C" target="MAP3K5">
+  <data key="d2">red</data>
+  <data key="d3">inhibition/dephosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">i</data>
+</edge>
+<edge source="PPM1A" target="MAP2K3">
+  <data key="d2">red</data>
+  <data key="d3">inhibition/dephosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">i</data>
+</edge>
+<edge source="PPM1A" target="MAP2K6">
+  <data key="d2">red</data>
+  <data key="d3">inhibition/dephosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">i</data>
+</edge>
+<edge source="PPM1A" target="MAP2K7">
+  <data key="d2">red</data>
+  <data key="d3">inhibition/dephosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">i</data>
+</edge>
+<edge source="PPM1A" target="MAP2K4">
+  <data key="d2">red</data>
+  <data key="d3">inhibition/dephosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">i</data>
+</edge>
+<edge source="MAP3K4" target="MAP2K3">
+  <data key="d2">green</data>
+  <data key="d3">activation/phosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="MAP3K4" target="MAP2K6">
+  <data key="d2">green</data>
+  <data key="d3">activation/phosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="MAP3K7" target="MAP3K14">
+  <data key="d2">orange</data>
+  <data key="d3">phosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="MAP3K7" target="MAP2K3">
+  <data key="d2">orange</data>
+  <data key="d3">phosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="MAP3K7" target="MAP2K6">
+  <data key="d2">orange</data>
+  <data key="d3">phosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="MAP3K7" target="NLK">
+  <data key="d2">orange</data>
+  <data key="d3">phosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="MAP3K7" target="IKBKB">
+  <data key="d5">a</data>
+</edge>
+<edge source="MAP3K7" target="IKBKG">
+  <data key="d5">a</data>
+</edge>
+<edge source="MAP3K5" target="MAP2K3">
+  <data key="d2">orange</data>
+  <data key="d3">phosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="MAP3K5" target="MAP2K6">
+  <data key="d2">orange</data>
+  <data key="d3">phosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="MAP3K6" target="MAP2K3">
+  <data key="d2">orange</data>
+  <data key="d3">phosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="MAP3K6" target="MAP2K6">
+  <data key="d2">orange</data>
+  <data key="d3">phosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="ECSIT" target="TRAF6">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="DAXX" target="MAP3K5">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="TRAF2" target="MAP4K2">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="TRAF2" target="MAP3K5">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="TRAF2" target="MAP3K1">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="CASP3" target="MAP3K1">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="CASP3" target="STK4">
+  <data key="d5">a</data>
+</edge>
+<edge source="CASP3" target="STK3">
+  <data key="d5">a</data>
+</edge>
+<edge source="CASP3" target="PAK1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CASP3" target="PAK2">
+  <data key="d5">a</data>
+</edge>
+<edge source="TNFRSF1A" target="TRADD">
+  <data key="d2">black</data>
+  <data key="d3"></data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="TNF" target="TNFRSF1A">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="MAPKAPK5" target="HSPB1">
+  <data key="d2">orange</data>
+  <data key="d3">phosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="MAP3K11" target="MAPK8IP3">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="MAP3K11" target="MAP2K7">
+  <data key="d2">orange</data>
+  <data key="d3">phosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="MAP2K7" target="MAPK8IP3">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="MAP2K4" target="MAPK8IP3">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="MAP2K4" target="CRK">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="MAP2K4" target="FLNA">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="MAPK8IP3" target="MAP3K1">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="MAP3K1" target="MAP2K4">
+  <data key="d2">orange</data>
+  <data key="d3">phosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="MAP3K1" target="MAP2K1">
+  <data key="d2">orange</data>
+  <data key="d3">phosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="MAP3K1" target="MAP2K2">
+  <data key="d2">orange</data>
+  <data key="d3">phosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="MAP3K1" target="IKBKB">
+  <data key="d5">a</data>
+</edge>
+<edge source="MAP3K1" target="IKBKG">
+  <data key="d5">a</data>
+</edge>
+<edge source="MAP3K8" target="MAP3K14">
+  <data key="d2">orange</data>
+  <data key="d3">phosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="MAP3K8" target="MAP2K1">
+  <data key="d2">orange</data>
+  <data key="d3">phosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="MAP3K8" target="MAP2K2">
+  <data key="d2">orange</data>
+  <data key="d3">phosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="MAP3K8" target="IKBKB">
+  <data key="d5">a</data>
+</edge>
+<edge source="MAP3K8" target="IKBKG">
+  <data key="d5">a</data>
+</edge>
+<edge source="MAP4K1" target="MAP3K11">
+  <data key="d2">orange</data>
+  <data key="d3">phosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="MAP4K3" target="MAP3K1">
+  <data key="d2">orange</data>
+  <data key="d3">phosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="SRF" target="ELK1">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="SRF" target="ELK4">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="SRF" target="FOS">
+  <data key="d2">green</data>
+  <data key="d3">expression</data>
+  <data key="d4">GErel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="TRADD" target="TRAF2">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="TRADD" target="CASP3">
+  <data key="d2">green</data>
+  <data key="d3">activation/indirect effect</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="MYD88" target="IRAK1">
+  <data key="d5">a</data>
+</edge>
+<edge source="MYD88" target="IRAK4">
+  <data key="d5">a</data>
+</edge>
+<edge source="ARAF" target="MAP2K1">
+  <data key="d2">green</data>
+  <data key="d3">activation/phosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="ARAF" target="MAP2K2">
+  <data key="d2">green</data>
+  <data key="d3">activation/phosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="RASGRF1" target="HRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="RASGRF1" target="KRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="RASGRF1" target="NRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="RASGRF1" target="RRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="RASGRF1" target="RRAS2">
+  <data key="d5">a</data>
+</edge>
+<edge source="RASGRF1" target="MRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="RASGRF2" target="HRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="RASGRF2" target="KRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="RASGRF2" target="NRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="RASGRF2" target="RRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="RASGRF2" target="RRAS2">
+  <data key="d5">a</data>
+</edge>
+<edge source="RASGRF2" target="MRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="IKBKB" target="NFKB1">
+  <data key="d5">a</data>
+</edge>
+<edge source="IKBKB" target="NFKB2">
+  <data key="d5">a</data>
+</edge>
+<edge source="IKBKB" target="RELA">
+  <data key="d5">a</data>
+</edge>
+<edge source="IKBKB" target="RELB">
+  <data key="d5">a</data>
+</edge>
+<edge source="IKBKG" target="NFKB1">
+  <data key="d5">a</data>
+</edge>
+<edge source="IKBKG" target="NFKB2">
+  <data key="d5">a</data>
+</edge>
+<edge source="IKBKG" target="RELA">
+  <data key="d5">a</data>
+</edge>
+<edge source="IKBKG" target="RELB">
+  <data key="d5">a</data>
+</edge>
+<edge source="PRKCA" target="RAF1">
+  <data key="d5">a</data>
+</edge>
+<edge source="PRKCA" target="HRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="PRKCA" target="KRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="PRKCA" target="NRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="PRKCA" target="RRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="PRKCA" target="RRAS2">
+  <data key="d5">a</data>
+</edge>
+<edge source="PRKCA" target="MRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="PRKCB" target="RAF1">
+  <data key="d5">a</data>
+</edge>
+<edge source="PRKCB" target="HRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="PRKCB" target="KRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="PRKCB" target="NRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="PRKCB" target="RRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="PRKCB" target="RRAS2">
+  <data key="d5">a</data>
+</edge>
+<edge source="PRKCB" target="MRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="PRKCG" target="RAF1">
+  <data key="d5">a</data>
+</edge>
+<edge source="PRKCG" target="HRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="PRKCG" target="KRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="PRKCG" target="NRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="PRKCG" target="RRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="PRKCG" target="RRAS2">
+  <data key="d5">a</data>
+</edge>
+<edge source="PRKCG" target="MRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="RAP1A" target="BRAF">
+  <data key="d5">a</data>
+</edge>
+<edge source="RAP1B" target="BRAF">
+  <data key="d5">a</data>
+</edge>
+<edge source="HRAS" target="BRAF">
+  <data key="d5">a</data>
+</edge>
+<edge source="HRAS" target="RAF1">
+  <data key="d5">a</data>
+</edge>
+<edge source="HRAS" target="ARAF">
+  <data key="d5">a</data>
+</edge>
+<edge source="HRAS" target="MAP3K1">
+  <data key="d5">a</data>
+</edge>
+<edge source="KRAS" target="BRAF">
+  <data key="d5">a</data>
+</edge>
+<edge source="KRAS" target="RAF1">
+  <data key="d5">a</data>
+</edge>
+<edge source="KRAS" target="ARAF">
+  <data key="d5">a</data>
+</edge>
+<edge source="KRAS" target="MAP3K1">
+  <data key="d5">a</data>
+</edge>
+<edge source="NRAS" target="BRAF">
+  <data key="d5">a</data>
+</edge>
+<edge source="NRAS" target="RAF1">
+  <data key="d5">a</data>
+</edge>
+<edge source="NRAS" target="ARAF">
+  <data key="d5">a</data>
+</edge>
+<edge source="NRAS" target="MAP3K1">
+  <data key="d5">a</data>
+</edge>
+<edge source="RRAS" target="BRAF">
+  <data key="d5">a</data>
+</edge>
+<edge source="RRAS" target="RAF1">
+  <data key="d5">a</data>
+</edge>
+<edge source="RRAS" target="ARAF">
+  <data key="d5">a</data>
+</edge>
+<edge source="RRAS" target="MAP3K1">
+  <data key="d5">a</data>
+</edge>
+<edge source="RRAS2" target="BRAF">
+  <data key="d5">a</data>
+</edge>
+<edge source="RRAS2" target="RAF1">
+  <data key="d5">a</data>
+</edge>
+<edge source="RRAS2" target="ARAF">
+  <data key="d5">a</data>
+</edge>
+<edge source="RRAS2" target="MAP3K1">
+  <data key="d5">a</data>
+</edge>
+<edge source="MRAS" target="BRAF">
+  <data key="d5">a</data>
+</edge>
+<edge source="MRAS" target="RAF1">
+  <data key="d5">a</data>
+</edge>
+<edge source="MRAS" target="ARAF">
+  <data key="d5">a</data>
+</edge>
+<edge source="MRAS" target="MAP3K1">
+  <data key="d5">a</data>
+</edge>
+<edge source="RASGRP1" target="HRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="RASGRP1" target="KRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="RASGRP1" target="NRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="RASGRP1" target="RRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="RASGRP1" target="RRAS2">
+  <data key="d5">a</data>
+</edge>
+<edge source="RASGRP1" target="MRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="RASGRP2" target="HRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="RASGRP2" target="KRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="RASGRP2" target="NRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="RASGRP2" target="RRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="RASGRP2" target="RRAS2">
+  <data key="d5">a</data>
+</edge>
+<edge source="RASGRP2" target="MRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="RASGRP3" target="HRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="RASGRP3" target="KRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="RASGRP3" target="NRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="RASGRP3" target="RRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="RASGRP3" target="RRAS2">
+  <data key="d5">a</data>
+</edge>
+<edge source="RASGRP3" target="MRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="RASGRP4" target="HRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="RASGRP4" target="KRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="RASGRP4" target="NRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="RASGRP4" target="RRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="RASGRP4" target="RRAS2">
+  <data key="d5">a</data>
+</edge>
+<edge source="RASGRP4" target="MRAS">
+  <data key="d5">a</data>
+</edge>
+<edge source="GNA12" target="RASA2">
+  <data key="d5">a</data>
+</edge>
+<edge source="GNG12" target="RASA2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1A" target="RASGRF1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1A" target="RASGRF2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1A" target="RASGRP1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1A" target="RASGRP2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1A" target="RASGRP3">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1A" target="RASGRP4">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1B" target="RASGRF1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1B" target="RASGRF2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1B" target="RASGRP1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1B" target="RASGRP2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1B" target="RASGRP3">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1B" target="RASGRP4">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1C" target="RASGRF1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1C" target="RASGRF2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1C" target="RASGRP1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1C" target="RASGRP2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1C" target="RASGRP3">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1C" target="RASGRP4">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1D" target="RASGRF1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1D" target="RASGRF2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1D" target="RASGRP1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1D" target="RASGRP2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1D" target="RASGRP3">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1D" target="RASGRP4">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1E" target="RASGRF1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1E" target="RASGRF2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1E" target="RASGRP1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1E" target="RASGRP2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1E" target="RASGRP3">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1E" target="RASGRP4">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1F" target="RASGRF1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1F" target="RASGRF2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1F" target="RASGRP1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1F" target="RASGRP2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1F" target="RASGRP3">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1F" target="RASGRP4">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1G" target="RASGRF1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1G" target="RASGRF2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1G" target="RASGRP1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1G" target="RASGRP2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1G" target="RASGRP3">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1G" target="RASGRP4">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1H" target="RASGRF1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1H" target="RASGRF2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1H" target="RASGRP1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1H" target="RASGRP2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1H" target="RASGRP3">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1H" target="RASGRP4">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1I" target="RASGRF1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1I" target="RASGRF2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1I" target="RASGRP1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1I" target="RASGRP2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1I" target="RASGRP3">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1I" target="RASGRP4">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1S" target="RASGRF1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1S" target="RASGRF2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1S" target="RASGRP1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1S" target="RASGRP2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1S" target="RASGRP3">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA1S" target="RASGRP4">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA2D1" target="RASGRF1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA2D1" target="RASGRF2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA2D1" target="RASGRP1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA2D1" target="RASGRP2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA2D1" target="RASGRP3">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA2D1" target="RASGRP4">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA2D2" target="RASGRF1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA2D2" target="RASGRF2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA2D2" target="RASGRP1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA2D2" target="RASGRP2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA2D2" target="RASGRP3">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA2D2" target="RASGRP4">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA2D3" target="RASGRF1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA2D3" target="RASGRF2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA2D3" target="RASGRP1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA2D3" target="RASGRP2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA2D3" target="RASGRP3">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA2D3" target="RASGRP4">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA2D4" target="RASGRF1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA2D4" target="RASGRF2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA2D4" target="RASGRP1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA2D4" target="RASGRP2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA2D4" target="RASGRP3">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNA2D4" target="RASGRP4">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNB1" target="RASGRF1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNB1" target="RASGRF2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNB1" target="RASGRP1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNB1" target="RASGRP2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNB1" target="RASGRP3">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNB1" target="RASGRP4">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNB2" target="RASGRF1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNB2" target="RASGRF2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNB2" target="RASGRP1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNB2" target="RASGRP2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNB2" target="RASGRP3">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNB2" target="RASGRP4">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNB3" target="RASGRF1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNB3" target="RASGRF2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNB3" target="RASGRP1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNB3" target="RASGRP2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNB3" target="RASGRP3">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNB3" target="RASGRP4">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNB4" target="RASGRF1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNB4" target="RASGRF2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNB4" target="RASGRP1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNB4" target="RASGRP2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNB4" target="RASGRP3">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNB4" target="RASGRP4">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG1" target="RASGRF1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG1" target="RASGRF2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG1" target="RASGRP1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG1" target="RASGRP2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG1" target="RASGRP3">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG1" target="RASGRP4">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG2" target="RASGRF1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG2" target="RASGRF2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG2" target="RASGRP1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG2" target="RASGRP2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG2" target="RASGRP3">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG2" target="RASGRP4">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG3" target="RASGRF1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG3" target="RASGRF2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG3" target="RASGRP1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG3" target="RASGRP2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG3" target="RASGRP3">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG3" target="RASGRP4">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG4" target="RASGRF1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG4" target="RASGRF2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG4" target="RASGRP1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG4" target="RASGRP2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG4" target="RASGRP3">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG4" target="RASGRP4">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG5" target="RASGRF1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG5" target="RASGRF2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG5" target="RASGRP1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG5" target="RASGRP2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG5" target="RASGRP3">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG5" target="RASGRP4">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG6" target="RASGRF1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG6" target="RASGRF2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG6" target="RASGRP1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG6" target="RASGRP2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG6" target="RASGRP3">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG6" target="RASGRP4">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG7" target="RASGRF1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG7" target="RASGRF2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG7" target="RASGRP1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG7" target="RASGRP2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG7" target="RASGRP3">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG7" target="RASGRP4">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG8" target="RASGRF1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG8" target="RASGRF2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG8" target="RASGRP1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG8" target="RASGRP2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG8" target="RASGRP3">
+  <data key="d5">a</data>
+</edge>
+<edge source="CACNG8" target="RASGRP4">
+  <data key="d5">a</data>
+</edge>
+<edge source="RPS6KA5" target="ATF4">
+  <data key="d5">a</data>
+</edge>
+<edge source="RPS6KA4" target="ATF4">
+  <data key="d5">a</data>
+</edge>
+<edge source="MAPKAPK2" target="HSPB1">
+  <data key="d5">a</data>
+</edge>
+<edge source="MAPKAPK2" target="ATF4">
+  <data key="d5">a</data>
+</edge>
+<edge source="MAPKAPK3" target="HSPB1">
+  <data key="d5">a</data>
+</edge>
+<edge source="MAPKAPK3" target="ATF4">
+  <data key="d5">a</data>
+</edge>
+<edge source="MAP3K12" target="MAP2K7">
+  <data key="d5">a</data>
+</edge>
+<edge source="MAP3K13" target="MAP2K7">
+  <data key="d5">a</data>
+</edge>
+<edge source="MAP3K9" target="MAP2K7">
+  <data key="d5">a</data>
+</edge>
+<edge source="MAP3K10" target="MAP2K7">
+  <data key="d5">a</data>
+</edge>
+<edge source="MLK4" target="MAP2K7">
+  <data key="d5">a</data>
+</edge>
+<edge source="TGFBR2" target="DAXX">
+  <data key="d5">a</data>
+</edge>
+<edge source="TGFBR1" target="DAXX">
+  <data key="d5">a</data>
+</edge>
+<edge source="IL1R1" target="MYD88">
+  <data key="d5">a</data>
+</edge>
+<edge source="IL1RAP" target="MYD88">
+  <data key="d5">a</data>
+</edge>
+<edge source="TGFB1" target="TGFBR2">
+  <data key="d5">a</data>
+</edge>
+<edge source="TGFB1" target="TGFBR1">
+  <data key="d5">a</data>
+</edge>
+<edge source="TGFB2" target="TGFBR2">
+  <data key="d5">a</data>
+</edge>
+<edge source="TGFB2" target="TGFBR1">
+  <data key="d5">a</data>
+</edge>
+<edge source="TGFB3" target="TGFBR2">
+  <data key="d5">a</data>
+</edge>
+<edge source="TGFB3" target="TGFBR1">
+  <data key="d5">a</data>
+</edge>
+<edge source="IL1A" target="IL1R1">
+  <data key="d5">a</data>
+</edge>
+<edge source="IL1A" target="IL1RAP">
+  <data key="d5">a</data>
+</edge>
+<edge source="IL1B" target="IL1R1">
+  <data key="d5">a</data>
+</edge>
+<edge source="IL1B" target="IL1RAP">
+  <data key="d5">a</data>
+</edge>
+<edge source="RAC1" target="MAP3K1">
+  <data key="d5">a</data>
+</edge>
+<edge source="RAC1" target="PAK1">
+  <data key="d5">a</data>
+</edge>
+<edge source="RAC1" target="PAK2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CDC42" target="MAP3K1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CDC42" target="PAK1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CDC42" target="PAK2">
+  <data key="d5">a</data>
+</edge>
+<edge source="RAC2" target="MAP3K1">
+  <data key="d5">a</data>
+</edge>
+<edge source="RAC2" target="PAK1">
+  <data key="d5">a</data>
+</edge>
+<edge source="RAC2" target="PAK2">
+  <data key="d5">a</data>
+</edge>
+<edge source="RAC3" target="MAP3K1">
+  <data key="d5">a</data>
+</edge>
+<edge source="RAC3" target="PAK1">
+  <data key="d5">a</data>
+</edge>
+<edge source="RAC3" target="PAK2">
+  <data key="d5">a</data>
+</edge>
+<edge source="PAK1" target="MAP3K2">
+  <data key="d5">a</data>
+</edge>
+<edge source="PAK1" target="MAP3K3">
+  <data key="d5">a</data>
+</edge>
+<edge source="PAK2" target="MAP3K2">
+  <data key="d5">a</data>
+</edge>
+<edge source="PAK2" target="MAP3K3">
+  <data key="d5">a</data>
+</edge>
+<edge source="MAPK8IP1" target="MAP2K7">
+  <data key="d5">a</data>
+</edge>
+<edge source="MAPK8IP1" target="MAP3K11">
+  <data key="d5">a</data>
+</edge>
+<edge source="MAPK8IP1" target="MAP4K1">
+  <data key="d5">a</data>
+</edge>
+<edge source="MAPK8IP2" target="MAP2K7">
+  <data key="d5">a</data>
+</edge>
+<edge source="MAPK8IP2" target="MAP3K11">
+  <data key="d5">a</data>
+</edge>
+<edge source="MAPK8IP2" target="MAP4K1">
+  <data key="d5">a</data>
+</edge>
+<edge source="EGF" target="EGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="EGF" target="ERBB2">
+  <data key="d5">a</data>
+</edge>
+<edge source="EGF" target="ERBB3">
+  <data key="d5">a</data>
+</edge>
+<edge source="EGF" target="ERBB4">
+  <data key="d5">a</data>
+</edge>
+<edge source="EGF" target="FGFR1">
+  <data key="d5">a</data>
+</edge>
+<edge source="EGF" target="FGFR2">
+  <data key="d5">a</data>
+</edge>
+<edge source="EGF" target="FGFR3">
+  <data key="d5">a</data>
+</edge>
+<edge source="EGF" target="FGFR4">
+  <data key="d5">a</data>
+</edge>
+<edge source="EGF" target="NGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="EGF" target="NTRK1">
+  <data key="d5">a</data>
+</edge>
+<edge source="EGF" target="NTRK2">
+  <data key="d5">a</data>
+</edge>
+<edge source="EGF" target="INSR">
+  <data key="d5">a</data>
+</edge>
+<edge source="EGF" target="IGF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="EGF" target="PDGFRA">
+  <data key="d5">a</data>
+</edge>
+<edge source="EGF" target="PDGFRB">
+  <data key="d5">a</data>
+</edge>
+<edge source="EGF" target="CSF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="EGF" target="KIT">
+  <data key="d5">a</data>
+</edge>
+<edge source="EGF" target="FLT3">
+  <data key="d5">a</data>
+</edge>
+<edge source="EGF" target="FLT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="EGF" target="FLT4">
+  <data key="d5">a</data>
+</edge>
+<edge source="EGF" target="KDR">
+  <data key="d5">a</data>
+</edge>
+<edge source="EGF" target="MET">
+  <data key="d5">a</data>
+</edge>
+<edge source="EGF" target="TEK">
+  <data key="d5">a</data>
+</edge>
+<edge source="EGF" target="EPHA2">
+  <data key="d5">a</data>
+</edge>
+<edge source="EGF" target="RET">
+  <data key="d5">a</data>
+</edge>
+<edge source="TGFA" target="EGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="TGFA" target="ERBB2">
+  <data key="d5">a</data>
+</edge>
+<edge source="TGFA" target="ERBB3">
+  <data key="d5">a</data>
+</edge>
+<edge source="TGFA" target="ERBB4">
+  <data key="d5">a</data>
+</edge>
+<edge source="TGFA" target="FGFR1">
+  <data key="d5">a</data>
+</edge>
+<edge source="TGFA" target="FGFR2">
+  <data key="d5">a</data>
+</edge>
+<edge source="TGFA" target="FGFR3">
+  <data key="d5">a</data>
+</edge>
+<edge source="TGFA" target="FGFR4">
+  <data key="d5">a</data>
+</edge>
+<edge source="TGFA" target="NGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="TGFA" target="NTRK1">
+  <data key="d5">a</data>
+</edge>
+<edge source="TGFA" target="NTRK2">
+  <data key="d5">a</data>
+</edge>
+<edge source="TGFA" target="INSR">
+  <data key="d5">a</data>
+</edge>
+<edge source="TGFA" target="IGF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="TGFA" target="PDGFRA">
+  <data key="d5">a</data>
+</edge>
+<edge source="TGFA" target="PDGFRB">
+  <data key="d5">a</data>
+</edge>
+<edge source="TGFA" target="CSF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="TGFA" target="KIT">
+  <data key="d5">a</data>
+</edge>
+<edge source="TGFA" target="FLT3">
+  <data key="d5">a</data>
+</edge>
+<edge source="TGFA" target="FLT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="TGFA" target="FLT4">
+  <data key="d5">a</data>
+</edge>
+<edge source="TGFA" target="KDR">
+  <data key="d5">a</data>
+</edge>
+<edge source="TGFA" target="MET">
+  <data key="d5">a</data>
+</edge>
+<edge source="TGFA" target="TEK">
+  <data key="d5">a</data>
+</edge>
+<edge source="TGFA" target="EPHA2">
+  <data key="d5">a</data>
+</edge>
+<edge source="TGFA" target="RET">
+  <data key="d5">a</data>
+</edge>
+<edge source="EREG" target="EGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="EREG" target="ERBB2">
+  <data key="d5">a</data>
+</edge>
+<edge source="EREG" target="ERBB3">
+  <data key="d5">a</data>
+</edge>
+<edge source="EREG" target="ERBB4">
+  <data key="d5">a</data>
+</edge>
+<edge source="EREG" target="FGFR1">
+  <data key="d5">a</data>
+</edge>
+<edge source="EREG" target="FGFR2">
+  <data key="d5">a</data>
+</edge>
+<edge source="EREG" target="FGFR3">
+  <data key="d5">a</data>
+</edge>
+<edge source="EREG" target="FGFR4">
+  <data key="d5">a</data>
+</edge>
+<edge source="EREG" target="NGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="EREG" target="NTRK1">
+  <data key="d5">a</data>
+</edge>
+<edge source="EREG" target="NTRK2">
+  <data key="d5">a</data>
+</edge>
+<edge source="EREG" target="INSR">
+  <data key="d5">a</data>
+</edge>
+<edge source="EREG" target="IGF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="EREG" target="PDGFRA">
+  <data key="d5">a</data>
+</edge>
+<edge source="EREG" target="PDGFRB">
+  <data key="d5">a</data>
+</edge>
+<edge source="EREG" target="CSF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="EREG" target="KIT">
+  <data key="d5">a</data>
+</edge>
+<edge source="EREG" target="FLT3">
+  <data key="d5">a</data>
+</edge>
+<edge source="EREG" target="FLT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="EREG" target="FLT4">
+  <data key="d5">a</data>
+</edge>
+<edge source="EREG" target="KDR">
+  <data key="d5">a</data>
+</edge>
+<edge source="EREG" target="MET">
+  <data key="d5">a</data>
+</edge>
+<edge source="EREG" target="TEK">
+  <data key="d5">a</data>
+</edge>
+<edge source="EREG" target="EPHA2">
+  <data key="d5">a</data>
+</edge>
+<edge source="EREG" target="RET">
+  <data key="d5">a</data>
+</edge>
+<edge source="AREG" target="EGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="AREG" target="ERBB2">
+  <data key="d5">a</data>
+</edge>
+<edge source="AREG" target="ERBB3">
+  <data key="d5">a</data>
+</edge>
+<edge source="AREG" target="ERBB4">
+  <data key="d5">a</data>
+</edge>
+<edge source="AREG" target="FGFR1">
+  <data key="d5">a</data>
+</edge>
+<edge source="AREG" target="FGFR2">
+  <data key="d5">a</data>
+</edge>
+<edge source="AREG" target="FGFR3">
+  <data key="d5">a</data>
+</edge>
+<edge source="AREG" target="FGFR4">
+  <data key="d5">a</data>
+</edge>
+<edge source="AREG" target="NGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="AREG" target="NTRK1">
+  <data key="d5">a</data>
+</edge>
+<edge source="AREG" target="NTRK2">
+  <data key="d5">a</data>
+</edge>
+<edge source="AREG" target="INSR">
+  <data key="d5">a</data>
+</edge>
+<edge source="AREG" target="IGF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="AREG" target="PDGFRA">
+  <data key="d5">a</data>
+</edge>
+<edge source="AREG" target="PDGFRB">
+  <data key="d5">a</data>
+</edge>
+<edge source="AREG" target="CSF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="AREG" target="KIT">
+  <data key="d5">a</data>
+</edge>
+<edge source="AREG" target="FLT3">
+  <data key="d5">a</data>
+</edge>
+<edge source="AREG" target="FLT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="AREG" target="FLT4">
+  <data key="d5">a</data>
+</edge>
+<edge source="AREG" target="KDR">
+  <data key="d5">a</data>
+</edge>
+<edge source="AREG" target="MET">
+  <data key="d5">a</data>
+</edge>
+<edge source="AREG" target="TEK">
+  <data key="d5">a</data>
+</edge>
+<edge source="AREG" target="EPHA2">
+  <data key="d5">a</data>
+</edge>
+<edge source="AREG" target="RET">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF1" target="EGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF1" target="ERBB2">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF1" target="ERBB3">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF1" target="ERBB4">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF1" target="FGFR1">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF1" target="FGFR2">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF1" target="FGFR3">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF1" target="FGFR4">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF1" target="NGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF1" target="NTRK1">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF1" target="NTRK2">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF1" target="INSR">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF1" target="IGF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF1" target="PDGFRA">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF1" target="PDGFRB">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF1" target="CSF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF1" target="KIT">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF1" target="FLT3">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF1" target="FLT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF1" target="FLT4">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF1" target="KDR">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF1" target="MET">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF1" target="TEK">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF1" target="EPHA2">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF1" target="RET">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF2" target="EGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF2" target="ERBB2">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF2" target="ERBB3">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF2" target="ERBB4">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF2" target="FGFR1">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF2" target="FGFR2">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF2" target="FGFR3">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF2" target="FGFR4">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF2" target="NGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF2" target="NTRK1">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF2" target="NTRK2">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF2" target="INSR">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF2" target="IGF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF2" target="PDGFRA">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF2" target="PDGFRB">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF2" target="CSF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF2" target="KIT">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF2" target="FLT3">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF2" target="FLT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF2" target="FLT4">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF2" target="KDR">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF2" target="MET">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF2" target="TEK">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF2" target="EPHA2">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF2" target="RET">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF19" target="EGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF19" target="ERBB2">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF19" target="ERBB3">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF19" target="ERBB4">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF19" target="FGFR1">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF19" target="FGFR2">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF19" target="FGFR3">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF19" target="FGFR4">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF19" target="NGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF19" target="NTRK1">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF19" target="NTRK2">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF19" target="INSR">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF19" target="IGF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF19" target="PDGFRA">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF19" target="PDGFRB">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF19" target="CSF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF19" target="KIT">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF19" target="FLT3">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF19" target="FLT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF19" target="FLT4">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF19" target="KDR">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF19" target="MET">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF19" target="TEK">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF19" target="EPHA2">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF19" target="RET">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF21" target="EGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF21" target="ERBB2">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF21" target="ERBB3">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF21" target="ERBB4">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF21" target="FGFR1">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF21" target="FGFR2">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF21" target="FGFR3">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF21" target="FGFR4">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF21" target="NGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF21" target="NTRK1">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF21" target="NTRK2">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF21" target="INSR">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF21" target="IGF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF21" target="PDGFRA">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF21" target="PDGFRB">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF21" target="CSF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF21" target="KIT">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF21" target="FLT3">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF21" target="FLT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF21" target="FLT4">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF21" target="KDR">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF21" target="MET">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF21" target="TEK">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF21" target="EPHA2">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF21" target="RET">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF23" target="EGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF23" target="ERBB2">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF23" target="ERBB3">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF23" target="ERBB4">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF23" target="FGFR1">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF23" target="FGFR2">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF23" target="FGFR3">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF23" target="FGFR4">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF23" target="NGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF23" target="NTRK1">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF23" target="NTRK2">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF23" target="INSR">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF23" target="IGF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF23" target="PDGFRA">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF23" target="PDGFRB">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF23" target="CSF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF23" target="KIT">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF23" target="FLT3">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF23" target="FLT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF23" target="FLT4">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF23" target="KDR">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF23" target="MET">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF23" target="TEK">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF23" target="EPHA2">
+  <data key="d5">a</data>
+</edge>
+<edge source="FGF23" target="RET">
+  <data key="d5">a</data>
+</edge>
+<edge source="BDNF" target="EGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="BDNF" target="ERBB2">
+  <data key="d5">a</data>
+</edge>
+<edge source="BDNF" target="ERBB3">
+  <data key="d5">a</data>
+</edge>
+<edge source="BDNF" target="ERBB4">
+  <data key="d5">a</data>
+</edge>
+<edge source="BDNF" target="FGFR1">
+  <data key="d5">a</data>
+</edge>
+<edge source="BDNF" target="FGFR2">
+  <data key="d5">a</data>
+</edge>
+<edge source="BDNF" target="FGFR3">
+  <data key="d5">a</data>
+</edge>
+<edge source="BDNF" target="FGFR4">
+  <data key="d5">a</data>
+</edge>
+<edge source="BDNF" target="NGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="BDNF" target="NTRK1">
+  <data key="d5">a</data>
+</edge>
+<edge source="BDNF" target="NTRK2">
+  <data key="d5">a</data>
+</edge>
+<edge source="BDNF" target="INSR">
+  <data key="d5">a</data>
+</edge>
+<edge source="BDNF" target="IGF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="BDNF" target="PDGFRA">
+  <data key="d5">a</data>
+</edge>
+<edge source="BDNF" target="PDGFRB">
+  <data key="d5">a</data>
+</edge>
+<edge source="BDNF" target="CSF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="BDNF" target="KIT">
+  <data key="d5">a</data>
+</edge>
+<edge source="BDNF" target="FLT3">
+  <data key="d5">a</data>
+</edge>
+<edge source="BDNF" target="FLT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="BDNF" target="FLT4">
+  <data key="d5">a</data>
+</edge>
+<edge source="BDNF" target="KDR">
+  <data key="d5">a</data>
+</edge>
+<edge source="BDNF" target="MET">
+  <data key="d5">a</data>
+</edge>
+<edge source="BDNF" target="TEK">
+  <data key="d5">a</data>
+</edge>
+<edge source="BDNF" target="EPHA2">
+  <data key="d5">a</data>
+</edge>
+<edge source="BDNF" target="RET">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF3" target="EGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF3" target="ERBB2">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF3" target="ERBB3">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF3" target="ERBB4">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF3" target="FGFR1">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF3" target="FGFR2">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF3" target="FGFR3">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF3" target="FGFR4">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF3" target="NGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF3" target="NTRK1">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF3" target="NTRK2">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF3" target="INSR">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF3" target="IGF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF3" target="PDGFRA">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF3" target="PDGFRB">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF3" target="CSF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF3" target="KIT">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF3" target="FLT3">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF3" target="FLT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF3" target="FLT4">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF3" target="KDR">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF3" target="MET">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF3" target="TEK">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF3" target="EPHA2">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF3" target="RET">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF4" target="EGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF4" target="ERBB2">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF4" target="ERBB3">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF4" target="ERBB4">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF4" target="FGFR1">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF4" target="FGFR2">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF4" target="FGFR3">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF4" target="FGFR4">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF4" target="NGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF4" target="NTRK1">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF4" target="NTRK2">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF4" target="INSR">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF4" target="IGF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF4" target="PDGFRA">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF4" target="PDGFRB">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF4" target="CSF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF4" target="KIT">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF4" target="FLT3">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF4" target="FLT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF4" target="FLT4">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF4" target="KDR">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF4" target="MET">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF4" target="TEK">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF4" target="EPHA2">
+  <data key="d5">a</data>
+</edge>
+<edge source="NTF4" target="RET">
+  <data key="d5">a</data>
+</edge>
+<edge source="INS" target="EGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="INS" target="ERBB2">
+  <data key="d5">a</data>
+</edge>
+<edge source="INS" target="ERBB3">
+  <data key="d5">a</data>
+</edge>
+<edge source="INS" target="ERBB4">
+  <data key="d5">a</data>
+</edge>
+<edge source="INS" target="FGFR1">
+  <data key="d5">a</data>
+</edge>
+<edge source="INS" target="FGFR2">
+  <data key="d5">a</data>
+</edge>
+<edge source="INS" target="FGFR3">
+  <data key="d5">a</data>
+</edge>
+<edge source="INS" target="FGFR4">
+  <data key="d5">a</data>
+</edge>
+<edge source="INS" target="NGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="INS" target="NTRK1">
+  <data key="d5">a</data>
+</edge>
+<edge source="INS" target="NTRK2">
+  <data key="d5">a</data>
+</edge>
+<edge source="INS" target="INSR">
+  <data key="d5">a</data>
+</edge>
+<edge source="INS" target="IGF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="INS" target="PDGFRA">
+  <data key="d5">a</data>
+</edge>
+<edge source="INS" target="PDGFRB">
+  <data key="d5">a</data>
+</edge>
+<edge source="INS" target="CSF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="INS" target="KIT">
+  <data key="d5">a</data>
+</edge>
+<edge source="INS" target="FLT3">
+  <data key="d5">a</data>
+</edge>
+<edge source="INS" target="FLT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="INS" target="FLT4">
+  <data key="d5">a</data>
+</edge>
+<edge source="INS" target="KDR">
+  <data key="d5">a</data>
+</edge>
+<edge source="INS" target="MET">
+  <data key="d5">a</data>
+</edge>
+<edge source="INS" target="TEK">
+  <data key="d5">a</data>
+</edge>
+<edge source="INS" target="EPHA2">
+  <data key="d5">a</data>
+</edge>
+<edge source="INS" target="RET">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF1" target="EGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF1" target="ERBB2">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF1" target="ERBB3">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF1" target="ERBB4">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF1" target="FGFR1">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF1" target="FGFR2">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF1" target="FGFR3">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF1" target="FGFR4">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF1" target="NGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF1" target="NTRK1">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF1" target="NTRK2">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF1" target="INSR">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF1" target="IGF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF1" target="PDGFRA">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF1" target="PDGFRB">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF1" target="CSF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF1" target="KIT">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF1" target="FLT3">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF1" target="FLT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF1" target="FLT4">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF1" target="KDR">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF1" target="MET">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF1" target="TEK">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF1" target="EPHA2">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF1" target="RET">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF2" target="EGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF2" target="ERBB2">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF2" target="ERBB3">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF2" target="ERBB4">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF2" target="FGFR1">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF2" target="FGFR2">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF2" target="FGFR3">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF2" target="FGFR4">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF2" target="NGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF2" target="NTRK1">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF2" target="NTRK2">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF2" target="INSR">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF2" target="IGF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF2" target="PDGFRA">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF2" target="PDGFRB">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF2" target="CSF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF2" target="KIT">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF2" target="FLT3">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF2" target="FLT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF2" target="FLT4">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF2" target="KDR">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF2" target="MET">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF2" target="TEK">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF2" target="EPHA2">
+  <data key="d5">a</data>
+</edge>
+<edge source="IGF2" target="RET">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFA" target="EGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFA" target="ERBB2">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFA" target="ERBB3">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFA" target="ERBB4">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFA" target="FGFR1">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFA" target="FGFR2">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFA" target="FGFR3">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFA" target="FGFR4">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFA" target="NGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFA" target="NTRK1">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFA" target="NTRK2">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFA" target="INSR">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFA" target="IGF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFA" target="PDGFRA">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFA" target="PDGFRB">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFA" target="CSF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFA" target="KIT">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFA" target="FLT3">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFA" target="FLT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFA" target="FLT4">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFA" target="KDR">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFA" target="MET">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFA" target="TEK">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFA" target="EPHA2">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFA" target="RET">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFB" target="EGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFB" target="ERBB2">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFB" target="ERBB3">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFB" target="ERBB4">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFB" target="FGFR1">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFB" target="FGFR2">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFB" target="FGFR3">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFB" target="FGFR4">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFB" target="NGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFB" target="NTRK1">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFB" target="NTRK2">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFB" target="INSR">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFB" target="IGF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFB" target="PDGFRA">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFB" target="PDGFRB">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFB" target="CSF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFB" target="KIT">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFB" target="FLT3">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFB" target="FLT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFB" target="FLT4">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFB" target="KDR">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFB" target="MET">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFB" target="TEK">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFB" target="EPHA2">
+  <data key="d5">a</data>
+</edge>
+<edge source="PDGFB" target="RET">
+  <data key="d5">a</data>
+</edge>
+<edge source="CSF1" target="EGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="CSF1" target="ERBB2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CSF1" target="ERBB3">
+  <data key="d5">a</data>
+</edge>
+<edge source="CSF1" target="ERBB4">
+  <data key="d5">a</data>
+</edge>
+<edge source="CSF1" target="FGFR1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CSF1" target="FGFR2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CSF1" target="FGFR3">
+  <data key="d5">a</data>
+</edge>
+<edge source="CSF1" target="FGFR4">
+  <data key="d5">a</data>
+</edge>
+<edge source="CSF1" target="NGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="CSF1" target="NTRK1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CSF1" target="NTRK2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CSF1" target="INSR">
+  <data key="d5">a</data>
+</edge>
+<edge source="CSF1" target="IGF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="CSF1" target="PDGFRA">
+  <data key="d5">a</data>
+</edge>
+<edge source="CSF1" target="PDGFRB">
+  <data key="d5">a</data>
+</edge>
+<edge source="CSF1" target="CSF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="CSF1" target="KIT">
+  <data key="d5">a</data>
+</edge>
+<edge source="CSF1" target="FLT3">
+  <data key="d5">a</data>
+</edge>
+<edge source="CSF1" target="FLT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CSF1" target="FLT4">
+  <data key="d5">a</data>
+</edge>
+<edge source="CSF1" target="KDR">
+  <data key="d5">a</data>
+</edge>
+<edge source="CSF1" target="MET">
+  <data key="d5">a</data>
+</edge>
+<edge source="CSF1" target="TEK">
+  <data key="d5">a</data>
+</edge>
+<edge source="CSF1" target="EPHA2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CSF1" target="RET">
+  <data key="d5">a</data>
+</edge>
+<edge source="KITLG" target="EGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="KITLG" target="ERBB2">
+  <data key="d5">a</data>
+</edge>
+<edge source="KITLG" target="ERBB3">
+  <data key="d5">a</data>
+</edge>
+<edge source="KITLG" target="ERBB4">
+  <data key="d5">a</data>
+</edge>
+<edge source="KITLG" target="FGFR1">
+  <data key="d5">a</data>
+</edge>
+<edge source="KITLG" target="FGFR2">
+  <data key="d5">a</data>
+</edge>
+<edge source="KITLG" target="FGFR3">
+  <data key="d5">a</data>
+</edge>
+<edge source="KITLG" target="FGFR4">
+  <data key="d5">a</data>
+</edge>
+<edge source="KITLG" target="NGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="KITLG" target="NTRK1">
+  <data key="d5">a</data>
+</edge>
+<edge source="KITLG" target="NTRK2">
+  <data key="d5">a</data>
+</edge>
+<edge source="KITLG" target="INSR">
+  <data key="d5">a</data>
+</edge>
+<edge source="KITLG" target="IGF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="KITLG" target="PDGFRA">
+  <data key="d5">a</data>
+</edge>
+<edge source="KITLG" target="PDGFRB">
+  <data key="d5">a</data>
+</edge>
+<edge source="KITLG" target="CSF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="KITLG" target="KIT">
+  <data key="d5">a</data>
+</edge>
+<edge source="KITLG" target="FLT3">
+  <data key="d5">a</data>
+</edge>
+<edge source="KITLG" target="FLT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="KITLG" target="FLT4">
+  <data key="d5">a</data>
+</edge>
+<edge source="KITLG" target="KDR">
+  <data key="d5">a</data>
+</edge>
+<edge source="KITLG" target="MET">
+  <data key="d5">a</data>
+</edge>
+<edge source="KITLG" target="TEK">
+  <data key="d5">a</data>
+</edge>
+<edge source="KITLG" target="EPHA2">
+  <data key="d5">a</data>
+</edge>
+<edge source="KITLG" target="RET">
+  <data key="d5">a</data>
+</edge>
+<edge source="FLT3LG" target="EGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="FLT3LG" target="ERBB2">
+  <data key="d5">a</data>
+</edge>
+<edge source="FLT3LG" target="ERBB3">
+  <data key="d5">a</data>
+</edge>
+<edge source="FLT3LG" target="ERBB4">
+  <data key="d5">a</data>
+</edge>
+<edge source="FLT3LG" target="FGFR1">
+  <data key="d5">a</data>
+</edge>
+<edge source="FLT3LG" target="FGFR2">
+  <data key="d5">a</data>
+</edge>
+<edge source="FLT3LG" target="FGFR3">
+  <data key="d5">a</data>
+</edge>
+<edge source="FLT3LG" target="FGFR4">
+  <data key="d5">a</data>
+</edge>
+<edge source="FLT3LG" target="NGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="FLT3LG" target="NTRK1">
+  <data key="d5">a</data>
+</edge>
+<edge source="FLT3LG" target="NTRK2">
+  <data key="d5">a</data>
+</edge>
+<edge source="FLT3LG" target="INSR">
+  <data key="d5">a</data>
+</edge>
+<edge source="FLT3LG" target="IGF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="FLT3LG" target="PDGFRA">
+  <data key="d5">a</data>
+</edge>
+<edge source="FLT3LG" target="PDGFRB">
+  <data key="d5">a</data>
+</edge>
+<edge source="FLT3LG" target="CSF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="FLT3LG" target="KIT">
+  <data key="d5">a</data>
+</edge>
+<edge source="FLT3LG" target="FLT3">
+  <data key="d5">a</data>
+</edge>
+<edge source="FLT3LG" target="FLT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="FLT3LG" target="FLT4">
+  <data key="d5">a</data>
+</edge>
+<edge source="FLT3LG" target="KDR">
+  <data key="d5">a</data>
+</edge>
+<edge source="FLT3LG" target="MET">
+  <data key="d5">a</data>
+</edge>
+<edge source="FLT3LG" target="TEK">
+  <data key="d5">a</data>
+</edge>
+<edge source="FLT3LG" target="EPHA2">
+  <data key="d5">a</data>
+</edge>
+<edge source="FLT3LG" target="RET">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFA" target="EGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFA" target="ERBB2">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFA" target="ERBB3">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFA" target="ERBB4">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFA" target="FGFR1">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFA" target="FGFR2">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFA" target="FGFR3">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFA" target="FGFR4">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFA" target="NGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFA" target="NTRK1">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFA" target="NTRK2">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFA" target="INSR">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFA" target="IGF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFA" target="PDGFRA">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFA" target="PDGFRB">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFA" target="CSF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFA" target="KIT">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFA" target="FLT3">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFA" target="FLT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFA" target="FLT4">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFA" target="KDR">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFA" target="MET">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFA" target="TEK">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFA" target="EPHA2">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFA" target="RET">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFB" target="EGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFB" target="ERBB2">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFB" target="ERBB3">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFB" target="ERBB4">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFB" target="FGFR1">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFB" target="FGFR2">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFB" target="FGFR3">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFB" target="FGFR4">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFB" target="NGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFB" target="NTRK1">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFB" target="NTRK2">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFB" target="INSR">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFB" target="IGF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFB" target="PDGFRA">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFB" target="PDGFRB">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFB" target="CSF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFB" target="KIT">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFB" target="FLT3">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFB" target="FLT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFB" target="FLT4">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFB" target="KDR">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFB" target="MET">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFB" target="TEK">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFB" target="EPHA2">
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFB" target="RET">
+  <data key="d5">a</data>
+</edge>
+<edge source="PGF" target="EGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="PGF" target="ERBB2">
+  <data key="d5">a</data>
+</edge>
+<edge source="PGF" target="ERBB3">
+  <data key="d5">a</data>
+</edge>
+<edge source="PGF" target="ERBB4">
+  <data key="d5">a</data>
+</edge>
+<edge source="PGF" target="FGFR1">
+  <data key="d5">a</data>
+</edge>
+<edge source="PGF" target="FGFR2">
+  <data key="d5">a</data>
+</edge>
+<edge source="PGF" target="FGFR3">
+  <data key="d5">a</data>
+</edge>
+<edge source="PGF" target="FGFR4">
+  <data key="d5">a</data>
+</edge>
+<edge source="PGF" target="NGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="PGF" target="NTRK1">
+  <data key="d5">a</data>
+</edge>
+<edge source="PGF" target="NTRK2">
+  <data key="d5">a</data>
+</edge>
+<edge source="PGF" target="INSR">
+  <data key="d5">a</data>
+</edge>
+<edge source="PGF" target="IGF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="PGF" target="PDGFRA">
+  <data key="d5">a</data>
+</edge>
+<edge source="PGF" target="PDGFRB">
+  <data key="d5">a</data>
+</edge>
+<edge source="PGF" target="CSF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="PGF" target="KIT">
+  <data key="d5">a</data>
+</edge>
+<edge source="PGF" target="FLT3">
+  <data key="d5">a</data>
+</edge>
+<edge source="PGF" target="FLT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="PGF" target="FLT4">
+  <data key="d5">a</data>
+</edge>
+<edge source="PGF" target="KDR">
+  <data key="d5">a</data>
+</edge>
+<edge source="PGF" target="MET">
+  <data key="d5">a</data>
+</edge>
+<edge source="PGF" target="TEK">
+  <data key="d5">a</data>
+</edge>
+<edge source="PGF" target="EPHA2">
+  <data key="d5">a</data>
+</edge>
+<edge source="PGF" target="RET">
+  <data key="d5">a</data>
+</edge>
+<edge source="HGF" target="EGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="HGF" target="ERBB2">
+  <data key="d5">a</data>
+</edge>
+<edge source="HGF" target="ERBB3">
+  <data key="d5">a</data>
+</edge>
+<edge source="HGF" target="ERBB4">
+  <data key="d5">a</data>
+</edge>
+<edge source="HGF" target="FGFR1">
+  <data key="d5">a</data>
+</edge>
+<edge source="HGF" target="FGFR2">
+  <data key="d5">a</data>
+</edge>
+<edge source="HGF" target="FGFR3">
+  <data key="d5">a</data>
+</edge>
+<edge source="HGF" target="FGFR4">
+  <data key="d5">a</data>
+</edge>
+<edge source="HGF" target="NGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="HGF" target="NTRK1">
+  <data key="d5">a</data>
+</edge>
+<edge source="HGF" target="NTRK2">
+  <data key="d5">a</data>
+</edge>
+<edge source="HGF" target="INSR">
+  <data key="d5">a</data>
+</edge>
+<edge source="HGF" target="IGF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="HGF" target="PDGFRA">
+  <data key="d5">a</data>
+</edge>
+<edge source="HGF" target="PDGFRB">
+  <data key="d5">a</data>
+</edge>
+<edge source="HGF" target="CSF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="HGF" target="KIT">
+  <data key="d5">a</data>
+</edge>
+<edge source="HGF" target="FLT3">
+  <data key="d5">a</data>
+</edge>
+<edge source="HGF" target="FLT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="HGF" target="FLT4">
+  <data key="d5">a</data>
+</edge>
+<edge source="HGF" target="KDR">
+  <data key="d5">a</data>
+</edge>
+<edge source="HGF" target="MET">
+  <data key="d5">a</data>
+</edge>
+<edge source="HGF" target="TEK">
+  <data key="d5">a</data>
+</edge>
+<edge source="HGF" target="EPHA2">
+  <data key="d5">a</data>
+</edge>
+<edge source="HGF" target="RET">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT1" target="EGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT1" target="ERBB2">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT1" target="ERBB3">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT1" target="ERBB4">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT1" target="FGFR1">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT1" target="FGFR2">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT1" target="FGFR3">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT1" target="FGFR4">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT1" target="NGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT1" target="NTRK1">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT1" target="NTRK2">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT1" target="INSR">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT1" target="IGF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT1" target="PDGFRA">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT1" target="PDGFRB">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT1" target="CSF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT1" target="KIT">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT1" target="FLT3">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT1" target="FLT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT1" target="FLT4">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT1" target="KDR">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT1" target="MET">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT1" target="TEK">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT1" target="EPHA2">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT1" target="RET">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT2" target="EGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT2" target="ERBB2">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT2" target="ERBB3">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT2" target="ERBB4">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT2" target="FGFR1">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT2" target="FGFR2">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT2" target="FGFR3">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT2" target="FGFR4">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT2" target="NGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT2" target="NTRK1">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT2" target="NTRK2">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT2" target="INSR">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT2" target="IGF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT2" target="PDGFRA">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT2" target="PDGFRB">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT2" target="CSF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT2" target="KIT">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT2" target="FLT3">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT2" target="FLT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT2" target="FLT4">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT2" target="KDR">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT2" target="MET">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT2" target="TEK">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT2" target="EPHA2">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT2" target="RET">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT4" target="EGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT4" target="ERBB2">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT4" target="ERBB3">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT4" target="ERBB4">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT4" target="FGFR1">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT4" target="FGFR2">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT4" target="FGFR3">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT4" target="FGFR4">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT4" target="NGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT4" target="NTRK1">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT4" target="NTRK2">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT4" target="INSR">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT4" target="IGF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT4" target="PDGFRA">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT4" target="PDGFRB">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT4" target="CSF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT4" target="KIT">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT4" target="FLT3">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT4" target="FLT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT4" target="FLT4">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT4" target="KDR">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT4" target="MET">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT4" target="TEK">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT4" target="EPHA2">
+  <data key="d5">a</data>
+</edge>
+<edge source="ANGPT4" target="RET">
+  <data key="d5">a</data>
+</edge>
+<edge source="GDNF" target="EGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="GDNF" target="ERBB2">
+  <data key="d5">a</data>
+</edge>
+<edge source="GDNF" target="ERBB3">
+  <data key="d5">a</data>
+</edge>
+<edge source="GDNF" target="ERBB4">
+  <data key="d5">a</data>
+</edge>
+<edge source="GDNF" target="FGFR1">
+  <data key="d5">a</data>
+</edge>
+<edge source="GDNF" target="FGFR2">
+  <data key="d5">a</data>
+</edge>
+<edge source="GDNF" target="FGFR3">
+  <data key="d5">a</data>
+</edge>
+<edge source="GDNF" target="FGFR4">
+  <data key="d5">a</data>
+</edge>
+<edge source="GDNF" target="NGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="GDNF" target="NTRK1">
+  <data key="d5">a</data>
+</edge>
+<edge source="GDNF" target="NTRK2">
+  <data key="d5">a</data>
+</edge>
+<edge source="GDNF" target="INSR">
+  <data key="d5">a</data>
+</edge>
+<edge source="GDNF" target="IGF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="GDNF" target="PDGFRA">
+  <data key="d5">a</data>
+</edge>
+<edge source="GDNF" target="PDGFRB">
+  <data key="d5">a</data>
+</edge>
+<edge source="GDNF" target="CSF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="GDNF" target="KIT">
+  <data key="d5">a</data>
+</edge>
+<edge source="GDNF" target="FLT3">
+  <data key="d5">a</data>
+</edge>
+<edge source="GDNF" target="FLT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="GDNF" target="FLT4">
+  <data key="d5">a</data>
+</edge>
+<edge source="GDNF" target="KDR">
+  <data key="d5">a</data>
+</edge>
+<edge source="GDNF" target="MET">
+  <data key="d5">a</data>
+</edge>
+<edge source="GDNF" target="TEK">
+  <data key="d5">a</data>
+</edge>
+<edge source="GDNF" target="EPHA2">
+  <data key="d5">a</data>
+</edge>
+<edge source="GDNF" target="RET">
+  <data key="d5">a</data>
+</edge>
+<edge source="NRTN" target="EGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="NRTN" target="ERBB2">
+  <data key="d5">a</data>
+</edge>
+<edge source="NRTN" target="ERBB3">
+  <data key="d5">a</data>
+</edge>
+<edge source="NRTN" target="ERBB4">
+  <data key="d5">a</data>
+</edge>
+<edge source="NRTN" target="FGFR1">
+  <data key="d5">a</data>
+</edge>
+<edge source="NRTN" target="FGFR2">
+  <data key="d5">a</data>
+</edge>
+<edge source="NRTN" target="FGFR3">
+  <data key="d5">a</data>
+</edge>
+<edge source="NRTN" target="FGFR4">
+  <data key="d5">a</data>
+</edge>
+<edge source="NRTN" target="NGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="NRTN" target="NTRK1">
+  <data key="d5">a</data>
+</edge>
+<edge source="NRTN" target="NTRK2">
+  <data key="d5">a</data>
+</edge>
+<edge source="NRTN" target="INSR">
+  <data key="d5">a</data>
+</edge>
+<edge source="NRTN" target="IGF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="NRTN" target="PDGFRA">
+  <data key="d5">a</data>
+</edge>
+<edge source="NRTN" target="PDGFRB">
+  <data key="d5">a</data>
+</edge>
+<edge source="NRTN" target="CSF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="NRTN" target="KIT">
+  <data key="d5">a</data>
+</edge>
+<edge source="NRTN" target="FLT3">
+  <data key="d5">a</data>
+</edge>
+<edge source="NRTN" target="FLT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="NRTN" target="FLT4">
+  <data key="d5">a</data>
+</edge>
+<edge source="NRTN" target="KDR">
+  <data key="d5">a</data>
+</edge>
+<edge source="NRTN" target="MET">
+  <data key="d5">a</data>
+</edge>
+<edge source="NRTN" target="TEK">
+  <data key="d5">a</data>
+</edge>
+<edge source="NRTN" target="EPHA2">
+  <data key="d5">a</data>
+</edge>
+<edge source="NRTN" target="RET">
+  <data key="d5">a</data>
+</edge>
+<edge source="ARTN" target="EGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="ARTN" target="ERBB2">
+  <data key="d5">a</data>
+</edge>
+<edge source="ARTN" target="ERBB3">
+  <data key="d5">a</data>
+</edge>
+<edge source="ARTN" target="ERBB4">
+  <data key="d5">a</data>
+</edge>
+<edge source="ARTN" target="FGFR1">
+  <data key="d5">a</data>
+</edge>
+<edge source="ARTN" target="FGFR2">
+  <data key="d5">a</data>
+</edge>
+<edge source="ARTN" target="FGFR3">
+  <data key="d5">a</data>
+</edge>
+<edge source="ARTN" target="FGFR4">
+  <data key="d5">a</data>
+</edge>
+<edge source="ARTN" target="NGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="ARTN" target="NTRK1">
+  <data key="d5">a</data>
+</edge>
+<edge source="ARTN" target="NTRK2">
+  <data key="d5">a</data>
+</edge>
+<edge source="ARTN" target="INSR">
+  <data key="d5">a</data>
+</edge>
+<edge source="ARTN" target="IGF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="ARTN" target="PDGFRA">
+  <data key="d5">a</data>
+</edge>
+<edge source="ARTN" target="PDGFRB">
+  <data key="d5">a</data>
+</edge>
+<edge source="ARTN" target="CSF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="ARTN" target="KIT">
+  <data key="d5">a</data>
+</edge>
+<edge source="ARTN" target="FLT3">
+  <data key="d5">a</data>
+</edge>
+<edge source="ARTN" target="FLT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="ARTN" target="FLT4">
+  <data key="d5">a</data>
+</edge>
+<edge source="ARTN" target="KDR">
+  <data key="d5">a</data>
+</edge>
+<edge source="ARTN" target="MET">
+  <data key="d5">a</data>
+</edge>
+<edge source="ARTN" target="TEK">
+  <data key="d5">a</data>
+</edge>
+<edge source="ARTN" target="EPHA2">
+  <data key="d5">a</data>
+</edge>
+<edge source="ARTN" target="RET">
+  <data key="d5">a</data>
+</edge>
+<edge source="PSPN" target="EGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="PSPN" target="ERBB2">
+  <data key="d5">a</data>
+</edge>
+<edge source="PSPN" target="ERBB3">
+  <data key="d5">a</data>
+</edge>
+<edge source="PSPN" target="ERBB4">
+  <data key="d5">a</data>
+</edge>
+<edge source="PSPN" target="FGFR1">
+  <data key="d5">a</data>
+</edge>
+<edge source="PSPN" target="FGFR2">
+  <data key="d5">a</data>
+</edge>
+<edge source="PSPN" target="FGFR3">
+  <data key="d5">a</data>
+</edge>
+<edge source="PSPN" target="FGFR4">
+  <data key="d5">a</data>
+</edge>
+<edge source="PSPN" target="NGFR">
+  <data key="d5">a</data>
+</edge>
+<edge source="PSPN" target="NTRK1">
+  <data key="d5">a</data>
+</edge>
+<edge source="PSPN" target="NTRK2">
+  <data key="d5">a</data>
+</edge>
+<edge source="PSPN" target="INSR">
+  <data key="d5">a</data>
+</edge>
+<edge source="PSPN" target="IGF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="PSPN" target="PDGFRA">
+  <data key="d5">a</data>
+</edge>
+<edge source="PSPN" target="PDGFRB">
+  <data key="d5">a</data>
+</edge>
+<edge source="PSPN" target="CSF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="PSPN" target="KIT">
+  <data key="d5">a</data>
+</edge>
+<edge source="PSPN" target="FLT3">
+  <data key="d5">a</data>
+</edge>
+<edge source="PSPN" target="FLT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="PSPN" target="FLT4">
+  <data key="d5">a</data>
+</edge>
+<edge source="PSPN" target="KDR">
+  <data key="d5">a</data>
+</edge>
+<edge source="PSPN" target="MET">
+  <data key="d5">a</data>
+</edge>
+<edge source="PSPN" target="TEK">
+  <data key="d5">a</data>
+</edge>
+<edge source="PSPN" target="EPHA2">
+  <data key="d5">a</data>
+</edge>
+<edge source="PSPN" target="RET">
+  <data key="d5">a</data>
+</edge>
+<edge source="IRAK1" target="TRAF6">
+  <data key="d5">a</data>
+</edge>
+<edge source="IRAK4" target="TRAF6">
+  <data key="d5">a</data>
+</edge>
+</graph></graphml>
