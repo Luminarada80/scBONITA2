@@ -179,7 +179,7 @@ if __name__ == '__main__':
     logging.info(f' -----{"-" * len(txt)}----- '.center(20))
 
     # Split the dataset into groups
-    split_datasets, groups = metadata_parser(
+    split_datasets, groups, cell_indices_per_group = metadata_parser(
         metadata_file,
         metadata_sep, 
         dataset_file, 
@@ -211,11 +211,14 @@ if __name__ == '__main__':
                 ruleset = pickle.load(open(ruleset_pickle_file_path, "rb"))
                 network = pickle.load(open(network_pickle_file_path, "rb"))
 
+                # Save the cell indices that map to each group to the full network (used for chi-square analysis of attractors)
+                network.group_cell_indices = cell_indices_per_group
+
                 # Find the importance score for each of the split datasets
                 for group_num, dataset_path in enumerate(split_datasets):
 
                     # Join the groups
-                    group = '_'.join(i for i in groups[group_num])
+                    group = groups[group_num]
 
                     # Specify the path to the group network pickle file
                     network_folder = f'pickle_files/{dataset_name}_pickle_files/network_pickle_files/{dataset_name}_{group}_pickle_files'
@@ -255,7 +258,12 @@ if __name__ == '__main__':
                         
                         os.makedirs(network_folder, exist_ok=True)
                         logging.info(f'\tSaving network pickle file {group} dataset for {network_name}')
+
+                        # Save the new group network pickle file
                         pickle.dump(new_network, open(network_file_path, 'wb'))
+
+                # Save the full network pickle file with the cell indices per group
+                pickle.dump(network, open(network_pickle_file_path, 'wb'))
             else:
                 logging.error(f'\n\nERROR: network pickle file not found: {network_pickle_file_path}')
                 assert FileNotFoundError(network_pickle_file_path)
