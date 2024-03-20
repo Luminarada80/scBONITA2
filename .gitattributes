@@ -1,0 +1,5 @@
+*.csv filter=lfs diff=lfs merge=lfs -text
+*.txt filter=lfs diff=lfs merge=lfs -text
+george_data/hiv_dataset/HIV_dataset_normalized_integrated_counts_HIV.csv filter=lfs diff=lfs merge=lfs -text
+george_data/hiv_dataset/HIV_dataset_normalized_integrated_counts_Healthy.csv filter=lfs diff=lfs merge=lfs -text
+george_data/hiv_dataset/HIV_dataset_normalized_integrated_counts.csv filter=lfs diff=lfs merge=lfs -text
