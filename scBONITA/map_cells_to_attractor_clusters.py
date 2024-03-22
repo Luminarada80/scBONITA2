@@ -226,8 +226,9 @@ if __name__ == '__main__':
     cells = cell_population.cells
 
     for cell_num, cell in enumerate(cells):
+        cell.groups = cell_group_dict[cell.index]
         if cell_num < 5:
-            logging.info(f'Cell Name {cell.name}, index {cell.index}')
+            logging.info(f'\nCell Name {cell.name}, index {cell.index}, group = {cell.groups}')
             
             logging.info(f'\tAttractor dict:')
             for attractor_num, (network_name, attractor) in enumerate(cell.attractor_dict.items()):
