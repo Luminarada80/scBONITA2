@@ -4,6 +4,7 @@ import os
 import argparse
 import glob
 from itertools import product
+from cell_class import Cell
 
 from setup.user_input_prompts import cell_attractor_mapping_arguments
 
@@ -219,12 +220,30 @@ if __name__ == '__main__':
 
     cell_info = {}
     network_info = {}
+
+    # Load the cell objects for the dataset
+    cell_population = pickle.load(open(f'pickle_files/{dataset_name}_pickle_files/cells_pickle_file/{dataset_name}.cells.pickle', "rb"))
+    cells = cell_population.cells
+
+    for cell_num, cell in enumerate(cells):
+        if cell_num < 5:
+            logging.info(f'Cell Name {cell.name}, index {cell.index}')
+            
+            logging.info(f'\tAttractor dict:')
+            for attractor_num, (network_name, attractor) in enumerate(cell.attractor_dict.items()):
+                if attractor_num < 5:
+                    logging.info(f'\t\tNetwork: {network_name} Attractor: {attractor}')
+
+            logging.info(f'\tExpression:')
+            for gene_num, (gene_name, expression) in enumerate(cell.expression.items()):
+                if gene_num < 5:
+                    logging.info(f'\t\t{gene_name}: {expression}')
+
     for network in all_networks:
 
         # Create a dictionary of cell indices to attractor number
         index_to_attractor_dict = {}
         for cell_index in range(num_cells):
-            attractor = network.cell_map[cell_index]
             index_to_attractor_dict[cell_index] = attractor
 
             if cell_index < 5:

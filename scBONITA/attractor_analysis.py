@@ -15,7 +15,7 @@ import pickle
 
 from setup.user_input_prompts import attractor_analysis_arguments
 
-def run_attractor_analysis(network):
+def run_attractor_analysis(network, cells):
     """
     Runs the attractor analysis for the dataset and all of the networks.
     """
@@ -120,14 +120,17 @@ def run_attractor_analysis(network):
     # Calculate which cluster each cell should map to
     min_hamming_cluster = {}
     for cell_num, clusters in cell_map.items():
+
         # Find the cluster with the minimum Hamming distance
         min_cluster = min(clusters, key=clusters.get)
         min_hamming_cluster[cell_num] = min_cluster
-
-        # Optionally, log the information
-        # logging.info(f'Cell {cell_num} is closest to cluster {min_cluster} with a Hamming distance of {clusters[min_cluster]}')
+        cell_object = cells[cell_num]
 
     network.cell_map = min_hamming_cluster
+
+    for cell_object in cells:
+        # Add the best attractor for each cell to that cell object
+        cell_object.attractor_dict[network.name] = min_hamming_cluster[cell_object.index]
 
     return cluster_fig
 
@@ -299,6 +302,10 @@ if __name__ == '__main__':
     # Load the network pickle files
     all_networks = []
 
+    # Load the cell objects for the dataset
+    cell_population = pickle.load(open(f'pickle_files/{dataset_name}_pickle_files/cells_pickle_file/{dataset_name}.cells.pickle', "rb"))
+    cells = cell_population.cells
+
     logging.info(f'\nRunning attractor analysis for all networks...')
     pickle_file_path = f'pickle_files/{dataset_name}_pickle_files/network_pickle_files/'
     for pickle_file in glob.glob(pickle_file_path + str(dataset_name) + "_" + "*" + ".network.pickle"):
@@ -323,7 +330,7 @@ if __name__ == '__main__':
         # Run the pathway analysis for each of the networks
 
         logging.info(f'\n----- ATTRACTOR ANALYSIS -----')
-        cluster_fig = run_attractor_analysis(network)
+        cluster_fig = run_attractor_analysis(network, cells)
         cluster_path = f'attractor_analysis_output/{dataset_name}_attractors'
         os.makedirs(cluster_path, exist_ok=True)
 
@@ -383,3 +390,10 @@ if __name__ == '__main__':
         network_pickle_file_path = f"{network_directory_path}/{dataset_name}_{network.name}.network.pickle"
         logging.info(f'\tFile: {dataset_name}_{network.name}.network.pickle')
         pickle.dump(network, open(network_pickle_file_path, "wb"))
+
+        cell_pickle_file_path = f'pickle_files/{dataset_name}_pickle_files/cells_pickle_file'
+        os.makedirs(cell_pickle_file_path, exist_ok=True)
+
+        cells_pickle_file = f'{dataset_name}.cells.pickle'
+        with open(f'{cell_pickle_file_path}/{cells_pickle_file}', "wb") as file:
+            pickle.dump(cell_population, file)

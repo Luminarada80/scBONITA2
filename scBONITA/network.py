@@ -6,6 +6,7 @@ class Network():
         self.name = name
         self.rulesets = None
         self.nodes = None
+        self.cells = None
         self.network = None
         self.dataset = None
 

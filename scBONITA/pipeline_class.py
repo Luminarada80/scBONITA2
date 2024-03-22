@@ -2,6 +2,7 @@ from rule_inference import RuleInference
 from pathways import Pathways
 from network import Network
 from importance_scores import CalculateImportanceScore
+from cell_class import CellPopulation
 
 # Setup
 from setup.scbonita_banner import make_banner
@@ -162,6 +163,18 @@ class Pipeline():
 
         # Run the rule inference
         ruleset.rule_determination(graph=str(processed_graphml_path))
+
+        # Write out the cells objects to a pickle file
+        cell_population = CellPopulation(ruleset.cells)
+        for cell in cell_population.cells:
+            print(cell.name)
+
+        cell_pickle_file_path = f'pickle_files/{self.dataset_name}_pickle_files/cells_pickle_file'
+        os.makedirs(cell_pickle_file_path, exist_ok=True)
+
+        cells_pickle_file = f'{self.dataset_name}.cells.pickle'
+        with open(f'{cell_pickle_file_path}/{cells_pickle_file}', "wb") as file:
+            pickle.dump(cell_population, file)
         
         logging.info(f'\nRule inference complete, saving to {data_pickle_file_path.split("/")[-1]}')
         pickle.dump(ruleset, open(data_pickle_file_path, "wb"))
