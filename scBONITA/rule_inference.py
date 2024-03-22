@@ -8,6 +8,7 @@ import time
 from deap_class import CustomDeap
 import csv
 import networkx as nx
+from cell_class import Cell
 
 class RuleInference(NetworkSetup):
 
@@ -38,17 +39,12 @@ class RuleInference(NetworkSetup):
         self.network_name = network_name
         self.binarize_threshold = binarize_threshold
         self.max_samples = 15000
+        self.cells = []
 
         logging.info(f'\n-----EXTRACTING AND FORMATTING DATA-----')
         # Extract the data from the data file based on the separator, sample the cells if over 15,000 cells
         logging.info(f'Extracting cell expression data from "{data_file}"')
         self.cell_names, self.gene_names, self.data = self._extract_data(data_file, sep, sample_cells, node_indices)
-        
-        gene_indices = []
-        for row_index, row in enumerate(self.data):
-            if row[0] in self.gene_names:
-                logging.info(f'\tGene {row[0]} in self.gene_names')
-                gene_indices.append(row_index)
 
 
         logging.info(f'\tFirst 2 genes: {self.gene_names[:2]}')
@@ -56,9 +52,6 @@ class RuleInference(NetworkSetup):
         
         logging.info(f'\tNumber of genes: {len(self.gene_names)}')
         logging.info(f'\tNumber of cells: {len(self.cell_names)}')
-
-        for row_index, row in enumerate(self.data):
-                logging.debug(f'Row {row_index}: {row[0:10]}')
 
         self.sparse_matrix = sparse.csr_matrix(self.data)
         logging.info(f'\tCreated sparse matrix')
@@ -78,6 +71,19 @@ class RuleInference(NetworkSetup):
         else:
             # Handle the case where no samples were selected
             raise ValueError("No samples selected for binarization")
+        
+        full_matrix = self.binarized_matrix.todense()
+
+        # Create cell objects
+        for cell_index, cell_name in enumerate(self.cell_names):
+            cell = Cell(cell_index)
+            cell.name = cell_name
+            for row_num, row in enumerate(full_matrix):
+                row_array = np.array(row).flatten()
+                cell.expression[self.gene_names[row_num]] = row_array[cell_index]
+
+            self.cells.append(cell)
+
 
         self.max_nodes = max_nodes
         self.pathway_graphs = {}
