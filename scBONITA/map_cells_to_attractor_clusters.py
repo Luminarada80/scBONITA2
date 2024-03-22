@@ -200,9 +200,6 @@ if __name__ == '__main__':
     all_networks = load_all_network_pickles(dataset_name)
 
     # Find the number of cells in the dataset
-    num_cells = all_networks[0].dataset.shape[1]
-    logging.info(f'\nTotal number of cells: {num_cells}')
-
     cell_group_dict = {}
 
     group_cell_counts = {}
@@ -225,6 +222,9 @@ if __name__ == '__main__':
     cell_population = pickle.load(open(f'pickle_files/{dataset_name}_pickle_files/cells_pickle_file/{dataset_name}.cells.pickle', "rb"))
     cells = cell_population.cells
 
+    num_cells = len(cells)
+    logging.info(f'\nTotal number of cells: {num_cells}')
+
     for cell_num, cell in enumerate(cells):
         cell.groups = cell_group_dict[cell.index]
         if cell_num < 5:
@@ -241,7 +241,6 @@ if __name__ == '__main__':
                     logging.info(f'\t\t{gene_name}: {expression}')
 
     for network in all_networks:
-
         # Create a dictionary of cell indices to attractor number
         index_to_attractor_dict = {}
         for cell_index in range(num_cells):
