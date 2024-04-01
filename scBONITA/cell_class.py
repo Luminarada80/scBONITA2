@@ -9,9 +9,6 @@ class Cell:
         self.attractor_barcode: list = []
         self.transcription_factors: dict = {}
         self.groups: str = ""
-    
-    def create_attractor_barcode(self):
-        self.attractor_barcode = self.attractor_dict.values()
 
 class CellPopulation:
     def __init__(self, cells):
