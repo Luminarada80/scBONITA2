@@ -131,10 +131,11 @@ if __name__ == '__main__':
                 total_cells += cell_count
                 combination_counts.append(cell_count + 5) # Add 5 to account for columns with 0 cells, so it works with chi-square test
             chi_square_table.append(combination_counts)
-
-            attractors = "\t".join([i for i in attractor_combo.split(', ')])
-            group_counts = "\t".join([str(value) for value in group_dict.values()])
-            combination_file.write(f'{attractors}\t{group_counts}\t{total_cells}\n')
+            for value in group_dict.values():
+                if value > num_cells * 0.1 # Only map attractors with > 10% of cells
+                    attractors = "\t".join([i for i in attractor_combo.split(', ')])
+                    group_counts = "\t".join([str(value) for value in group_dict.values()])
+                    combination_file.write(f'{attractors}\t{group_counts}\t{total_cells}\n')
 
         # Performing the Chi-square test
         chi2, p_value, dof, expected = chi2_contingency(np.array(chi_square_table))
@@ -143,3 +144,8 @@ if __name__ == '__main__':
 
         combination_file.write(f'Chi Square Value: {chi2}, p_value = {p_value}')
         logging.info(f'\tChi Square Value: {chi2}, p_value = {p_value}')
+
+        contributions = (chi_square_table - expected) ** 2 / expected
+        logging.info("Contributions of each cell to the chi-square statistic:")
+        logging.info(f'\t{contributions}')
+        combination_file.write(contributions)

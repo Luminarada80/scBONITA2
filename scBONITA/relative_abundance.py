@@ -134,6 +134,34 @@ def relative_abundance_arguments(control_group, experimental_group):
     
     return control_group, experimental_group
 
+def plot_abundance_heatmap(gene_names, mean_expression_control, mean_expression_experimental, control_group_name, experimental_group_name, network_name):
+
+    data = {
+    'Gene': gene_names,
+    f'{control_group_name}': mean_expression_control,
+    f'{experimental_group_name}': mean_expression_experimental
+    }
+    df = pd.DataFrame(data).set_index('Gene').transpose()
+    # Create the heatmap
+    figure = plt.figure(figsize=(18, 8))  # Adjust the size as needed
+    ax = sns.heatmap(df, annot=False, cmap='coolwarm', cbar_kws={'label':'Expression', 'orientation': 'horizontal', 'aspect': 25})
+
+    # Customizing the heatmap
+    plt.title(f'{network_name} Mean Expression Values Between {control_group_name} and {experimental_group_name}')
+    ax.set_ylabel('Groups')
+    ax.set_xlabel('Genes')
+    ax.xaxis.tick_top()
+
+    plt.xticks(rotation=90, fontsize=8)
+    plt.yticks(rotation=0)
+
+    # Move colorbar to the bottom
+    ax.collections[0].colorbar.set_label('Mean Expression Value')
+    ax.collections[0].colorbar.ax.xaxis.set_ticks_position('bottom')
+    ax.collections[0].colorbar.ax.xaxis.set_label_position('bottom')
+
+    return figure
+
 if __name__ == '__main__':
     # Set the logging level for output
     logging.basicConfig(format='%(message)s', level=logging.INFO)
@@ -218,7 +246,7 @@ if __name__ == '__main__':
                 for group_num, dataset_path in enumerate(split_datasets):
 
                     # Join the groups
-                    group = groups[group_num]
+                    group = groups[group_num][0]
 
                     # Specify the path to the group network pickle file
                     network_folder = f'pickle_files/{dataset_name}_pickle_files/network_pickle_files/{dataset_name}_{group}_pickle_files'
@@ -236,7 +264,6 @@ if __name__ == '__main__':
                         # Extract the data from each dataset
                         sample_cells = True
                         cell_names, gene_names, split_dataset = extract_data(dataset_path, dataset_sep, ruleset.sample_cells, ruleset.node_indices, ruleset.max_samples)
-
                         # Append the row index for each gene in the network to a list
                         gene_indices = []
                         for row_index, row in enumerate(split_dataset):
@@ -297,8 +324,11 @@ if __name__ == '__main__':
             for pickle_file in glob.glob(control_group_path):
                 try:
                     network = pickle.load(open(pickle_file, "rb"))
-                    logging.info(f'\t\tLoaded network {network.name}')
-                    control_group_networks.append(network)
+                    if network.dataset.todense().shape[1] == 1:
+                        logging.info(f'\t\t\tNetwork {network.name} dataset only has one cell')
+                    else:
+                        logging.info(f'\t\tLoaded network {network.name}')
+                        control_group_networks.append(network)
                 except:
                     assert FileNotFoundError("Network pickle file not found")
             break
@@ -317,8 +347,12 @@ if __name__ == '__main__':
             for pickle_file in glob.glob(experimental_group_path):
                 if len(pickle_file) > 0:
                     network = pickle.load(open(pickle_file, "rb"))
-                    logging.info(f'\t\tLoaded network {network.name}')
-                    experimental_group_networks.append(network)
+                    
+                    if network.dataset.todense().shape[1] == 1:
+                        logging.info(f'\t\t\tNetwork {network.name} dataset only has one cell')
+                    else:
+                        logging.info(f'\t\tLoaded network {network.name}')
+                        experimental_group_networks.append(network)
                 else:
                     assert FileNotFoundError("Network pickle file not found")
             break
@@ -330,8 +364,9 @@ if __name__ == '__main__':
     for control_group_network in control_group_networks:
         for experimental_group_network in experimental_group_networks:
             if control_group_network.name.split('_')[0] == experimental_group_network.name.split('_')[0]:
-
-                logging.info(f'\tNetwork: {control_group_network.name.split("_")[0]}')
+                
+                network_name = control_group_network.name.split("_")[0]
+                logging.info(f'\tNetwork: {network_name}')
                 control_group_nodes = [node.name for node in control_group_network.nodes]
                 experimental_group_nodes = [node.name for node in experimental_group_network.nodes]
 
@@ -384,6 +419,8 @@ if __name__ == '__main__':
                 mean_expression_control = np.mean(control_group_data, axis=0)
                 mean_expression_experimental = np.mean(experimental_group_data, axis=0)
 
+
+
                 stdev_expression_control = np.std(control_group_data, axis=0)
                 stdev_expression_experimental = np.std(experimental_group_data, axis=0)
 
@@ -393,7 +430,15 @@ if __name__ == '__main__':
                 relative_abundances = difference_in_expression
                 file_path = f'relative_abundance_output/{dataset_name}/{control_group}_vs_{experimental_group}'
                 filename = f'{control_group_network.name.split("_")[0]}_{dataset_name}_{control_group}_vs_{experimental_group}_relative_abundance'
+                
+                figure = plot_abundance_heatmap(gene_list, mean_expression_control, mean_expression_experimental, control_group, experimental_group, network_name)
+                png_file_path = f'{file_path}/png_files'
+                os.makedirs(png_file_path, exist_ok=True)
+                figure.savefig(f'{png_file_path}/{control_group_network.name}_{dataset_name}_heatmap_expression.png', format="png")
 
+                plt.close(figure)
+                
+                
                 # Calculate the pathway modulation score
                 pathway_modulation = 0
 
@@ -445,11 +490,11 @@ if __name__ == '__main__':
 
                 # Create the paths to the relative abundance results
                 text_file_path = f'{file_path}/text_files'
-                png_file_path = f'{file_path}/png_files'
+                
                 svg_file_path = f'{file_path}/svg_files'
 
                 os.makedirs(text_file_path, exist_ok=True)
-                os.makedirs(png_file_path, exist_ok=True)
+                
                 os.makedirs(svg_file_path, exist_ok=True)
 
                 node_abundances = {}
