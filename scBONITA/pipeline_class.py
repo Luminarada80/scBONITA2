@@ -166,8 +166,6 @@ class Pipeline():
 
         # Write out the cells objects to a pickle file
         cell_population = CellPopulation(ruleset.cells)
-        for cell in cell_population.cells:
-            print(cell.name)
 
         cell_pickle_file_path = f'pickle_files/{self.dataset_name}_pickle_files/cells_pickle_file'
         os.makedirs(cell_pickle_file_path, exist_ok=True)
