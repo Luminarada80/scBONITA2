@@ -8,9 +8,9 @@
     # Rule determination must be run prior to importance score, importance score must be run prior to relative abundance
 RUN_RULE_DETERMINATION=False
 RUN_IMPORTANCE_SCORE=False
-RUN_RELATIVE_ABUNDANCE=True
+RUN_RELATIVE_ABUNDANCE=False
 RUN_ATTRACTOR_ANALYSIS=False
-RUN_CELL_MAPPING=False
+RUN_CELL_MAPPING=True
 
 # General Arguments (Required for all steps)
 DATA_FILE="../../george_data/hiv_dataset/HIV_dataset_normalized_integrated_counts.csv"
