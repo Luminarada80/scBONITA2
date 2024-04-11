@@ -1,0 +1,186 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d5" for="edge" attr.name="signal" attr.type="string"/>
+<key id="d4" for="edge" attr.name="type" attr.type="string"/>
+<key id="d3" for="edge" attr.name="subtype" attr.type="string"/>
+<key id="d2" for="edge" attr.name="color" attr.type="string"/>
+<key id="d1" for="node" attr.name="type" attr.type="string"/>
+<key id="d0" for="node" attr.name="name" attr.type="string"/>
+<graph edgedefault="directed"><node id="CDC42">
+  <data key="d0">CDC42</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="KDR">
+  <data key="d0">KDR</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="PTGS2">
+  <data key="d0">PTGS2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="HSPB1">
+  <data key="d0">HSPB1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="NFATC2">
+  <data key="d0">NFATC2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="PTK2">
+  <data key="d0">PTK2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="PXN">
+  <data key="d0">PXN</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="SH2D2A">
+  <data key="d0">SH2D2A</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="SRC">
+  <data key="d0">SRC</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="SHC2">
+  <data key="d0">SHC2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="VEGFA">
+  <data key="d0">VEGFA</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="RAF1">
+  <data key="d0">RAF1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="NOS3">
+  <data key="d0">NOS3</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="PLCG1"/>
+<node id="PLCG2"/>
+<node id="MAPKAPK2"/>
+<node id="MAPKAPK3"/>
+<node id="PRKCA"/>
+<node id="PRKCB"/>
+<node id="PRKCG"/>
+<node id="MAP2K1"/>
+<node id="MAP2K2"/>
+<node id="HRAS"/>
+<node id="KRAS"/>
+<node id="NRAS"/>
+<edge source="KDR" target="SH2D2A">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="KDR" target="SHC2">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="KDR" target="PTK2">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="KDR" target="PXN">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="KDR" target="CDC42">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="KDR" target="SRC">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="KDR" target="PLCG1">
+  <data key="d5">a</data>
+</edge>
+<edge source="KDR" target="PLCG2">
+  <data key="d5">a</data>
+</edge>
+<edge source="NFATC2" target="PTGS2">
+  <data key="d2">green</data>
+  <data key="d3">expression</data>
+  <data key="d4">GErel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="VEGFA" target="KDR">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="RAF1" target="MAP2K1">
+  <data key="d5">a</data>
+</edge>
+<edge source="RAF1" target="MAP2K2">
+  <data key="d5">a</data>
+</edge>
+<edge source="PLCG1" target="NOS3">
+  <data key="d5">a</data>
+</edge>
+<edge source="PLCG1" target="SH2D2A">
+  <data key="d5">a</data>
+</edge>
+<edge source="PLCG1" target="PRKCA">
+  <data key="d5">a</data>
+</edge>
+<edge source="PLCG1" target="PRKCB">
+  <data key="d5">a</data>
+</edge>
+<edge source="PLCG1" target="PRKCG">
+  <data key="d5">a</data>
+</edge>
+<edge source="PLCG2" target="NOS3">
+  <data key="d5">a</data>
+</edge>
+<edge source="PLCG2" target="SH2D2A">
+  <data key="d5">a</data>
+</edge>
+<edge source="PLCG2" target="PRKCA">
+  <data key="d5">a</data>
+</edge>
+<edge source="PLCG2" target="PRKCB">
+  <data key="d5">a</data>
+</edge>
+<edge source="PLCG2" target="PRKCG">
+  <data key="d5">a</data>
+</edge>
+<edge source="MAPKAPK2" target="HSPB1">
+  <data key="d5">a</data>
+</edge>
+<edge source="MAPKAPK3" target="HSPB1">
+  <data key="d5">a</data>
+</edge>
+<edge source="PRKCA" target="RAF1">
+  <data key="d5">a</data>
+</edge>
+<edge source="PRKCB" target="RAF1">
+  <data key="d5">a</data>
+</edge>
+<edge source="PRKCG" target="RAF1">
+  <data key="d5">a</data>
+</edge>
+<edge source="HRAS" target="RAF1">
+  <data key="d5">a</data>
+</edge>
+<edge source="KRAS" target="RAF1">
+  <data key="d5">a</data>
+</edge>
+<edge source="NRAS" target="RAF1">
+  <data key="d5">a</data>
+</edge>
+</graph></graphml>

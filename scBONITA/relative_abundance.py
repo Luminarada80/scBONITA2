@@ -10,6 +10,7 @@ import matplotlib.patches as mpatches
 from matplotlib.colors import TwoSlopeNorm
 import networkx as nx
 from scipy.sparse import csr_matrix, csc_matrix
+from scipy.stats import norm
 from network import Network
 from sklearn import preprocessing
 import scipy.sparse as sparse
@@ -134,6 +135,43 @@ def relative_abundance_arguments(control_group, experimental_group):
     
     return control_group, experimental_group
 
+def bubble_plot(network_names, p_values):
+    # Assuming p_values is a list containing all your p-values before correction
+    num_tests = len(p_values)  # The number of tests
+    alpha = 0.05  # The typical significance level
+
+    # Perform Bonferroni correction
+    bonferroni_corrected_p_values = [min(p * num_tests, 1.0) for p in p_values]
+
+    # Calculate -log10 of Bonferroni-corrected p-values
+    # Added a small constant inside the log10 function to avoid log10(0)
+    neg_log10_bonferroni_corrected_p_values = [-np.log10(p + 1e-100) for p in bonferroni_corrected_p_values]
+
+    # Sample sizes for the bubbles (you might want to scale these based on another metric)
+    bubble_sizes = [300 for _ in range(len(network_names))]  # Uniform size for now
+
+    # Create the bubble plot
+    figure, ax = plt.subplots(figsize=(10, 8))
+    ax.scatter(neg_log10_bonferroni_corrected_p_values, range(len(network_names)), s=bubble_sizes)
+
+    # Set the y-axis to show the network names
+    ax.set_yticks(range(len(network_names)))
+    ax.set_yticklabels(network_names)
+
+    # Set the x-axis label
+    ax.set_xlabel('-log10(adjusted p-value)')
+
+    # Invert y-axis to have the first entry at the top
+    ax.invert_yaxis()
+
+    # Show grid
+    ax.grid(True, axis='x', linestyle='--', alpha=0.7)
+
+    # Show the plot
+    plt.tight_layout()
+
+    return figure
+
 if __name__ == '__main__':
     # Set the logging level for output
     logging.basicConfig(format='%(message)s', level=logging.INFO)
@@ -226,7 +264,6 @@ if __name__ == '__main__':
 
                     # Check if the group file exists for this dataset and if the user passed in the overwrite argument
                     if overwrite_check(overwrite, network_file_path) == True or os.path.exists(network_file_path) == False:
-
                         # Store the network information in a pickle file for each group
                         new_network = Network(name=f'{network_name}_{group}')
                         new_network.nodes = network.nodes
@@ -261,13 +298,13 @@ if __name__ == '__main__':
 
                         # Save the new group network pickle file
                         pickle.dump(new_network, open(network_file_path, 'wb'))
-
+                    else:
+                        logging.info(f'\t\tUsing existing group network {network.name} file for {group} ')
                 # Save the full network pickle file with the cell indices per group
                 pickle.dump(network, open(network_pickle_file_path, 'wb'))
             else:
                 logging.error(f'\n\nERROR: network pickle file not found: {network_pickle_file_path}')
-                assert FileNotFoundError(network_pickle_file_path)
-                exit(1)
+                
     else:
         logging.error(f'\n\tERROR: No networks loaded')
         exit(1)
@@ -297,8 +334,14 @@ if __name__ == '__main__':
             for pickle_file in glob.glob(control_group_path):
                 try:
                     network = pickle.load(open(pickle_file, "rb"))
-                    logging.info(f'\t\tLoaded network {network.name}')
-                    control_group_networks.append(network)
+                    dense_dataset = network.dataset.todense()
+                    
+                    # Check if the network's dataset has more than one column
+                    if dense_dataset.shape[1] > 1:
+                        logging.info(f'\t\tLoaded network {network.name}')
+                        control_group_networks.append(network)
+                    else:
+                        logging.info(f'Skipped network {network.name} due to it having only one column')
                 except:
                     assert FileNotFoundError("Network pickle file not found")
             break
@@ -317,14 +360,21 @@ if __name__ == '__main__':
             for pickle_file in glob.glob(experimental_group_path):
                 if len(pickle_file) > 0:
                     network = pickle.load(open(pickle_file, "rb"))
-                    logging.info(f'\t\tLoaded network {network.name}')
-                    experimental_group_networks.append(network)
+                    dense_dataset_exp = network.dataset.todense()
+
+                    if dense_dataset.shape[1] > 1:
+                        logging.info(f'\t\tLoaded network {network.name}')
+                        experimental_group_networks.append(network)
+                    else:
+                        logging.info(f'Skipped network {network.name} due to it having only one column')                    
                 else:
                     assert FileNotFoundError("Network pickle file not found")
             break
         else:
             experimental_group = input(f'{experimental_group} network pickle files do not exist, check spelling and try again: ')
 
+    p_values = []
+    network_names = [control_group_network.name.split('_')[0] for control_group_network in control_group_networks]
     # Iterate through both networks and find the matching networks
     logging.info(f'\n----- Calculating Relative Abundance between groups {experimental_group} and {control_group} -----')
     for control_group_network in control_group_networks:
@@ -361,12 +411,14 @@ if __name__ == '__main__':
 
                     # Ensure gene data is ordered according to gene_list
                     ordered_gene_data = [gene_data[gene] for gene in gene_list if gene in gene_data]
-                    ordered_gene_data = np.array(ordered_gene_data, dtype=float).T.squeeze()  # Transpose to match your original data structure
+                    ordered_gene_data = np.array(ordered_gene_data, dtype=float).T.squeeze()  # Transpose to match the original data structure
 
                     # Scale the data
                     if fit_scaler:
                         scaler.fit(ordered_gene_data)
+
                     scaled_data = scaler.transform(ordered_gene_data)
+
 
                     return scaled_data
                                 
@@ -408,7 +460,7 @@ if __name__ == '__main__':
                 logging.info(f'\t\tPathway Modulation Score: {pathway_modulation}')
 
                 # Bootstrapping to find the P value
-                n_iterations = 10000
+                n_iterations = 100
                 bootstrap_scores = []
 
                 # Bootstrap process
@@ -434,13 +486,20 @@ if __name__ == '__main__':
                 # Step 1: Calculate the absolute difference of the original score from the bootstrap mean
                 original_abs_difference = abs(pathway_modulation - np.mean(bootstrap_scores))
 
-                # Step 2: Calculate absolute differences for bootstrap scores
-                bootstrap_abs_differences = [abs(score - np.mean(bootstrap_scores)) for score in bootstrap_scores]
+                # Step 2: Calculate absolute differences for bootstrap scores and
+                # then calculate the proportion of bootstrap scores that are as extreme as the original score
+                extreme_count = np.sum(np.abs(bootstrap_scores - np.mean(bootstrap_scores)) >= original_abs_difference)
+                proportion_extreme = extreme_count / len(bootstrap_scores)
 
-                # Step 3: Calculate the p-value
-                p_value = np.sum(np.array(bootstrap_abs_differences) >= original_abs_difference) / len(bootstrap_scores)
+                # Step 3: Calculate the p-value (two-tailed)
+                p_value_two_tailed = 2 * proportion_extreme
+                p_value = min(p_value_two_tailed, 1.0)  # Ensure p-value does not exceed 1
+                log_p_value = -np.log10(p_value + 1e-10)  # Added a small constant for numerical stability
 
                 logging.info(f'\t\t\tP-value: {p_value}')
+                logging.info(f'\t\t\t-log10(P-value): {log_p_value}')
+
+                p_values.append(p_value)
 
 
                 # Create the paths to the relative abundance results
@@ -482,6 +541,9 @@ if __name__ == '__main__':
 
                 plt.close(fig)
 
+    bubble_plot_fig = bubble_plot(network_names, p_values)
+    bubble_plot_fig.show()
+    bubble_plot_fig.savefig(f'{png_file_path}/bubbleplot_histogram.png', format='png')
     logging.info(f'\nResults saved to: "relative_abundance_output/{dataset_name}/{control_group}_vs_{experimental_group}"\n')
 
 

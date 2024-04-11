@@ -22,10 +22,10 @@ class CustomDeap:
 
         # Genetic algorithm parameters
         self.mutate_percent_pop = 0.25
-        self.generations = 10
-        self.starting_population_size = 25
-        self.parent_population_size = 5
-        self.child_population_size = 20
+        self.generations = 15
+        self.starting_population_size = 50
+        self.parent_population_size = 25
+        self.child_population_size = 25
         self.crossover_probability = 0.1
         self.mutation_probability = 0.9
         self.bitFlipProb = 0.5
@@ -152,6 +152,12 @@ class CustomDeap:
 
             if gen == self.generations:
                 # self.graph_results(total_fitnesses)
+                with open("deap_results.txt", "w") as temp_file:
+
+                    joined_generations = ",".join([str(i) for i in range(self.generations+1)])
+                    joined_fitness = ",".join([str(i) for i in total_fitnesses])
+                    temp_file.write(str(joined_generations))
+                    temp_file.write(str(joined_fitness))
                 return raw_fitnesses, invalid_offspring, logbook
             else:
 
@@ -185,6 +191,7 @@ class CustomDeap:
 
                 logging.info(f'{gen}\t{len(population)+len(raw_fitnesses)}\t{average_fitness}\t{stdev_fitness}\t{min_fitness}\t{max_fitness}')
 
+
     def graph_genetic_algorithm_results(self, total_fitnesses):
         x = [i for i in range(self.generations + 1)]
         y = total_fitnesses
@@ -196,6 +203,7 @@ class CustomDeap:
         plt.ylim([0, 0.5])
         plt.legend()
         plt.show()
+
 
     def find_best_individual(self, population, raw_fitnesses):
         # Set the fitness values to it's unweighted fitness

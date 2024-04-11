@@ -78,7 +78,11 @@ def metadata_parser(metadata_file, metadata_sep, dataset_file, dataset_sep, cell
                 if line_count == 1:
                     for cell_index, cell in enumerate(line):
                         try:
-                            group_name = '_'.join(group for group in groups[cell])
+                            if len(groups[cell]) > 1:
+                                group_name = '_'.join(group for group in groups[cell])
+                            else:
+                                name = groups[cell]
+                                group_name = name[0]
                             if not group_name in cell_groups:
                                 cell_groups[group_name] = [cell_index]
                             else:
