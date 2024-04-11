@@ -89,12 +89,12 @@ if __name__ == '__main__':
 
     # Create a dictionary of cell indices to group
     for group, cell_indices in all_networks[0].group_cell_indices.items():
-        logging.info(f'\tGroup: {group}, {len(cell_indices)} cells')
-        groups.append(group)
+        logging.info(f'\tGroup: {group[0]}, {len(cell_indices)} cells')
+        groups.append(group[0])
 
         for cell_index in cell_indices:
-            cell_group_dict[cell_index] = group
-            group_cell_counts[group] = len(cell_indices)
+            cell_group_dict[cell_index] = group[0]
+            group_cell_counts[group[0]] = len(cell_indices)
 
     cell_info = {}
     network_info = {}
@@ -131,7 +131,6 @@ if __name__ == '__main__':
                 total_cells += cell_count
                 combination_counts.append(cell_count + 5) # Add 5 to account for columns with 0 cells, so it works with chi-square test
             chi_square_table.append(combination_counts)
-
             attractors = "\t".join([i for i in attractor_combo.split(', ')])
             group_counts = "\t".join([str(value) for value in group_dict.values()])
             combination_file.write(f'{attractors}\t{group_counts}\t{total_cells}\n')
@@ -143,3 +142,7 @@ if __name__ == '__main__':
 
         combination_file.write(f'Chi Square Value: {chi2}, p_value = {p_value}')
         logging.info(f'\tChi Square Value: {chi2}, p_value = {p_value}')
+
+        contributions = (chi_square_table - expected) ** 2 / expected
+        logging.info("Contributions of each cell to the chi-square statistic:")
+        logging.info(f'\t{contributions}')

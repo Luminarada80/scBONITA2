@@ -143,6 +143,12 @@ if [ "$RUN_RELATIVE_ABUNDANCE" = "True" ]; then
         CONTROL_GROUP=${CONTROL_GROUPS[$i]}
         EXPERIMENTAL_GROUP=${EXPERIMENTAL_GROUPS[$i]}
 
+        if [ ${#KEGG_PATHWAYS[@]} -gt 0 ]; then
+        echo "Running with KEGG pathways"
+
+        # Using a list of KEGG pathways:
+        KEGG_PATHWAYS_ARGS="${KEGG_PATHWAYS[@]}"
+
         # Execute the command with the current pair of control and experimental group
         /home/emoeller/anaconda3/envs/scBonita/bin/python relative_abundance.py \
             --dataset_name "$DATASET_NAME" \
