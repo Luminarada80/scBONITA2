@@ -524,9 +524,11 @@ def overwrite_check(overwrite, output_path):
     if overwrite == 'y' or overwrite == True:
         overwrite = True
         return overwrite
+    
     elif overwrite == 'n' or overwrite == False:
         overwrite = False
         return overwrite
+    
     else:
         while True:
             overwrite_output_path = input(f'\n\t{output_path.split("/")[-1]} exists. Do you want to overwrite? (y/n): ')
