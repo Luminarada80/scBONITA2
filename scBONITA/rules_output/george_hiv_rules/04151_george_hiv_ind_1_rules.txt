@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 EIF4E = EIF4EBP1
 EIF4EBP1 = NOT MLST8 AND NOT MTOR
 MTOR = RHEB
@@ -208,3 +209,8 @@ SGK3 = PDPK1
 CCND2 = CDKN1B OR CDKN1A
 CCND3 = CDKN1B OR CDKN1A
 Refined_error:	0.026602870813397135
+=======
+version https://git-lfs.github.com/spec/v1
+oid sha256:9f01312167272f3761329971511552312425cb2f62004aee71daab981907dfc6
+size 3839
+>>>>>>> refs/remotes/origin/working

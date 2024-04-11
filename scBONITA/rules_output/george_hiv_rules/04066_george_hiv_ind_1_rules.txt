@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 RBX1 = RBX1
 VEGFA = ARNT OR EP300 OR HIF1A
 VHL = VHL
@@ -52,3 +53,8 @@ MAP2K2 = EGFR AND ERBB2 AND IGF1R
 CDKN1A = NOT ARNT OR NOT EP300 OR NOT HIF1A
 CDKN1B = HIF1A OR ARNT OR EP300
 Refined_error:	0.07566037735849056
+=======
+version https://git-lfs.github.com/spec/v1
+oid sha256:4d42fb32e11b494ffc4760f4ef25641a98f60ef7e5d0554b3c8c6e70e04add93
+size 1346
+>>>>>>> refs/remotes/origin/working

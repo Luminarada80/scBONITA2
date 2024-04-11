@@ -102,7 +102,11 @@ def metadata_parser(metadata_file, metadata_sep, dataset_file, dataset_sep, cell
         for groups, col_indices in cell_groups.items():
             # Format the output path to include the groups
             formatted_dataset_file = dataset_file.replace('.csv', '')
-            output_path = f'{formatted_dataset_file}_{"_".join(groups)}.csv'
+            if len(cell_groups.items()) > 1:
+                group_name = "_".join(groups)
+            else:
+                group_name = groups[0]
+            output_path = f'{formatted_dataset_file}_{group_name}.csv'
             dataset_paths.append(output_path)
             dataset_groups.append(groups)
             if not os.path.exists(output_path):
