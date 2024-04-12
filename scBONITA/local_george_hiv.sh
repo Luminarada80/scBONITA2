@@ -6,8 +6,8 @@
 
 # Which parts do you want to run? Set True to run or False to skip
     # Rule determination must be run prior to importance score, importance score must be run prior to relative abundance
-RUN_RULE_DETERMINATION=True
-RUN_IMPORTANCE_SCORE=False
+RUN_RULE_DETERMINATION=False
+RUN_IMPORTANCE_SCORE=True
 RUN_RELATIVE_ABUNDANCE=False
 RUN_ATTRACTOR_ANALYSIS=False
 RUN_CELL_MAPPING=False
@@ -17,7 +17,7 @@ DATA_FILE="../../george_data/hiv_dataset/HIV_dataset_normalized_integrated_count
 DATASET_NAME="george_hiv"
 DATAFILE_SEP=","
 #  "04010" "04370" "04630" "04668" "04066" "04020" "04151" "04150" "00010" "00020" "04060" "04512" "04514" "04670" "04625" "04062"  "04810"
-KEGG_PATHWAYS=("04810") # Enter KEGG pathway codes or leave blank to find all pathways with overlapping genes
+KEGG_PATHWAYS=("04210") # Enter KEGG pathway codes or leave blank to find all pathways with overlapping genes
 CUSTOM_PATHWAYS=() #("modified_network.graphml") #Put custom networks in the scBONITA folder
 BINARIZE_THRESHOLD=0.01 # Data points with values above this number will be set to 1, lower set to 0
 ORGANISM_CODE="hsa" # Organism code in front of KEGG pathway numbers
@@ -143,12 +143,6 @@ if [ "$RUN_RELATIVE_ABUNDANCE" = "True" ]; then
         CONTROL_GROUP=${CONTROL_GROUPS[$i]}
         EXPERIMENTAL_GROUP=${EXPERIMENTAL_GROUPS[$i]}
 
-        if [ ${#KEGG_PATHWAYS[@]} -gt 0 ]; then
-        echo "Running with KEGG pathways"
-
-        # Using a list of KEGG pathways:
-        KEGG_PATHWAYS_ARGS="${KEGG_PATHWAYS[@]}"
-
         # Execute the command with the current pair of control and experimental group
         /home/emoeller/anaconda3/envs/scBonita/bin/python relative_abundance.py \
             --dataset_name "$DATASET_NAME" \
@@ -164,7 +158,7 @@ if [ "$RUN_RELATIVE_ABUNDANCE" = "True" ]; then
             --overwrite "$OVERWRITE" \
             --organism "$ORGANISM_CODE" \
             --list_of_kegg_pathways $KEGG_PATHWAYS_ARGS
-    done
+        done
 fi
 
 #  --------------------------------------

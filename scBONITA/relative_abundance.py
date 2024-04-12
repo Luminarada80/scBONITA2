@@ -284,8 +284,7 @@ if __name__ == '__main__':
                 for group_num, dataset_path in enumerate(split_datasets):
 
                     # Join the groups
-                    group = groups[group_num][0]
-
+                    group = groups[group_num]
                     # Specify the path to the group network pickle file
                     network_folder = f'pickle_files/{dataset_name}_pickle_files/network_pickle_files/{dataset_name}_{group}_pickle_files'
                     network_file_path = f'{network_folder}/{dataset_name}_{network_name}_{group}.network.pickle'

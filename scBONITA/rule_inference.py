@@ -156,31 +156,6 @@ class RuleInference(NetworkSetup):
                     self.cv_genes.append(self.gene_names[i])
         else:
             self.cv_genes = copy.deepcopy(self.gene_names)
-
-    def plot_graph_from_graphml(self, network):
-        # Load the graph
-        G = network
-        logging.debug(f'\n-----IMPORTANCE SCORE GRAPH-----')
-
-        # Assuming each node has an attribute 'value' that is a number between 0 and 1
-        values = [node.importance_score for node in self.nodes]
-        logging.debug(f'Values: {values}')
-
-        # Choose a colormap (e.g., 'viridis', 'plasma', 'inferno', 'magma', 'cividis')
-        cmap = plt.cm.Greys
-
-        # Map 'values' to colors
-        node_colors = [cmap(value) for value in values]
-        logging.debug(f'node_color: {node_colors}')
-
-        pos = nx.spring_layout(G, k=1)
-
-        # Draw the graph
-        fig = plt.figure(figsize=(12, 8))
-        nx.draw(G, pos, with_labels=True,  node_color=node_colors, edge_color='gray', node_size=500, font_size=10)
-        plt.title("Importance score for each node in the network")
-        
-        return fig
     
     def genetic_algorithm(self, net):
         # Genetic algorithm
@@ -233,6 +208,39 @@ class RuleInference(NetworkSetup):
         for node in self.nodes:
             node.calculation_function = node.find_calculation_function(node.best_rule[2])
 
+    def plot_graph_from_graphml(self, network):
+        # Load the graph
+        G = network
+        logging.debug(f'\n-----IMPORTANCE SCORE GRAPH-----')
+
+        # Assuming each node has an attribute 'value' that is a number between 0 and 1
+        values = [node.importance_score for node in self.nodes]
+        logging.debug(f'Values: {values}')
+
+        # Choose a colormap (e.g., 'viridis', 'plasma', 'inferno', 'magma', 'cividis')
+        cmap = plt.cm.Greys
+
+        # Map 'values' to colors
+        node_colors = [cmap(value) for value in values]
+        logging.debug(f'node_color: {node_colors}')
+
+        pos = nx.spring_layout(G, k=1)
+
+        # Invert the text color if the value is above a certain value, so the gene name can still be read
+        text_colors = ['white' if value > 0.8 else 'black' for value in values]
+
+
+        # Draw the graph
+        fig = plt.figure(figsize=(12, 8))
+        # Draw the graph
+        fig = plt.figure(figsize=(12, 8))
+        nx.draw_networkx_nodes(G, pos, node_color=node_colors, node_size=500)
+        nx.draw_networkx_edges(G, pos, edge_color='gray')
+        nx.draw_networkx_labels(G, pos, font_color=text_colors, font_size=10)
+        plt.title("Importance score for each node in the network")
+        
+        return fig
+    
     def __inherit(
         self,
         graph,
