@@ -78,11 +78,8 @@ def metadata_parser(metadata_file, metadata_sep, dataset_file, dataset_sep, cell
                 if line_count == 1:
                     for cell_index, cell in enumerate(line):
                         try:
-                            if len(groups[cell]) > 1:
-                                group_name = '_'.join(group for group in groups[cell])
-                            else:
-                                name = groups[cell]
-                                group_name = name[0]
+                            name = groups[cell]
+                            group_name = name[0]
                             if not group_name in cell_groups:
                                 cell_groups[group_name] = [cell_index]
                             else:
@@ -102,10 +99,7 @@ def metadata_parser(metadata_file, metadata_sep, dataset_file, dataset_sep, cell
         for groups, col_indices in cell_groups.items():
             # Format the output path to include the groups
             formatted_dataset_file = dataset_file.replace('.csv', '')
-            if len(cell_groups.items()) > 1:
-                group_name = "_".join(groups)
-            else:
-                group_name = groups[0]
+            group_name = groups
             output_path = f'{formatted_dataset_file}_{group_name}.csv'
             dataset_paths.append(output_path)
             dataset_groups.append(groups)

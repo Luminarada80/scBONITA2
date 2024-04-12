@@ -236,7 +236,6 @@ def run_full_importance_score(dataset_name, network_names):
     for file_name in os.listdir(ruleset_pickle_file_path):
         network_name = file_name.split(dataset_name+"_")[1].split(".ruleset.pickle")[0]
         network_name_check.append(network_name)
-        print(network_names)
         if network_name in network_names:
 
             # Check to make sure the ruleset pickle file exists
@@ -275,7 +274,6 @@ def run_full_importance_score(dataset_name, network_names):
     common_items = [item for item in network_name_check if item in network_names]
     if len(common_items) == 0:
         raise Exception(f'ERROR: Pathways specific do not exist in the ruleset.pickle folder. Check spelling and try again')
-
 
 def importance_score(ruleset, network, folder_path, file_name):
     importance_score_calculator = CalculateImportanceScore(network.nodes, network.dataset.astype(np.bool))
