@@ -61,6 +61,26 @@ class Node:
         # Relative abundance
         self.relative_abundance = None
 
+        self.possible_rules = {
+            0: '{A} and {B} and {C}',
+            1: '({A} and {B}) or {C}',
+            2: '{A} and ({B} or {C})',  
+            3: '({A} or {B}) and {C}',  
+            4: '{A} or ({B} and {C})',  
+            5: '({A} and {C}) or {B}',    
+            6: '({A} or {C}) and {B}',    
+            7: '{A} or {C} or {B}',  
+            8: '{A} and {C}',  
+            9: '{A} or {C}',  
+            10: '{B} and {C}',  
+            11: '{B} or {C}',  
+            12: '{C}',
+            13: '{A} and {B}',  
+            14: '{A} or {B}',  
+            15: '{B}', 
+            16: '{A}'
+        }
+
     # Find the length of the rule combinations for the current node
     def find_rule_length(self):
         """
@@ -197,14 +217,7 @@ class Node:
 
     def find_calculation_function(self, rule):
         # ----- Gate choice list/dictionary -----
-        possible_rules = [
-            A_AND_B_AND_C,
-            A_AND_B_OR_C,
-            A_OR_B_OR_C,
-            A_AND_B,
-            A_OR_B,
-            A
-        ]
+
 
         # Find the function based on the name of the function
         rules = {func.__name__: func for func in possible_rules}
