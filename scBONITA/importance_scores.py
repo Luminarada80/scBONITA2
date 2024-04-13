@@ -55,25 +55,120 @@ class CalculateImportanceScore():
                 elif node.name == knockin_node:
                     next_step_node_expression = self.ones_array
 
-                else: 
+                else:
+                    
                     # Get the rows in the dataset for the incoming nodes
                     if step == 0:
                         incoming_node_data = [self.dataset[i] for i in node.incoming_node_indices]
                     else:
                         incoming_node_data = [total_simulation_states[step-1][i] for i in node.incoming_node_indices]
+                    
+                        
+                    incoming_node_inversions = [node.inversions[index] for index in node.incoming_node_indices]
 
-                    # Allow for whole rows of the dataset to be passed into the function rather than one at a time
-                    vectorized_calculation_function = np.vectorize(node.calculation_function)
+                    A = None
+                    B = None
+                    C = None
 
-                    # Set up the argument to be passed into the logic funciton, allows for different number of input nodes
-                    function_argument = incoming_node_data + node.inversion_rules
+                    not_a = None
+                    not_b = None
+                    not_c = None
 
-                    # Apply the logic function to the data from the incoming nodes to get the predicted output
+                    if len(node.incoming_node_indices) == 3:
+                        rule_index = node.best_rule
+                        A = incoming_node_data[0]
+                        B = incoming_node_data[1]
+                        C = incoming_node_data[2]
 
-                    next_step_node_expression = vectorized_calculation_function(*function_argument)
+                        not_a = incoming_node_inversions[0]
+                        not_b = incoming_node_inversions[1]
+                        not_c = incoming_node_inversions[2]
+                        
+                    # (for two nodes, its only the two and one node possibilities)    
+                    elif len(node.incoming_node_indices) == 2:
+                        rule_index = node.best_rule
+                        A = incoming_node_data[0]
+                        B = incoming_node_data[1]
 
-                # Save the expression for the node for this step
-                step_expression.append(next_step_node_expression)
+                        not_a = incoming_node_inversions[0]
+                        not_b = incoming_node_inversions[1]
+                        
+                    # (for one node, its only the one node possibilities)      
+                    elif len(node.incoming_node_indices) == 1:
+                        rule_index = node.best_rule
+                        A = incoming_node_data[0]
+
+                        not_a = incoming_node_inversions[0]
+
+                    print(incoming_node_data)
+                    for column, _ in enumerate(incoming_node_data[0]):
+                        print(column)
+                        if A is not None:
+                            # print(f'\tA = {A[column]} not_a = {not_a}')
+                            A_new = (1 - A[column] if not_a else A[column])
+                        if B is not None:
+                            # print(f'\tB = {B[column]} not_b = {not_b}')
+                            B_new = (1 - B[column] if not_b else B[column])
+                        if C is not None:
+                            # print(f'\tC = {C[column]} not_c = {not_c}')
+                            C_new = (1 - C[column] if not_c else C[column])
+                        
+                        # I want to ignore cases where none of the rules are 1
+
+                        if rule_index == 0:
+                            # A and B and C
+                            result = int(A_new and B_new and C_new)
+
+                        elif rule_index == 1:
+                            # (A and B) or C
+                            result = int((A_new and B_new) or C_new)
+                        
+                        elif rule_index == 2:
+                            result = int(A_new and (B_new or C_new))
+                        
+                        elif rule_index == 3:
+                            result = int((A_new or B_new) and C_new)
+                        
+                        elif rule_index == 4:
+                            result = int(A_new or (B_new and C_new))
+                        
+                        elif rule_index == 5:
+                            result = int((A_new and C_new) or B_new)
+                        
+                        elif rule_index == 6:
+                            result = int((A_new or C_new) and B_new)
+                        
+                        elif rule_index == 7:
+                            result = int(A_new or C_new or B_new)
+                        
+                        elif rule_index == 8:
+                            result = int(A_new and C_new)
+                        
+                        elif rule_index == 9:
+                            result = int(A_new or C_new)
+                        
+                        elif rule_index == 10:
+                            result = int(B_new and C_new)
+                        
+                        elif rule_index == 11:
+                            result = int(B_new or C_new)
+                        
+                        elif rule_index == 12:
+                            result = int(C_new)
+                        
+                        elif rule_index == 13:
+                            result = int(A_new and B_new)
+                        
+                        elif rule_index == 14:
+                            result = int(A_new or B_new)
+                        
+                        elif rule_index == 15:
+                            result = int(B_new)
+                        
+                        elif rule_index == 16:
+                            result = int(C_new)
+                        
+                        step_expression.append(result)
             
             # Save the expression 
             total_simulation_states.append(step_expression)
@@ -124,14 +219,14 @@ class CalculateImportanceScore():
 
         count = 1
 
-        for node in self.nodes:
-            incoming_nodes = node.best_rule[1][:]
-            logic_function = node.best_rule[2]
-            inversion_rules = node.best_rule[3]
+        # for node in self.nodes:
+        #     incoming_nodes = node.predecessors.keys()
+        #     logic_function = node.possible_rules[node.best_rule]
+        #     inversion_rules = node.best_rule[3]
             
-            node.calculation_function = node.find_calculation_function(logic_function)
-            node.incoming_node_indices = [index for index, name in node.predecessors.items() if name in incoming_nodes]
-            node.inversion_rules = inversion_rules
+        #     node.calculation_function = node.find_calculation_function(logic_function)
+        #     node.incoming_node_indices = [index for index, name in node.predecessors.items() if name in incoming_nodes]
+        #     node.inversion_rules = inversion_rules
             
 
         # Calculate knockins and knockouts

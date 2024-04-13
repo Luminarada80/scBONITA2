@@ -164,6 +164,10 @@ class Pipeline():
         # Run the rule inference
         ruleset.rule_determination(graph=str(processed_graphml_path))
 
+        with open(f'rules_output/{self.dataset_name}_rules/{network_name}_{self.dataset_name}_rules.txt', 'w') as rule_file:
+            for key, value in ruleset.best_rule_dict.items():
+                rule_file.write(f'{key} = {value}\n')
+
         # Write out the cells objects to a pickle file
         cell_population = CellPopulation(ruleset.cells)
 

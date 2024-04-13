@@ -171,10 +171,10 @@ class RuleInference(NetworkSetup):
             self.successorNums
             )
 
-        raw_fitnesses, population, logbook = custom_deap.genetic_algorithm()
-        best_ruleset = custom_deap.find_best_individual(population, raw_fitnesses)
+        # raw_fitnesses, population, logbook = custom_deap.genetic_algorithm()
+        # best_ruleset = custom_deap.find_best_individual(population, raw_fitnesses)
 
-        return best_ruleset
+        return custom_deap.chunked_data_numpy
 
     def rule_determination(self, graph):
         """Main function that performs rule determination and node scoring in preparation for pathway analysis"""
@@ -200,13 +200,257 @@ class RuleInference(NetworkSetup):
             maxIncomingEdges=3,
             groundTruth=False,
         )
+
+        chunked_data_numpy = self.genetic_algorithm(self.network)
         
         # Runs the genetic algorithm and rule refinement
-        self.best_ruleset = self.genetic_algorithm(self.network)
+        self.best_ruleset = self.fitness_calculation(self.nodes, chunked_data_numpy)
 
-        # Finds the Boolean logic calculation function that matches the best rule
-        for node in self.nodes:
-            node.calculation_function = node.find_calculation_function(node.best_rule[2])
+    def fitness_calculation(self, nodes, dataset):
+        best_rule_dict = {}
+
+        # Calculate the error for each node in the individual
+        print(f'\n Calculate error for each node in the dataset')
+        for node in nodes:
+
+            errors = {}
+
+            print(f'{node.name}')
+            # print(f'\tName: {node.name}')
+            # print(f'\tIndex: {node.index}')
+            # print(f'\tPredecessors: {node.predecessors}')
+            # print(f'\tIncoming node indices: {node.incoming_node_indices}')
+            # print(f'\tInversions: {node.inversions}')
+            
+            # get the indices in the dataset for the incoming nodes
+            incoming_node_inversions = []
+            # print(f'Incoming node indices:')
+            for incoming_node in node.predecessors.keys():
+                node.incoming_node_indices.append(incoming_node)
+                incoming_node_inversions.append(node.inversions[incoming_node])
+            
+            # Get the row in the dataset for the node being evaluated
+            node_evaluated = dataset[node.index]
+
+            # Get the dataset row indices for the incoming nodes included in this rule
+            incoming_node_indices = [index for index in node.predecessors]
+            incoming_node_names = [value for value in node.predecessors.values()]
+            incoming_node_inversions = [node.inversions[index] for index in incoming_node_indices]
+
+            # Get the row(s) in the dataset for the incoming node(s)
+            incoming_node_data = [dataset[i] for i in incoming_node_indices]
+            # print(incoming_node_data)
+
+            # for each node in the dataset, calculate the error for each rule combination
+            
+            print(f'\tIncoming nodes: {incoming_node_indices}')
+            print(f'\tNumber of incoming nodes: {len(incoming_node_indices)}')
+            print(f'\tInversions: {incoming_node_inversions}')
+            possible_indices = []
+
+            A = None
+            B = None
+            C = None
+
+            not_a = None
+            not_b = None
+            not_c = None
+            
+            # Dont try to calculate 3 node rules if there are only 2 incoming nodes
+            # Find each of the possible indices 
+            # (for three nodes, its all of the possibilities)
+            # print(f'len(incoming_node_data): {len(incoming_node_data)}')
+
+            if len(incoming_node_indices) == 0:
+                best_rule_dict[node.name] = node.name
+            
+            else:
+
+                if len(incoming_node_indices) == 3:
+                    possible_indices = range(len(node.possible_rules.keys()))
+                    A = incoming_node_data[0]
+                    B = incoming_node_data[1]
+                    C = incoming_node_data[2]
+
+                    not_a = incoming_node_inversions[0]
+                    not_b = incoming_node_inversions[1]
+                    not_c = incoming_node_inversions[2]
+                    
+                # (for two nodes, its only the two and one node possibilities)    
+                elif len(incoming_node_indices) == 2:
+                    possible_indices = [13, 14, 15, 16]
+                    A = incoming_node_data[0]
+                    B = incoming_node_data[1]
+
+                    not_a = incoming_node_inversions[0]
+                    not_b = incoming_node_inversions[1]
+                    
+                # (for one node, its only the one node possibilities)      
+                elif len(incoming_node_indices) == 1:
+                    possible_indices = [16]
+                    A = incoming_node_data[0]
+
+                    not_a = incoming_node_inversions[0]
+                
+                # print(f'len(incoming_node_data[0]): {len(incoming_node_data[0])}')
+                for column, _ in enumerate(incoming_node_data[0]):      
+                    # print(f'Column: {column}')
+
+                    # If there are possible rules (i.e. there are incoming nodes), calculate error
+                    if len(possible_indices) > 0:
+                        # Calculate the error for each possible rule
+                        for i in node.possible_rules:
+                            if i in possible_indices:
+                                if A is not None:
+                                    # print(f'\tA = {A[column]} not_a = {not_a}')
+                                    A_new = (not A[column] if not_a else A[column])
+                                if B is not None:
+                                    # print(f'\tB = {B[column]} not_b = {not_b}')
+                                    B_new = (not B[column] if not_b else B[column])
+                                if C is not None:
+                                    # print(f'\tC = {C[column]} not_c = {not_c}')
+                                    C_new = (not C[column] if not_c else C[column])
+                                # print(f'\t{node.possible_rules[i]}')
+                                
+                                # I want to ignore cases where none of the rules are 1
+                                if A_new + B_new + C_new > 0:
+                                    if i == 0:
+                                        # A and B and C
+                                        result = int(A_new and B_new and C_new)
+
+                                    elif i == 1:
+                                        # (A and B) or C
+                                        result = int((A_new and B_new) or C_new)
+                                    
+                                    elif i == 2:
+                                        result = int(A_new and (B_new or C_new))
+                                    
+                                    elif i == 3:
+                                        result = int((A_new or B_new) and C_new)
+                                    
+                                    elif i == 4:
+                                        result = int(A_new or (B_new and C_new))
+                                    
+                                    elif i == 5:
+                                        result = int((A_new and C_new) or B_new)
+                                    
+                                    elif i == 6:
+                                        result = int((A_new or C_new) and B_new)
+                                    
+                                    elif i == 7:
+                                        result = int(A_new or C_new or B_new)
+                                    
+                                    elif i == 8:
+                                        result = int(A_new and C_new)
+                                    
+                                    elif i == 9:
+                                        result = int(A_new or C_new)
+                                    
+                                    elif i == 10:
+                                        result = int(B_new and C_new)
+                                    
+                                    elif i == 11:
+                                        result = int(B_new or C_new)
+                                    
+                                    elif i == 12:
+                                        result = int(C_new)
+                                    
+                                    elif i == 13:
+                                        result = int(A_new and B_new)
+                                    
+                                    elif i == 14:
+                                        result = int(A_new or B_new)
+                                    
+                                    elif i == 15:
+                                        result = int(B_new)
+                                    
+                                    elif i == 16:
+                                        result = int(C_new)
+                                    
+                                    # print(f'\t\tPredicted = {result}')
+                                    # print(f'\t\tActual =  {node_evaluated[column]}')
+
+                                    for x in possible_indices:
+                                        if not x in errors:
+                                            errors[x] = 0
+
+                                    if node_evaluated[column] != result:
+                                        errors[i] += 1
+                                        # print(f'\t\tERROR')
+
+                formatted_errors = {}
+                print(f'\tRule Errors:')
+
+                for key, value in errors.items():
+                    if key in possible_indices:
+                        rule_template = node.possible_rules[key]
+                        
+                        # Dictionary to hold the actual values to substitute into the rule
+                        substitutions = {}
+                        
+                        # Iterate over each incoming node to determine the substitution
+                        for i, inversion in enumerate(incoming_node_inversions):
+                            placeholder = chr(65 + i)  # 'A', 'B', 'C' corresponding to 0, 1, 2
+                            node_name = incoming_node_names[i]
+
+                            if inversion:
+                                substitutions[placeholder] = f'not {node_name}'
+                            else:
+                                substitutions[placeholder] = node_name
+
+                        # Use str.format_map() to replace placeholders with actual values
+                        rule = rule_template.format_map(substitutions)
+
+                        print(f'\t\t{rule}: {value}')
+                        
+                        formatted_errors[rule] = value
+                    
+                # Assuming 'errors' is already defined and 'node.possible_rules' maps rule indices to rule descriptions
+
+                # Step 1: Calculate the average error
+                total_error = sum(errors.values())
+                num_rules = len(errors)
+                average_error = total_error / num_rules if num_rules else 0
+
+                # Step 2: Define the threshold
+                threshold = 0.75 * average_error
+
+                # Step 3: Filter the rules
+                significantly_lower_errors = {key: value for key, value in formatted_errors.items() if value < threshold}
+
+                # Step 4: Output results
+                print(f'\t\tAverage Error: {average_error}')
+
+                if len(significantly_lower_errors.items()) > 0:
+                    print("\t\tRules with significantly lower errors than average:")
+                    min_val = min(significantly_lower_errors.values())
+                    print(f'\t\tmin_val = {min_val}')
+                    for rule, error in significantly_lower_errors.items():
+                        print(f'\t\t\tRule {rule}: {error}')
+                        if error == min_val and not node.name in best_rule_dict:
+                            best_rule_dict[node.name] = rule
+
+                            for i, (formatted_rule, value) in enumerate(formatted_errors.items()):
+                                if formatted_rule == rule:
+                                    print(f'\t\t\tRule index = {i}')
+
+                                    node.best_rule = i
+                                    print(f'\t\t\t\tBEST RULE: {node.best_rule}')
+                            
+                    
+                            print(f'\t\t\t\tmin_rule = {best_rule_dict[node.name]}')
+
+                else:
+                    print(f'\t\tNo low error rules for {node.name}')
+                    best_rule_dict[node.name] = node.name
+
+        print(f'\n')
+        for key, value in best_rule_dict.items():
+            print(f'{key} = {value}')
+        
+        self.best_rule_dict = best_rule_dict
+
+        return best_rule_dict
 
     def plot_graph_from_graphml(self, network):
         # Load the graph
