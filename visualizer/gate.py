@@ -10,26 +10,27 @@ class Gate(Object):
         self.gate_type = gate_type
         self.activation_threshold = self.incoming_connections
 
+
         # General attributes
-        self.size = self.size / 2 # This represents half the width/height of the gate for drawing purposes
+        self.size = self.size/1.5 # This represents half the width/height of the gate for drawing purposes
         self.draw_object_function = self.draw_gate
 
         # AND gate images
         self.inactive_and_image = pygame.image.load('visualizer/images/and_gate.png').convert_alpha()  # Adjusted for gate drawing space
-        self.active_and_image = pygame.image.load('visualizer/images/active_and_gate.png').convert_alpha()
+        self.active_and_image = pygame.image.load('visualizer/images/and_gate.png').convert_alpha()
 
         # OR gate images
         self.inactive_or_image = pygame.image.load('visualizer/images/or_gate.png').convert_alpha()  # Adjusted for gate drawing space
-        self.active_or_image = pygame.image.load('visualizer/images/active_or_gate.png').convert_alpha()
+        self.active_or_image = pygame.image.load('visualizer/images/or_gate.png').convert_alpha()
 
         # NOT gate images
         self.inactive_not_image = pygame.image.load('visualizer/images/not_gate.png').convert_alpha()  # Adjusted for gate drawing space
-        self.active_not_image = pygame.image.load('visualizer/images/active_not_gate.png').convert_alpha()
+        self.active_not_image = pygame.image.load('visualizer/images/not_gate.png').convert_alpha()
 
         self.inactive_image, self.active_image = self.choose_gate_image()
 
-        self.inactive_scaled_image = pygame.transform.scale(self.inactive_image, (self.size * 2 + 20, self.size * 2 + 10))
-        self.active_scaled_image = pygame.transform.scale(self.active_image, (self.size * 2 + 20, self.size * 2 + 10))
+        self.inactive_scaled_image = pygame.transform.scale(self.inactive_image, (self.size+5, self.size))
+        self.active_scaled_image = pygame.transform.scale(self.active_image, (self.size+5, self.size))
         
         # Initial image and rect setup
         self.image = self.inactive_image

@@ -7,8 +7,8 @@ class Game:
     def __init__(self):
 
         pygame.init()
-        self.WIDTH = 1080
-        self.HEIGHT = 720
+        self.WIDTH = 1920
+        self.HEIGHT = 1080
 
         self.screen = pygame.display.set_mode((self.WIDTH,self.HEIGHT))
         pygame.display.set_caption('Graph visualizer')
@@ -98,15 +98,15 @@ class Game:
 
             keys = pygame.key.get_pressed()
             if keys[pygame.K_TAB]:
-                self.display_box.display_text('Node State', (self.WIDTH / 6 + 25, self.HEIGHT - 200))
-                self.display_box.display_text(f'Update {len(self.states)}', (self.WIDTH / 6 + 25, self.HEIGHT - 175))
+                self.display_box.display_text('Node State', (self.WIDTH / 4 + 25, self.HEIGHT - 400))
+                self.display_box.display_text(f'Update {len(self.states)}', (self.WIDTH / 4 + 25, self.HEIGHT - 375))
 
                 if self.nodes[0].update_num <= 35:
                     self.states[self.nodes[0].update_num] = []
                     for node_num, node in enumerate(self.nodes_group):
                         position_adjustment = 15 * node_num
                         update_adjustment = 10 * self.nodes[0].update_num - 150
-                        self.states[self.nodes[0].update_num].append((node.state, (self.WIDTH / 6 + update_adjustment, self.HEIGHT - 150 + position_adjustment)))
+                        self.states[self.nodes[0].update_num].append((node.state, (self.WIDTH / 4 + update_adjustment, self.HEIGHT - 350 + position_adjustment)))
 
 
                 # Displaying states
