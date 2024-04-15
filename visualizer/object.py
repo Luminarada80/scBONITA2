@@ -5,7 +5,7 @@ class Object(pygame.sprite.Sprite):
     def __init__(self, name, position, color):
         super().__init__()
 
-        self.size = 50
+        self.size = 125
         self.name = name
         self.position = position
         self.color = color
@@ -67,14 +67,14 @@ class Object(pygame.sprite.Sprite):
                 unit_direction = (direction[0] / distance, direction[1] / distance)
 
                 # Calculate start and end points on the edges of the nodes, not the centers
-                start_point = (self.position[0] + unit_direction[0] * self.size, self.position[1] + unit_direction[1] * self.size)
-                end_point = (object.position[0] - unit_direction[0] * object.size, object.position[1] - unit_direction[1] * object.size)
+                start_point = (self.position[0] + unit_direction[0] * self.size / 2, self.position[1] + unit_direction[1] * self.size / 2)
+                end_point = (object.position[0] - unit_direction[0] * object.size / 2, object.position[1] - unit_direction[1] * object.size / 2)
 
                 # Draw the line
-                pygame.draw.line(self.display_surface, self.line_color, start_point, end_point, 2)
+                pygame.draw.line(self.display_surface, self.line_color, start_point, end_point, 3)
                 
                 # Assuming arrow_length and arrow_degrees define the size and angle of the arrowhead
-                arrow_length = 10
+                arrow_length = 16
                 arrow_degrees = math.radians(30)
 
                 # Calculate the end point of the arrow body (slightly before the actual end_point)
@@ -85,7 +85,7 @@ class Object(pygame.sprite.Sprite):
                 arrow_point_1 = (arrow_body_end[0] - arrow_length * math.cos(angle + arrow_degrees), 
                                 arrow_body_end[1] - arrow_length * math.sin(angle + arrow_degrees))
                 
-                arrow_point_2 = (arrow_body_end[0] - arrow_length * math.cos(angle - arrow_degrees), 
+                arrow_point_2 = (arrow_body_end[0] - arrow_length  * math.cos(angle - arrow_degrees), 
                                 arrow_body_end[1] - arrow_length * math.sin(angle - arrow_degrees))
 
                 # Draw the arrowhead
