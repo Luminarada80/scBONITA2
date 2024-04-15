@@ -2,6 +2,7 @@ import pygame, sys
 from node import Node
 from gate import Gate
 from display_box import DisplayBox
+import random
 
 class Game:
     def __init__(self):
@@ -22,9 +23,13 @@ class Game:
         relative_abundance = False
 
         self.nodes = []
-        # Nodes
+        # # Nodes
+        # for i in range(1, num_nodes+1):
+        #     self.nodes.append(Node(f'Gene {i}', (self.WIDTH/2+350,self.HEIGHT/2+(50*i)), "light blue"))
+        
+        # Boolean Nodes
         for i in range(1, num_nodes+1):
-            self.nodes.append(Node(f'Gene {i}', (self.WIDTH/2+350,self.HEIGHT/2+(50*i)), "light blue"))
+            self.nodes.append(Node('', (self.WIDTH/2+350,self.HEIGHT/2+(50*i)), "light blue"))
 
         # Change the size and color of the nodes for relative abundance. Manual entry required
         if relative_abundance:

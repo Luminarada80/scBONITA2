@@ -14,6 +14,7 @@ class Gate(Object):
         # General attributes
         self.size = self.size/1.5 # This represents half the width/height of the gate for drawing purposes
         self.draw_object_function = self.draw_gate
+        self.label_offset = 0
 
         # AND gate images
         self.inactive_and_image = pygame.image.load('visualizer/images/and_gate.png').convert_alpha()  # Adjusted for gate drawing space
@@ -37,20 +38,26 @@ class Gate(Object):
         self.rect = self.image.get_rect(center=self.position)
         self.original_image = self.image  # This will hold the currently displayed image
 
+        self.font_size = 20
+        self.font = pygame.freetype.Font(None, self.font_size)
+
         self.angle = 0
     
     def choose_gate_image(self):
         if self.gate_type == 'AND':
             inactive_image = self.inactive_and_image
             active_image = self.active_and_image
+            self.label_offset = 0
 
         elif self.gate_type == 'OR':
             inactive_image = self.inactive_or_image
             active_image = self.active_or_image
+            self.label_offset = 0
 
         elif self.gate_type == 'NOT':
             inactive_image = self.inactive_not_image
             active_image = self.active_not_image
+            self.label_offset = 15
         
         return inactive_image, active_image
 
@@ -60,12 +67,23 @@ class Gate(Object):
             self.image = self.inactive_scaled_image
         elif self.state == 1:
             self.image = self.active_scaled_image
-        
         # Update original image for rotation
         self.original_image = self.image.copy()
-
         # Apply rotation if needed
-        self.image = pygame.transform.rotate(self.original_image, -self.angle)  
+        self.image = self.rotate(self.angle)
+
+
+        text_surface, text_rect = self.font.render(self.gate_type, pygame.Color('black'))
+
+        if self.gate_type == 'NOT' and self.angle == 180:
+            text_rect.center = (self.size/2 + self.label_offset, self.size/2)
+        else:
+            text_rect.center = (self.size/2 - self.label_offset, self.size/2)
+            
+        self.image.blit(text_surface, text_rect)
+        
+
+
         self.rect = self.image.get_rect(center=self.position)
 
         # Blit the rotated image
@@ -96,23 +114,18 @@ class Gate(Object):
 
             
     def rotate(self, angle):
-        """Rotate the sprite image to the given angle."""
-        if self.angle != angle:
-            self.angle = angle
+        """Rotate the sprite image to the given angle and apply flipping for 180 degrees."""
+        self.angle = angle
+        rotated_image = pygame.transform.rotate(self.original_image, -self.angle)
 
-            # If the angle is 180 degrees, the image (and text) will be upside down.
-            # A vertical flip after rotation corrects the text orientation.
-            if angle == 180:
-                # Rotate the original image by the desired angle
-                rotated_image = pygame.transform.rotate(self.original_image, -self.angle)
-                self.image = pygame.transform.flip(self.image, True, False)  # Flip vertically only
+        if angle == 180:
+            # Flip horizontally to mirror the image when rotated 180 degrees
+            self.image = pygame.transform.flip(rotated_image, False, True)
 
-            elif angle != 180:
-                # Rotate the original image by the desired angle
-                rotated_image = pygame.transform.rotate(self.original_image, -self.angle)
-                self.image = rotated_image
-
-            self.rect = self.image.get_rect(center=self.position)  # Update the rect to keep the sprite centered
+        else:
+            self.image = rotated_image
+        
+        return self.image
 
     def simulate_and_logic(self):
         # Get which objects are connected to this one        
