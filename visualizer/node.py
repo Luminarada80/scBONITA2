@@ -48,6 +48,11 @@ class Node(Object):
         text_rect.center = (self.size/2, self.size/2)
         self.image.blit(text_surface, text_rect)
 
+        if self.name == '':
+            activation_surface, activation_rect = self.font.render(str(self.state), pygame.Color('black'))
+            activation_rect.center = (self.size/2, self.size/2)
+            self.image.blit(activation_surface, activation_rect)
+
         self.original_image = self.image.copy()  # Update the original image
     
     def set_size(self, new_size):

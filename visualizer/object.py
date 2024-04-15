@@ -210,12 +210,18 @@ class Object(pygame.sprite.Sprite):
         if object in self.active_incoming_connections:
             self.active_incoming_connections.remove(object)
         
+        if object in self.incoming_connections:
+            self.incoming_connections.remove(object)
+        
         # Remove the connection to this object from the other objects connections list
         if self in object.outgoing_connections:
             object.outgoing_connections.remove(self)
         
         if self in object.active_incoming_connections:
             object.active_incoming_connections.remove(self)
+        
+        if self in object.incoming_connections:
+            object.incoming_connections.remove(self)
 
 
     # Activate or deactivate the connections based on the connections between nodes
