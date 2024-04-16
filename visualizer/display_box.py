@@ -8,7 +8,12 @@ class DisplayBox():
         self.font = pygame.font.Font(None, 24)
 
     def display_text(self, text, position):
-        text = self.font.render(text, True, "black")
+        if text == "1":
+            text = self.font.render(text, True, "black")
+        elif text == "0":
+            text = self.font.render(text, True, (201, 201, 201))
+        else:
+            text = self.font.render(text, True, "black")
 
         text_rect = text.get_rect()
 

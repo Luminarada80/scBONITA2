@@ -5,7 +5,7 @@ class Object(pygame.sprite.Sprite):
     def __init__(self, name, position, color):
         super().__init__()
 
-        self.size = 125
+        self.size = 60
         self.name = name
         self.position = position
         self.color = color
@@ -18,7 +18,6 @@ class Object(pygame.sprite.Sprite):
 
         self.simulation_running = False
 
-        self.font = pygame.font.Font(None, 36)
         self.display_surface = pygame.display.get_surface()
         self.moving = False
 
@@ -44,7 +43,7 @@ class Object(pygame.sprite.Sprite):
         if self.locked:
             self.lock_image = pygame.image.load('visualizer/images/lock.png').convert_alpha()  # Adjusted for gate drawing space
 
-            self.lock_scaled_image = pygame.transform.scale(self.lock_image, (self.size + 10, self.size + 10))
+            self.lock_scaled_image = pygame.transform.smoothscale(self.lock_image, (self.size + 10, self.size + 10))
             # Update the lock_rect position before drawing
             self.lock_rect = self.lock_scaled_image.get_rect(center=self.position)
             # Draw the scaled lock image at the updated position
@@ -71,10 +70,10 @@ class Object(pygame.sprite.Sprite):
                 end_point = (object.position[0] - unit_direction[0] * object.size / 2, object.position[1] - unit_direction[1] * object.size / 2)
 
                 # Draw the line
-                pygame.draw.line(self.display_surface, self.line_color, start_point, end_point, 3)
+                pygame.draw.line(self.display_surface, self.line_color, start_point, end_point, 2)
                 
                 # Assuming arrow_length and arrow_degrees define the size and angle of the arrowhead
-                arrow_length = 16
+                arrow_length = 8
                 arrow_degrees = math.radians(30)
 
                 # Calculate the end point of the arrow body (slightly before the actual end_point)
@@ -309,14 +308,14 @@ class Object(pygame.sprite.Sprite):
             self.update_time = pygame.time.get_ticks()
             self.locked = True
             self.can_update = False
-            print(f'{self.name} locked = {self.locked}')
+            # print(f'{self.name} locked = {self.locked}')
 
         
         elif keys[pygame.K_3] and rect.collidepoint(mouse_pos) and self.can_update and self.locked:
             self.update_time = pygame.time.get_ticks()
             self.locked = False
             self.can_update = False
-            print(f'{self.name} locked = {self.locked}')
+            # print(f'{self.name} locked = {self.locked}')
 
 
 

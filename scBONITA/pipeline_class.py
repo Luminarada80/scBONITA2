@@ -106,8 +106,10 @@ class Pipeline():
         for pathway in pathways.pathway_graphs:
             node_indices = []
             graph = pathways.pathway_graphs[pathway]
+            
             for node in graph.nodes():
                 node_indices.append(pathways.gene_list.index(node))
+                
 
             # node_indices = set(node_indices)  # Only keep unique values
             self.node_indices = list(node_indices)  # Convert back to a list
@@ -146,6 +148,10 @@ class Pipeline():
         logging.debug(f'Pipeline: Setting up the ruleset parameters')
         ruleset.max_samples = 15000 #max_samples
         ruleset.gene_list = [ruleset.gene_list[node] for node in node_indices]
+        print('node_list = {')
+        for node in ruleset.gene_list:
+            print(f'"{node}",')
+        print('}')
         ruleset.node_list = ruleset.gene_list
         ruleset.node_positions = [ruleset.gene_list.index(node) for node in ruleset.node_list]
 
