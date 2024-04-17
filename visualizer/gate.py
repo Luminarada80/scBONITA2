@@ -76,7 +76,7 @@ class Gate(Object):
         text_surface, text_rect = self.font.render(self.gate_type, pygame.Color('black'))
 
         if self.gate_type == 'NOT' and self.angle == 180:
-            text_rect.center = (self.size/2 + self.label_offset, self.size/2)
+            text_rect.center = (self.size/2 + self.label_offset + 5, self.size/2)
         else:
             text_rect.center = (self.size/2 - self.label_offset, self.size/2)
             
@@ -140,8 +140,8 @@ class Gate(Object):
         elif len(self.active_incoming_connections) == 0:
             self.activation_threshold = 0
 
-    def update_object(self, events, connections, objects, game):
-        self.update(events, connections, objects, self.rect, self.draw_gate, game)
+    def update_object(self, events, connections, objects, uuid_dict, game):
+        self.update(events, connections, objects, uuid_dict, self.rect, self.draw_gate, game)
         # self.calculate_desired_orientation()
 
         if self.gate_type == 'AND':

@@ -1,5 +1,6 @@
 import pygame
 import math
+import uuid
 
 class Object(pygame.sprite.Sprite):
     def __init__(self, name, position, color):
@@ -15,6 +16,8 @@ class Object(pygame.sprite.Sprite):
         self.num_active_incoming_connections = len(self.active_incoming_connections)
         self.activation_threshold = 0
         self.locked = False
+        
+        self.id = uuid.uuid4()
 
         self.simulation_running = False
 
@@ -36,8 +39,6 @@ class Object(pygame.sprite.Sprite):
 
         self.update_num = 0
         self.velocity = pygame.math.Vector2(0, 0)  # Assuming each sprite has velocity
-
-
     
     def draw_lock(self, position):
         if self.locked:
@@ -56,6 +57,8 @@ class Object(pygame.sprite.Sprite):
 
         if self.outgoing_connections is not None:
             for object in self.outgoing_connections:
+                
+
                 # Vector from this node to the connected node
                 direction = (object.position[0] - self.position[0], object.position[1] - self.position[1])
 
@@ -373,7 +376,7 @@ class Object(pygame.sprite.Sprite):
         self.velocity = -self.velocity
         other_sprite.velocity = -other_sprite.velocity
     
-    def update(self, events, connections, objects, rect, draw_object_function, game):
+    def update(self, events, connections, objects, uuid_dict, rect, draw_object_function, game):
         self.lock_state(rect)
         self.move(events, rect, game)
         self.simulation_step_cooldown()
