@@ -16,6 +16,8 @@ from sklearn import preprocessing
 import scipy.sparse as sparse
 import csv
 import seaborn as sns
+import matplotlib.gridspec as gridspec
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 from metadata_parser import metadata_parser
 from setup.user_input_prompts import *
@@ -71,8 +73,8 @@ def extract_data(data_file, sep, sample_cells, node_indices, max_samples):
 
         return cell_names, gene_names, data
 
-def figure_graph(control_network, dataset_name, relative_abundances):
-    G = control_network.network       
+def figure_graph(experimental_network, dataset_name, relative_abundances):
+    G = experimental_network.network       
 
     # Mapping scaled differences to colors from red to blue
     # Positive = higher expression in experimental
@@ -82,10 +84,9 @@ def figure_graph(control_network, dataset_name, relative_abundances):
     # Extracting importance scores
     importance_scores = []
 
-    for node in control_network.nodes:
+    for node in experimental_network.nodes:
         node_colors.append(relative_abundances[node.name])
         importance_scores.append(node.importance_score)
-
 
     # Define minimum and maximum node sizes
     min_node_size = 100  # Minimum node size
@@ -100,7 +101,7 @@ def figure_graph(control_network, dataset_name, relative_abundances):
     ]
 
     max_abs_value = max(abs(min(node_colors)), abs(max(node_colors)))
-    normalize = TwoSlopeNorm(vmin=-max_abs_value, vcenter=0, vmax=max_abs_value)
+    normalize = TwoSlopeNorm(vcenter=0) #vmin=-1, vcenter=0, vmax=1
     normalized_colors = normalize(node_colors)
 
     # Drawing the graph
@@ -112,7 +113,7 @@ def figure_graph(control_network, dataset_name, relative_abundances):
     pos = nx.spring_layout(G, k=1, iterations=50)
     nx.draw(G, pos, with_labels=True, node_color=normalized_colors, cmap='coolwarm', node_size=scaled_importance_scores, font_size=10, ax=ax)
 
-    ax.set_title(f"Importance Score and Relative Abundance for network {control_network.name.split('_')[0]} for dataset {dataset_name}")
+    ax.set_title(f"Importance Score and Relative Abundance for network {experimental_network.name.split('_')[0]} for dataset {dataset_name}")
     plt.legend(handles=[blue_patch, red_patch], title=f'Relative Expression of {experimental_group} compared to {control_group}')
 
     return fig
@@ -136,32 +137,37 @@ def relative_abundance_arguments(control_group, experimental_group):
     return control_group, experimental_group
 
 def plot_abundance_heatmap(gene_names, mean_expression_control, mean_expression_experimental, control_group_name, experimental_group_name, network_name):
-
     data = {
-    'Gene': gene_names,
-    f'{control_group_name}': mean_expression_control,
-    f'{experimental_group_name}': mean_expression_experimental
+        'Gene': gene_names,
+        f'{control_group_name}': mean_expression_control,
+        f'{experimental_group_name}': mean_expression_experimental
     }
     df = pd.DataFrame(data).set_index('Gene').transpose()
-    # Create the heatmap
-    figure = plt.figure(figsize=(18, 8))  # Adjust the size as needed
-    ax = sns.heatmap(df, annot=False, cmap='coolwarm', cbar_kws={'label':'Expression', 'orientation': 'horizontal', 'aspect': 25})
+
+    # Create the figure with modified figsize to affect the heatmap height
+    fig = plt.figure(figsize=(18, 6))  # Reduced height from 8 to 6
+    gs = plt.GridSpec(1, 2, width_ratios=[30, 1])  # Adjust grid specification for a narrower colorbar section
+    ax = fig.add_subplot(gs[0])
+    
+    # Create the heatmap without automatically adding a colorbar
+    heatmap = sns.heatmap(df, annot=False, cmap='coolwarm', cbar=False, ax=ax, vmin=0, vmax=1)
 
     # Customizing the heatmap
-    plt.title(f'{network_name} Mean Expression Values Between {control_group_name} and {experimental_group_name}')
-    ax.set_ylabel('Groups')
-    ax.set_xlabel('Genes')
+    plt.title(f'{network_name} Mean Expression Values Between {control_group_name} and {experimental_group_name}', fontsize=20)
+    ax.set_ylabel('Groups', fontsize=18)
+    ax.set_xlabel('Genes', fontsize=18)
     ax.xaxis.tick_top()
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=90, fontsize=16)
+    ax.set_yticklabels(ax.get_yticklabels(), rotation=0, fontsize=16)
 
-    plt.xticks(rotation=90, fontsize=8)
-    plt.yticks(rotation=0)
+    # Manually adding a colorbar
+    cax = fig.add_subplot(gs[1])
+    plt.colorbar(heatmap.collections[0], cax=cax, orientation='vertical')
+    cax.set_ylabel('Mean Expression Value', fontsize=16)
 
-    # Move colorbar to the bottom
-    ax.collections[0].colorbar.set_label('Mean Expression Value')
-    ax.collections[0].colorbar.ax.xaxis.set_ticks_position('bottom')
-    ax.collections[0].colorbar.ax.xaxis.set_label_position('bottom')
+    plt.tight_layout()
 
-    return figure
+    return fig
 
 def bubble_plot(network_names, p_values):
     # Assuming p_values is a list containing all your p-values before correction
@@ -459,11 +465,10 @@ if __name__ == '__main__':
                 logging.debug(f'\t{experimental_group} has {experimental_group_data.shape[0]} cells')
 
                 min_num_cells = min(control_group_data.shape[0], experimental_group_data.shape[0])
+
                 # Calculate mean expression levels for each gene across all samples within each group
                 mean_expression_control = np.mean(control_group_data, axis=0)
                 mean_expression_experimental = np.mean(experimental_group_data, axis=0)
-
-
 
                 stdev_expression_control = np.std(control_group_data, axis=0)
                 stdev_expression_experimental = np.std(experimental_group_data, axis=0)
@@ -472,8 +477,9 @@ if __name__ == '__main__':
                 difference_in_expression = mean_expression_experimental - mean_expression_control
 
                 relative_abundances = difference_in_expression
-                file_path = f'relative_abundance_output/{dataset_name}/{control_group}_vs_{experimental_group}'
-                filename = f'{control_group_network.name.split("_")[0]}_{dataset_name}_{control_group}_vs_{experimental_group}_relative_abundance'
+
+                file_path = f'relative_abundance_output/{dataset_name}/{experimental_group}_vs_{control_group}'
+                filename = f'{control_group_network.name.split("_")[0]}_{dataset_name}_{experimental_group}_vs_{control_group}_relative_abundance'
                 
                 figure = plot_abundance_heatmap(gene_list, mean_expression_control, mean_expression_experimental, control_group, experimental_group, network_name)
                 png_file_path = f'{file_path}/png_files'
@@ -558,30 +564,30 @@ if __name__ == '__main__':
                     for node_number, shared_node in enumerate(gene_list):
                         
                         # Set the relative abundance for group 1 vs group 2
-                        for node in control_group_network.nodes:
+                        for node in experimental_group_network.nodes:
                             if shared_node == node.name:
                                 # relative abundance negative to show how increased or decreased experimental is compared to control
                                 abundance_file.write(f'{node.name},{node.importance_score},{relative_abundances[node_number]}\n')
                                 node_abundances[node.name] = relative_abundances[node_number]
 
                 # Create the relative abundance figures in png and svg format
-                fig = figure_graph(control_group_network, dataset_name, node_abundances)
+                relative_abundance_graph = figure_graph(experimental_group_network, dataset_name, node_abundances)
                 bootstrap_fig = plot_bootstrap_histogram(bootstrap_scores, pathway_modulation)
 
-                figure_path_png = f'{png_file_path}/{filename}.png'
-                figure_path_svg = f'{svg_file_path}/{filename}.svg'
+                figure_path_png = f'{png_file_path}/{control_group_network.name.split("_")[0]}_{dataset_name}_{experimental_group}_vs_{control_group}.png'
+                figure_path_svg = f'{svg_file_path}/{control_group_network.name.split("_")[0]}_{dataset_name}_{experimental_group}_vs_{control_group}.svg'
 
-                plt.savefig(figure_path_png, format='png')
-                plt.savefig(figure_path_svg, format='svg')
+                relative_abundance_graph.savefig(figure_path_png, format='png')
+                relative_abundance_graph.savefig(figure_path_svg, format='svg')
 
                 bootstrap_fig.savefig(f'{png_file_path}/{experimental_group_network.name.split("_")[0]}_bootstrap_histogram.png', format='png')
 
-                plt.close(fig)
+                plt.close(relative_abundance_graph)
 
     bubble_plot_fig = bubble_plot(network_names, p_values)
     bubble_plot_fig.show()
     bubble_plot_fig.savefig(f'{png_file_path}/bubbleplot_histogram.png', format='png')
-    logging.info(f'\nResults saved to: "relative_abundance_output/{dataset_name}/{control_group}_vs_{experimental_group}"\n')
+    logging.info(f'\nResults saved to: "relative_abundance_output/{dataset_name}/{experimental_group}_vs_{control_group}"\n')
 
 
 

@@ -59,8 +59,8 @@ class Node(Object):
     #     self.original_image = self.image.copy()
 
     
-    def update_object(self, events, connections, nodes, game):
-        self.update(events, connections, nodes, self.rect, self.draw_circle, game)
+    def update_object(self, events, connections, objects, uuid_dict, game):
+        self.update(events, connections, objects, uuid_dict, self.rect, self.draw_circle, game)
         self.update_activation_highlight(self.draw_circle)
 
         # Display the updated image to the surface
