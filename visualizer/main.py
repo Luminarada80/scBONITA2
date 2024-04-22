@@ -233,7 +233,9 @@ class Game:
         self.objects_group = pygame.sprite.Group([self.gates_group, self.nodes_group])
 
         for object in self.objects_group:
-            self.uuids[object.uuid] = object
+            self.uuids[object.id] = object
+            object.nodes_group = self.nodes_group
+            object.gates_group = self.gates_group
 
         self.connections = 0        
 
@@ -256,13 +258,13 @@ class Game:
             self.screen.fill("white")      
             for node in self.nodes_group:
                 node.draw_connections()
-                node.update_object(events, self.connections, self.objects_group, self.uuids self)
+                node.update_object(events, self.connections, self.gates_group, self.nodes_group, self.uuids, self)
                 if node.is_drawing_line == True:
                     self.connections += 1  
             
             for gate in self.gates_group:
                 gate.draw_connections()
-                gate.update_object(events, self.connections, self.objects_group, self.uuids, self)
+                gate.update_object(events, self.connections, self.gates_group, self.nodes_group, self.uuids, self)
                 if gate.is_drawing_line == True:
                     self.connections += 1
 
