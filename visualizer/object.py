@@ -16,6 +16,9 @@ class Object(pygame.sprite.Sprite):
         self.num_active_incoming_connections = len(self.active_incoming_connections)
         self.activation_threshold = 0
         self.locked = False
+
+        self.nodes_group = None
+        self.gates_group = None
         
         self.id = uuid.uuid4()
 
@@ -274,7 +277,10 @@ class Object(pygame.sprite.Sprite):
 
             
                 self.update_num += 1
-                self.can_update = False
+
+                # Only the gates can update (allows for logic to update correctly if multiple gates are strung together)
+                if self in self.nodes_group:
+                    self.can_update = False
         else:
             self.update_num = 0
 
@@ -319,8 +325,6 @@ class Object(pygame.sprite.Sprite):
             self.locked = False
             self.can_update = False
             # print(f'{self.name} locked = {self.locked}')
-
-
 
     def update_activation_highlight(self, draw_object_function):
         """
@@ -376,7 +380,9 @@ class Object(pygame.sprite.Sprite):
         self.velocity = -self.velocity
         other_sprite.velocity = -other_sprite.velocity
     
-    def update(self, events, connections, objects, uuid_dict, rect, draw_object_function, game):
+    def update(self, events, connections, gates, nodes, uuid_dict, rect, draw_object_function, game):
+
+        objects = pygame.sprite.Group([gates, nodes])
         self.lock_state(rect)
         self.move(events, rect, game)
         self.simulation_step_cooldown()
