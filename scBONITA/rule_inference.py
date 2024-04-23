@@ -133,12 +133,12 @@ class RuleInference(NetworkSetup):
             data_row_index = 0  # Separate index for data array
 
             for i, row in enumerate(reader):
-                if (i + 1) in node_indices:  # Adjust index for skipped header
-                    gene_names.append(row[0])
-                    # Offset cell indices by 1 to skip the gene name column
-                    selected_data = [float(row[cell_index + 1]) for cell_index in sampled_cell_indices]
-                    data[data_row_index, :] = selected_data
-                    data_row_index += 1
+                # if (i + 1) in node_indices:  # Adjust index for skipped header
+                gene_names.append(row[0])
+                # Offset cell indices by 1 to skip the gene name column
+                selected_data = [float(row[cell_index + 1]) for cell_index in sampled_cell_indices]
+                data[data_row_index, :] = selected_data
+                data_row_index += 1
 
             # Convert the filtered data to a NumPy array
             logging.info("\tConverting filtered data to numpy array...")

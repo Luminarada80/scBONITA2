@@ -21,8 +21,10 @@ class SaveState():
             self.object_names.append(object.name)
             self.object_positions.append(object.position)
             self.object_color.append(object.color)
-            self.object_outgoing_connections.append(object.outgoing_connections)
-            self.object_incoming_connections.append(object.incoming_connections)
+            for connected_object in object.outgoing_connections:
+                self.object_outgoing_connections.append(connected_object.id)
+            for connected_object in object.incoming_connections:
+                self.object_incoming_connections.append(connected_object.id)
     
     def load_objects(self):
         nodes = []
