@@ -17,16 +17,16 @@ class Gate(Object):
         self.label_offset = 0
 
         # AND gate images
-        self.inactive_and_image = pygame.image.load('visualizer/images/and_gate.png').convert_alpha()  # Adjusted for gate drawing space
-        self.active_and_image = pygame.image.load('visualizer/images/and_gate.png').convert_alpha()
+        self.inactive_and_image = pygame.image.load('visualizer/images/and.png').convert_alpha()  # Adjusted for gate drawing space
+        self.active_and_image = pygame.image.load('visualizer/images/and.png').convert_alpha()
 
         # OR gate images
-        self.inactive_or_image = pygame.image.load('visualizer/images/or_gate.png').convert_alpha()  # Adjusted for gate drawing space
-        self.active_or_image = pygame.image.load('visualizer/images/or_gate.png').convert_alpha()
+        self.inactive_or_image = pygame.image.load('visualizer/images/or.png').convert_alpha()  # Adjusted for gate drawing space
+        self.active_or_image = pygame.image.load('visualizer/images/or.png').convert_alpha()
 
         # NOT gate images
-        self.inactive_not_image = pygame.image.load('visualizer/images/not_gate.png').convert_alpha()  # Adjusted for gate drawing space
-        self.active_not_image = pygame.image.load('visualizer/images/not_gate.png').convert_alpha()
+        self.inactive_not_image = pygame.image.load('visualizer/images/not.png').convert_alpha()  # Adjusted for gate drawing space
+        self.active_not_image = pygame.image.load('visualizer/images/not.png').convert_alpha()
 
         self.inactive_image, self.active_image = self.choose_gate_image()
 
@@ -38,7 +38,7 @@ class Gate(Object):
         self.rect = self.image.get_rect(center=self.position)
         self.original_image = self.image  # This will hold the currently displayed image
 
-        self.font_size = 12
+        self.font_size = 24
         self.font = pygame.freetype.Font('visualizer/arial.ttf', self.font_size)
 
         self.angle = 0
@@ -57,7 +57,7 @@ class Gate(Object):
         elif self.gate_type == 'NOT':
             inactive_image = self.inactive_not_image
             active_image = self.active_not_image
-            self.label_offset = 5
+            self.label_offset = 15
         
         return inactive_image, active_image
 
