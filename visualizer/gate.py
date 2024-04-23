@@ -140,8 +140,8 @@ class Gate(Object):
         elif len(self.active_incoming_connections) == 0:
             self.activation_threshold = 0
 
-    def update_object(self, events, connections, objects, uuid_dict, game):
-        self.update(events, connections, objects, uuid_dict, self.rect, self.draw_gate, game)
+    def update_object(self, events, connections, gates, nodes, uuid_dict, game):
+        self.update(events, connections, gates, nodes, uuid_dict, self.rect, self.draw_gate, game)
         # self.calculate_desired_orientation()
 
         if self.gate_type == 'AND':
@@ -150,7 +150,6 @@ class Gate(Object):
             self.simulate_or_logic()
         elif self.gate_type == 'NOT':
             self.simulate_not_logic()
-
 
         self.adjust_rotation()
         self.update_activation_highlight(self.draw_gate)
