@@ -78,10 +78,10 @@ class Game:
 
         self.uuids = {}
 
-        num_nodes = 7
-        num_and_gates = 25
-        num_or_gates = 25
-        num_not_gates = 10
+        num_nodes = 10
+        num_and_gates = 10
+        num_or_gates = 10
+        num_not_gates = 4
 
         relative_abundance = False
 
@@ -232,8 +232,8 @@ class Game:
         self.gates_group = pygame.sprite.Group(*self.gates)
         self.objects_group = pygame.sprite.Group([self.gates_group, self.nodes_group])
 
-        for object in self.objects_group:
-            self.uuids[object.uuid] = object
+        # for object in self.objects_group:
+        #     self.uuids[object.uuid] = object
 
         self.connections = 0        
 
@@ -256,7 +256,7 @@ class Game:
             self.screen.fill("white")      
             for node in self.nodes_group:
                 node.draw_connections()
-                node.update_object(events, self.connections, self.objects_group, self.uuids self)
+                node.update_object(events, self.connections, self.objects_group, self.uuids, self)
                 if node.is_drawing_line == True:
                     self.connections += 1  
             
