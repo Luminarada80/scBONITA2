@@ -6,7 +6,7 @@ class Object(pygame.sprite.Sprite):
     def __init__(self, name, position, color):
         super().__init__()
 
-        self.size = 60
+        self.size = 150
         self.name = name
         self.position = position
         self.color = color
@@ -76,10 +76,10 @@ class Object(pygame.sprite.Sprite):
                 end_point = (object.position[0] - unit_direction[0] * object.size / 2, object.position[1] - unit_direction[1] * object.size / 2)
 
                 # Draw the line
-                pygame.draw.line(self.display_surface, self.line_color, start_point, end_point, 2)
+                pygame.draw.line(self.display_surface, self.line_color, start_point, end_point, 4)
                 
                 # Assuming arrow_length and arrow_degrees define the size and angle of the arrowhead
-                arrow_length = 8
+                arrow_length = 12
                 arrow_degrees = math.radians(30)
 
                 # Calculate the end point of the arrow body (slightly before the actual end_point)
