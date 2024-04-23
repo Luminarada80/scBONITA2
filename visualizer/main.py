@@ -80,10 +80,10 @@ class Game:
 
         self.uuids = {}
 
-        num_nodes = 7
-        num_and_gates = 25
-        num_or_gates = 25
-        num_not_gates = 10
+        num_nodes = 10
+        num_and_gates = 10
+        num_or_gates = 10
+        num_not_gates = 4
 
         relative_abundance = False
 
