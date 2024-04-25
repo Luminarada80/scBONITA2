@@ -313,6 +313,15 @@ if __name__ == '__main__':
     dataset_name = check_dataset_name(args.dataset_name)
     network_names = args.list_of_kegg_pathways
     organism_code = args.organism
+    
+    # If no network is specified, get all of the rulesets for the dataset
+    if network_names[0] == "":
+        network_names_list = []
+        for filename in os.listdir(f'./rules_output/{dataset_name}_rules/'):
+            network = filename.split('_')[0]
+            network_names_list.append(network)
+        network_name_set = set(network_names_list)
+        network_names = list(network_name_set)
 
     for name_index, name in enumerate(network_names):
         org_network_name = organism_code + name

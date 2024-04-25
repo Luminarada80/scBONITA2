@@ -1,0 +1,417 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d5" for="edge" attr.name="signal" attr.type="string"/>
+<key id="d4" for="edge" attr.name="type" attr.type="string"/>
+<key id="d3" for="edge" attr.name="subtype" attr.type="string"/>
+<key id="d2" for="edge" attr.name="color" attr.type="string"/>
+<key id="d1" for="node" attr.name="type" attr.type="string"/>
+<key id="d0" for="node" attr.name="name" attr.type="string"/>
+<graph edgedefault="directed"><node id="ACVR2A">
+  <data key="d0">ACVR2A</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="IL10RB">
+  <data key="d0">IL10RB</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="IL2RG">
+  <data key="d0">IL2RG</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="IL2RB">
+  <data key="d0">IL2RB</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="IL6ST">
+  <data key="d0">IL6ST</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="IL18RAP">
+  <data key="d0">IL18RAP</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="IL18R1">
+  <data key="d0">IL18R1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="TGFBR1">
+  <data key="d0">TGFBR1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="TGFBR2">
+  <data key="d0">TGFBR2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="IL18">
+  <data key="d0">IL18</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="TGFB3">
+  <data key="d0">TGFB3</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="TGFB1">
+  <data key="d0">TGFB1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="TNFRSF13C">
+  <data key="d0">TNFRSF13C</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="TNFRSF9">
+  <data key="d0">TNFRSF9</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="TNFRSF14">
+  <data key="d0">TNFRSF14</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="TNFSF13B">
+  <data key="d0">TNFSF13B</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="TNFSF9">
+  <data key="d0">TNFSF9</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="TNFSF14">
+  <data key="d0">TNFSF14</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="LTA">
+  <data key="d0">LTA</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="IFNLR1">
+  <data key="d0">IFNLR1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="IFNGR2">
+  <data key="d0">IFNGR2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="IFNGR1">
+  <data key="d0">IFNGR1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="IFNL1">
+  <data key="d0">IFNL1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="IFNG">
+  <data key="d0">IFNG</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="IL15RA">
+  <data key="d0">IL15RA</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="IL15">
+  <data key="d0">IL15</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="IL12RB1">
+  <data key="d0">IL12RB1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="IL12RB2">
+  <data key="d0">IL12RB2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="IL23A">
+  <data key="d0">IL23A</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="CLCF1">
+  <data key="d0">CLCF1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="OSM">
+  <data key="d0">OSM</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="CXCR6">
+  <data key="d0">CXCR6</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="CXCR3">
+  <data key="d0">CXCR3</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="PF4">
+  <data key="d0">PF4</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="CXCL16">
+  <data key="d0">CXCL16</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="TNFRSF1A">
+  <data key="d0">TNFRSF1A</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="TNFRSF1B">
+  <data key="d0">TNFRSF1B</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="TNFRSF12A">
+  <data key="d0">TNFRSF12A</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="TNFSF12">
+  <data key="d0">TNFSF12</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="TNF">
+  <data key="d0">TNF</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="CCR5">
+  <data key="d0">CCR5</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="CCL4">
+  <data key="d0">CCL4</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="CCL3">
+  <data key="d0">CCL3</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="CCR1">
+  <data key="d0">CCR1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="CCL5">
+  <data key="d0">CCL5</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="IL16">
+  <data key="d0">IL16</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="CD4">
+  <data key="d0">CD4</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="GDF11">
+  <data key="d0">GDF11</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="IL12A"/>
+<edge source="IL18" target="IL18RAP">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="IL18" target="IL18R1">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="TGFB3" target="TGFBR1">
+  <data key="d2">black</data>
+  <data key="d3"></data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="TGFB3" target="TGFBR2">
+  <data key="d2">black</data>
+  <data key="d3"></data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="TGFB1" target="TGFBR1">
+  <data key="d2">black</data>
+  <data key="d3"></data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="TGFB1" target="TGFBR2">
+  <data key="d2">black</data>
+  <data key="d3"></data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="TNFSF13B" target="TNFRSF13C">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="TNFSF9" target="TNFRSF9">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="TNFSF14" target="TNFRSF14">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="LTA" target="TNFRSF1A">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="LTA" target="TNFRSF1B">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="LTA" target="TNFRSF14">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="IFNL1" target="IL10RB">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="IFNL1" target="IFNLR1">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="IFNG" target="IFNGR2">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="IFNG" target="IFNGR1">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="IL15" target="IL15RA">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="IL15" target="IL2RG">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="IL15" target="IL2RB">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="IL23A" target="IL12RB1">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="CLCF1" target="IL6ST">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="OSM" target="IL6ST">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="PF4" target="CXCR3">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="CXCL16" target="CXCR6">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="TNFSF12" target="TNFRSF12A">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="TNF" target="TNFRSF1A">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="TNF" target="TNFRSF1B">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="CCL4" target="CCR5">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="CCL3" target="CCR5">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="CCL3" target="CCR1">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="CCL5" target="CCR5">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="CCL5" target="CCR1">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="IL16" target="CD4">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="GDF11" target="TGFBR1">
+  <data key="d2">black</data>
+  <data key="d3"></data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="GDF11" target="ACVR2A">
+  <data key="d2">black</data>
+  <data key="d3"></data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="IL12A" target="IL12RB2">
+  <data key="d5">a</data>
+</edge>
+<edge source="IL12A" target="IL12RB1">
+  <data key="d5">a</data>
+</edge>
+</graph></graphml>

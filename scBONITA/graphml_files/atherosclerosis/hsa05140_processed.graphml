@@ -1,0 +1,234 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d5" for="edge" attr.name="signal" attr.type="string"/>
+<key id="d4" for="edge" attr.name="type" attr.type="string"/>
+<key id="d3" for="edge" attr.name="subtype" attr.type="string"/>
+<key id="d2" for="edge" attr.name="color" attr.type="string"/>
+<key id="d1" for="node" attr.name="type" attr.type="string"/>
+<key id="d0" for="node" attr.name="name" attr.type="string"/>
+<graph edgedefault="directed"><node id="PRKCB">
+  <data key="d0">PRKCB</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="NCF1">
+  <data key="d0">NCF1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="IFNG">
+  <data key="d0">IFNG</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="STAT1">
+  <data key="d0">STAT1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="MYD88">
+  <data key="d0">MYD88</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="TNF">
+  <data key="d0">TNF</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="PTPN6">
+  <data key="d0">PTPN6</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="ELK1">
+  <data key="d0">ELK1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="FOS">
+  <data key="d0">FOS</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="MARCKSL1">
+  <data key="d0">MARCKSL1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="TRAF6">
+  <data key="d0">TRAF6</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="MAP3K7">
+  <data key="d0">MAP3K7</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="IFNGR1">
+  <data key="d0">IFNGR1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="IFNGR2">
+  <data key="d0">IFNGR2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="CYBA">
+  <data key="d0">CYBA</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="NCF2">
+  <data key="d0">NCF2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="NCF4">
+  <data key="d0">NCF4</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="FCGR1A"/>
+<node id="FCGR2A"/>
+<node id="JAK1"/>
+<node id="JAK2"/>
+<node id="NFKBIB"/>
+<node id="NFKBIA"/>
+<node id="NFKB1"/>
+<node id="RELA"/>
+<node id="IL12A"/>
+<node id="IRAK1"/>
+<node id="IRAK4"/>
+<edge source="PRKCB" target="NCF2">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="PRKCB" target="NCF4">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="PRKCB" target="NCF1">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="NCF1" target="CYBA">
+  <data key="d2">yellow</data>
+  <data key="d3">dissociation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">i</data>
+</edge>
+<edge source="IFNG" target="IFNGR1">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="IFNG" target="IFNGR2">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="STAT1" target="IL12A">
+  <data key="d5">a</data>
+</edge>
+<edge source="MYD88" target="IRAK1">
+  <data key="d5">a</data>
+</edge>
+<edge source="MYD88" target="IRAK4">
+  <data key="d5">a</data>
+</edge>
+<edge source="PTPN6" target="JAK1">
+  <data key="d5">i</data>
+</edge>
+<edge source="PTPN6" target="JAK2">
+  <data key="d5">i</data>
+</edge>
+<edge source="ELK1" target="FOS">
+  <data key="d2">green</data>
+  <data key="d3">expression</data>
+  <data key="d4">GErel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="TRAF6" target="MAP3K7">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="MAP3K7" target="NFKBIB">
+  <data key="d5">a</data>
+</edge>
+<edge source="MAP3K7" target="NFKBIA">
+  <data key="d5">a</data>
+</edge>
+<edge source="IFNGR1" target="MARCKSL1">
+  <data key="d2">green</data>
+  <data key="d3">expression/indirect effect</data>
+  <data key="d4">GErel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="IFNGR1" target="JAK1">
+  <data key="d5">a</data>
+</edge>
+<edge source="IFNGR1" target="JAK2">
+  <data key="d5">a</data>
+</edge>
+<edge source="IFNGR2" target="MARCKSL1">
+  <data key="d2">green</data>
+  <data key="d3">expression/indirect effect</data>
+  <data key="d4">GErel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="IFNGR2" target="JAK1">
+  <data key="d5">a</data>
+</edge>
+<edge source="IFNGR2" target="JAK2">
+  <data key="d5">a</data>
+</edge>
+<edge source="NCF2" target="CYBA">
+  <data key="d2">yellow</data>
+  <data key="d3">dissociation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">i</data>
+</edge>
+<edge source="NCF4" target="CYBA">
+  <data key="d2">yellow</data>
+  <data key="d3">dissociation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">i</data>
+</edge>
+<edge source="FCGR1A" target="PRKCB">
+  <data key="d5">a</data>
+</edge>
+<edge source="FCGR2A" target="PRKCB">
+  <data key="d5">a</data>
+</edge>
+<edge source="JAK1" target="STAT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="JAK2" target="STAT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="NFKBIB" target="NFKB1">
+  <data key="d5">i</data>
+</edge>
+<edge source="NFKBIB" target="RELA">
+  <data key="d5">i</data>
+</edge>
+<edge source="NFKBIA" target="NFKB1">
+  <data key="d5">i</data>
+</edge>
+<edge source="NFKBIA" target="RELA">
+  <data key="d5">i</data>
+</edge>
+<edge source="NFKB1" target="TNF">
+  <data key="d5">a</data>
+</edge>
+<edge source="NFKB1" target="IL12A">
+  <data key="d5">a</data>
+</edge>
+<edge source="RELA" target="TNF">
+  <data key="d5">a</data>
+</edge>
+<edge source="RELA" target="IL12A">
+  <data key="d5">a</data>
+</edge>
+<edge source="IRAK1" target="TRAF6">
+  <data key="d5">a</data>
+</edge>
+<edge source="IRAK4" target="TRAF6">
+  <data key="d5">a</data>
+</edge>
+</graph></graphml>

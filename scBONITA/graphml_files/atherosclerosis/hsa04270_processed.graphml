@@ -1,0 +1,199 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d2" for="edge" attr.name="signal" attr.type="string"/>
+<key id="d1" for="node" attr.name="type" attr.type="string"/>
+<key id="d0" for="node" attr.name="name" attr.type="string"/>
+<graph edgedefault="directed"><node id="RHOA">
+  <data key="d0">RHOA</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="PPP1R14A">
+  <data key="d0">PPP1R14A</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="GNAS">
+  <data key="d0">GNAS</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="MYL6"/>
+<node id="PPP1R12A"/>
+<node id="PPP1R12B"/>
+<node id="PPP1R12C"/>
+<node id="ROCK1"/>
+<node id="ROCK2"/>
+<node id="PRKCA"/>
+<node id="PRKCB"/>
+<node id="PRKCD"/>
+<node id="PRKCE"/>
+<node id="PRKCH"/>
+<node id="PRKCQ"/>
+<node id="ARHGEF12"/>
+<node id="ARHGEF1"/>
+<node id="ACTA2"/>
+<node id="GNAQ"/>
+<node id="GNA12"/>
+<node id="GNA13"/>
+<node id="PLA2G6"/>
+<node id="ARAF"/>
+<node id="BRAF"/>
+<node id="RAF1"/>
+<node id="MAP2K1"/>
+<node id="MAP2K2"/>
+<node id="ADORA2A"/>
+<node id="ADCY3"/>
+<node id="ADCY4"/>
+<node id="ADCY7"/>
+<node id="ADCY9"/>
+<edge source="RHOA" target="ROCK1">
+  <data key="d2">a</data>
+</edge>
+<edge source="RHOA" target="ROCK2">
+  <data key="d2">a</data>
+</edge>
+<edge source="PPP1R14A" target="PPP1R12A">
+  <data key="d2">i</data>
+</edge>
+<edge source="PPP1R14A" target="PPP1R12B">
+  <data key="d2">i</data>
+</edge>
+<edge source="PPP1R14A" target="PPP1R12C">
+  <data key="d2">i</data>
+</edge>
+<edge source="GNAS" target="ADCY3">
+  <data key="d2">a</data>
+</edge>
+<edge source="GNAS" target="ADCY4">
+  <data key="d2">a</data>
+</edge>
+<edge source="GNAS" target="ADCY7">
+  <data key="d2">a</data>
+</edge>
+<edge source="GNAS" target="ADCY9">
+  <data key="d2">a</data>
+</edge>
+<edge source="MYL6" target="ACTA2">
+  <data key="d2">i</data>
+</edge>
+<edge source="PPP1R12A" target="MYL6">
+  <data key="d2">i</data>
+</edge>
+<edge source="PPP1R12B" target="MYL6">
+  <data key="d2">i</data>
+</edge>
+<edge source="PPP1R12C" target="MYL6">
+  <data key="d2">i</data>
+</edge>
+<edge source="ROCK1" target="PPP1R12A">
+  <data key="d2">i</data>
+</edge>
+<edge source="ROCK1" target="PPP1R12B">
+  <data key="d2">i</data>
+</edge>
+<edge source="ROCK1" target="PPP1R12C">
+  <data key="d2">i</data>
+</edge>
+<edge source="ROCK2" target="PPP1R12A">
+  <data key="d2">i</data>
+</edge>
+<edge source="ROCK2" target="PPP1R12B">
+  <data key="d2">i</data>
+</edge>
+<edge source="ROCK2" target="PPP1R12C">
+  <data key="d2">i</data>
+</edge>
+<edge source="PRKCA" target="ARAF">
+  <data key="d2">a</data>
+</edge>
+<edge source="PRKCA" target="BRAF">
+  <data key="d2">a</data>
+</edge>
+<edge source="PRKCA" target="RAF1">
+  <data key="d2">a</data>
+</edge>
+<edge source="PRKCB" target="ARAF">
+  <data key="d2">a</data>
+</edge>
+<edge source="PRKCB" target="BRAF">
+  <data key="d2">a</data>
+</edge>
+<edge source="PRKCB" target="RAF1">
+  <data key="d2">a</data>
+</edge>
+<edge source="PRKCD" target="ARAF">
+  <data key="d2">a</data>
+</edge>
+<edge source="PRKCD" target="BRAF">
+  <data key="d2">a</data>
+</edge>
+<edge source="PRKCD" target="RAF1">
+  <data key="d2">a</data>
+</edge>
+<edge source="PRKCE" target="ARAF">
+  <data key="d2">a</data>
+</edge>
+<edge source="PRKCE" target="BRAF">
+  <data key="d2">a</data>
+</edge>
+<edge source="PRKCE" target="RAF1">
+  <data key="d2">a</data>
+</edge>
+<edge source="PRKCH" target="ARAF">
+  <data key="d2">a</data>
+</edge>
+<edge source="PRKCH" target="BRAF">
+  <data key="d2">a</data>
+</edge>
+<edge source="PRKCH" target="RAF1">
+  <data key="d2">a</data>
+</edge>
+<edge source="PRKCQ" target="ARAF">
+  <data key="d2">a</data>
+</edge>
+<edge source="PRKCQ" target="BRAF">
+  <data key="d2">a</data>
+</edge>
+<edge source="PRKCQ" target="RAF1">
+  <data key="d2">a</data>
+</edge>
+<edge source="ARHGEF12" target="RHOA">
+  <data key="d2">a</data>
+</edge>
+<edge source="ARHGEF1" target="RHOA">
+  <data key="d2">a</data>
+</edge>
+<edge source="GNAQ" target="PLA2G6">
+  <data key="d2">a</data>
+</edge>
+<edge source="GNA12" target="ARHGEF12">
+  <data key="d2">a</data>
+</edge>
+<edge source="GNA12" target="ARHGEF1">
+  <data key="d2">a</data>
+</edge>
+<edge source="GNA13" target="ARHGEF12">
+  <data key="d2">a</data>
+</edge>
+<edge source="GNA13" target="ARHGEF1">
+  <data key="d2">a</data>
+</edge>
+<edge source="ARAF" target="MAP2K1">
+  <data key="d2">a</data>
+</edge>
+<edge source="ARAF" target="MAP2K2">
+  <data key="d2">a</data>
+</edge>
+<edge source="BRAF" target="MAP2K1">
+  <data key="d2">a</data>
+</edge>
+<edge source="BRAF" target="MAP2K2">
+  <data key="d2">a</data>
+</edge>
+<edge source="RAF1" target="MAP2K1">
+  <data key="d2">a</data>
+</edge>
+<edge source="RAF1" target="MAP2K2">
+  <data key="d2">a</data>
+</edge>
+<edge source="ADORA2A" target="GNAS">
+  <data key="d2">a</data>
+</edge>
+</graph></graphml>

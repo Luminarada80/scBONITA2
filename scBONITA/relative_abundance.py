@@ -100,9 +100,9 @@ def figure_graph(experimental_network, dataset_name, relative_abundances):
         for iscore in importance_scores
     ]
 
-    max_abs_value = max(abs(min(node_colors)), abs(max(node_colors)))
-    normalize = TwoSlopeNorm(vcenter=0) #vmin=-1, vcenter=0, vmax=1
-    normalized_colors = normalize(node_colors)
+    cmap = plt.cm.coolwarm
+    norm = TwoSlopeNorm(vmin=min(node_colors), vcenter=1, vmax=max(node_colors))
+    colors = [cmap(norm(value)) for value in node_colors]
 
     # Drawing the graph
     # Create custom legend
@@ -111,7 +111,7 @@ def figure_graph(experimental_network, dataset_name, relative_abundances):
     
     fig, ax = plt.subplots(figsize=(16, 12))
     pos = nx.spring_layout(G, k=1, iterations=50)
-    nx.draw(G, pos, with_labels=True, node_color=normalized_colors, cmap='coolwarm', node_size=scaled_importance_scores, font_size=10, ax=ax)
+    nx.draw(G, pos, with_labels=True, node_color=colors, cmap='coolwarm', node_size=scaled_importance_scores, font_size=10, ax=ax)
 
     ax.set_title(f"Importance Score and Relative Abundance for network {experimental_network.name.split('_')[0]} for dataset {dataset_name}")
     plt.legend(handles=[blue_patch, red_patch], title=f'Relative Expression of {experimental_group} compared to {control_group}')
@@ -244,6 +244,15 @@ if __name__ == '__main__':
 
     organism = args.organism
     network_names = args.list_of_kegg_pathways
+
+    # If no network is specified, get all of the rulesets for the dataset
+    if network_names[0] == "":
+        network_names_list = []
+        for filename in os.listdir(f'./rules_output/{dataset_name}_rules/'):
+            network = filename.split('_')[0]
+            network_names_list.append(network)
+        network_name_set = set(network_names_list)
+        network_names = list(network_name_set)
 
     txt = f'Relative Abundance for {dataset_name} {control_group} vs {experimental_group}'
     logging.info(f' -----{"-" * len(txt)}----- '.center(20))
@@ -474,9 +483,9 @@ if __name__ == '__main__':
                 stdev_expression_experimental = np.std(experimental_group_data, axis=0)
 
                 # Compute the difference in mean expression levels for the relative expression
-                difference_in_expression = mean_expression_experimental - mean_expression_control
+                fold_change = mean_expression_experimental / mean_expression_control
 
-                relative_abundances = difference_in_expression
+                relative_abundances = fold_change
 
                 file_path = f'relative_abundance_output/{dataset_name}/{experimental_group}_vs_{control_group}'
                 filename = f'{control_group_network.name.split("_")[0]}_{dataset_name}_{experimental_group}_vs_{control_group}_relative_abundance'
@@ -581,12 +590,14 @@ if __name__ == '__main__':
                 relative_abundance_graph.savefig(figure_path_svg, format='svg')
 
                 bootstrap_fig.savefig(f'{png_file_path}/{experimental_group_network.name.split("_")[0]}_bootstrap_histogram.png', format='png')
-
+                
+                plt.close(bootstrap_fig)
                 plt.close(relative_abundance_graph)
 
     bubble_plot_fig = bubble_plot(network_names, p_values)
     bubble_plot_fig.show()
     bubble_plot_fig.savefig(f'{png_file_path}/bubbleplot_histogram.png', format='png')
+    plt.close(bubble_plot_fig)
     logging.info(f'\nResults saved to: "relative_abundance_output/{dataset_name}/{experimental_group}_vs_{control_group}"\n')
 
 
