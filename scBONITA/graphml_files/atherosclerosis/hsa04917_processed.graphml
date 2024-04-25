@@ -1,0 +1,262 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d5" for="edge" attr.name="type" attr.type="string"/>
+<key id="d4" for="edge" attr.name="subtype" attr.type="string"/>
+<key id="d3" for="edge" attr.name="color" attr.type="string"/>
+<key id="d2" for="edge" attr.name="signal" attr.type="string"/>
+<key id="d1" for="node" attr.name="type" attr.type="string"/>
+<key id="d0" for="node" attr.name="name" attr.type="string"/>
+<graph edgedefault="directed"><node id="RAF1">
+  <data key="d0">RAF1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="JAK2">
+  <data key="d0">JAK2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="GRB2">
+  <data key="d0">GRB2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="FOXO3">
+  <data key="d0">FOXO3</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="GALT">
+  <data key="d0">GALT</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="CISH">
+  <data key="d0">CISH</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="IRF1">
+  <data key="d0">IRF1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="CCND2">
+  <data key="d0">CCND2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="CCND1">
+  <data key="d0">CCND1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="GSK3B">
+  <data key="d0">GSK3B</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="FOS">
+  <data key="d0">FOS</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="MAP2K1"/>
+<node id="MAP2K2"/>
+<node id="HRAS"/>
+<node id="KRAS"/>
+<node id="NRAS"/>
+<node id="STAT1"/>
+<node id="STAT3"/>
+<node id="STAT5A"/>
+<node id="STAT5B"/>
+<node id="SHC1"/>
+<node id="SOCS1"/>
+<node id="SOCS2"/>
+<node id="SOCS3"/>
+<node id="SOCS4"/>
+<node id="SOCS5"/>
+<node id="ESR2"/>
+<node id="NFKB1"/>
+<node id="RELA"/>
+<edge source="RAF1" target="MAP2K1">
+  <data key="d2">a</data>
+</edge>
+<edge source="RAF1" target="MAP2K2">
+  <data key="d2">a</data>
+</edge>
+<edge source="JAK2" target="STAT1">
+  <data key="d2">a</data>
+</edge>
+<edge source="JAK2" target="STAT3">
+  <data key="d2">a</data>
+</edge>
+<edge source="JAK2" target="STAT5A">
+  <data key="d2">a</data>
+</edge>
+<edge source="JAK2" target="STAT5B">
+  <data key="d2">a</data>
+</edge>
+<edge source="JAK2" target="SHC1">
+  <data key="d2">a</data>
+</edge>
+<edge source="FOXO3" target="GALT">
+  <data key="d3">green</data>
+  <data key="d4">expression</data>
+  <data key="d5">GErel</data>
+  <data key="d2">a</data>
+</edge>
+<edge source="GSK3B" target="CCND1">
+  <data key="d3">red</data>
+  <data key="d4">inhibition/phosphorylation</data>
+  <data key="d5">PPrel</data>
+  <data key="d2">i</data>
+</edge>
+<edge source="FOS" target="CCND1">
+  <data key="d3">green</data>
+  <data key="d4">expression</data>
+  <data key="d5">GErel</data>
+  <data key="d2">a</data>
+</edge>
+<edge source="HRAS" target="RAF1">
+  <data key="d2">a</data>
+</edge>
+<edge source="KRAS" target="RAF1">
+  <data key="d2">a</data>
+</edge>
+<edge source="NRAS" target="RAF1">
+  <data key="d2">a</data>
+</edge>
+<edge source="STAT1" target="CCND1">
+  <data key="d2">a</data>
+</edge>
+<edge source="STAT1" target="CISH">
+  <data key="d2">a</data>
+</edge>
+<edge source="STAT1" target="IRF1">
+  <data key="d2">a</data>
+</edge>
+<edge source="STAT1" target="CCND2">
+  <data key="d2">a</data>
+</edge>
+<edge source="STAT1" target="ESR2">
+  <data key="d2">a</data>
+</edge>
+<edge source="STAT3" target="CCND1">
+  <data key="d2">a</data>
+</edge>
+<edge source="STAT3" target="CISH">
+  <data key="d2">a</data>
+</edge>
+<edge source="STAT3" target="IRF1">
+  <data key="d2">a</data>
+</edge>
+<edge source="STAT3" target="CCND2">
+  <data key="d2">a</data>
+</edge>
+<edge source="STAT3" target="ESR2">
+  <data key="d2">a</data>
+</edge>
+<edge source="STAT5A" target="CCND1">
+  <data key="d2">a</data>
+</edge>
+<edge source="STAT5A" target="CISH">
+  <data key="d2">a</data>
+</edge>
+<edge source="STAT5A" target="IRF1">
+  <data key="d2">a</data>
+</edge>
+<edge source="STAT5A" target="CCND2">
+  <data key="d2">a</data>
+</edge>
+<edge source="STAT5A" target="ESR2">
+  <data key="d2">a</data>
+</edge>
+<edge source="STAT5B" target="CCND1">
+  <data key="d2">a</data>
+</edge>
+<edge source="STAT5B" target="CISH">
+  <data key="d2">a</data>
+</edge>
+<edge source="STAT5B" target="IRF1">
+  <data key="d2">a</data>
+</edge>
+<edge source="STAT5B" target="CCND2">
+  <data key="d2">a</data>
+</edge>
+<edge source="STAT5B" target="ESR2">
+  <data key="d2">a</data>
+</edge>
+<edge source="SHC1" target="GRB2">
+  <data key="d2">a</data>
+</edge>
+<edge source="SOCS1" target="JAK2">
+  <data key="d2">i</data>
+</edge>
+<edge source="SOCS1" target="STAT1">
+  <data key="d2">i</data>
+</edge>
+<edge source="SOCS1" target="STAT3">
+  <data key="d2">i</data>
+</edge>
+<edge source="SOCS1" target="STAT5A">
+  <data key="d2">i</data>
+</edge>
+<edge source="SOCS1" target="STAT5B">
+  <data key="d2">i</data>
+</edge>
+<edge source="SOCS2" target="JAK2">
+  <data key="d2">i</data>
+</edge>
+<edge source="SOCS2" target="STAT1">
+  <data key="d2">i</data>
+</edge>
+<edge source="SOCS2" target="STAT3">
+  <data key="d2">i</data>
+</edge>
+<edge source="SOCS2" target="STAT5A">
+  <data key="d2">i</data>
+</edge>
+<edge source="SOCS2" target="STAT5B">
+  <data key="d2">i</data>
+</edge>
+<edge source="SOCS3" target="JAK2">
+  <data key="d2">i</data>
+</edge>
+<edge source="SOCS3" target="STAT1">
+  <data key="d2">i</data>
+</edge>
+<edge source="SOCS3" target="STAT3">
+  <data key="d2">i</data>
+</edge>
+<edge source="SOCS3" target="STAT5A">
+  <data key="d2">i</data>
+</edge>
+<edge source="SOCS3" target="STAT5B">
+  <data key="d2">i</data>
+</edge>
+<edge source="SOCS4" target="JAK2">
+  <data key="d2">i</data>
+</edge>
+<edge source="SOCS4" target="STAT1">
+  <data key="d2">i</data>
+</edge>
+<edge source="SOCS4" target="STAT3">
+  <data key="d2">i</data>
+</edge>
+<edge source="SOCS4" target="STAT5A">
+  <data key="d2">i</data>
+</edge>
+<edge source="SOCS4" target="STAT5B">
+  <data key="d2">i</data>
+</edge>
+<edge source="SOCS5" target="JAK2">
+  <data key="d2">i</data>
+</edge>
+<edge source="SOCS5" target="STAT1">
+  <data key="d2">i</data>
+</edge>
+<edge source="SOCS5" target="STAT3">
+  <data key="d2">i</data>
+</edge>
+<edge source="SOCS5" target="STAT5A">
+  <data key="d2">i</data>
+</edge>
+<edge source="SOCS5" target="STAT5B">
+  <data key="d2">i</data>
+</edge>
+<edge source="NFKB1" target="CCND1">
+  <data key="d2">a</data>
+</edge>
+<edge source="RELA" target="CCND1">
+  <data key="d2">a</data>
+</edge>
+</graph></graphml>

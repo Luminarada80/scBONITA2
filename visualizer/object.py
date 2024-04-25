@@ -6,7 +6,7 @@ class Object(pygame.sprite.Sprite):
     def __init__(self, name, position, color):
         super().__init__()
 
-        self.size = 150
+        self.size = 100
         self.name = name
         self.position = position
         self.color = color

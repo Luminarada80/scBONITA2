@@ -1,0 +1,240 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d5" for="edge" attr.name="signal" attr.type="string"/>
+<key id="d4" for="edge" attr.name="type" attr.type="string"/>
+<key id="d3" for="edge" attr.name="subtype" attr.type="string"/>
+<key id="d2" for="edge" attr.name="color" attr.type="string"/>
+<key id="d1" for="node" attr.name="type" attr.type="string"/>
+<key id="d0" for="node" attr.name="name" attr.type="string"/>
+<graph edgedefault="directed"><node id="UPF1">
+  <data key="d0">UPF1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="UPF2">
+  <data key="d0">UPF2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="SMG1">
+  <data key="d0">SMG1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="SMG5">
+  <data key="d0">SMG5</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="SMG7">
+  <data key="d0">SMG7</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="SMG6">
+  <data key="d0">SMG6</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="ETF1">
+  <data key="d0">ETF1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="FIP1L1">
+  <data key="d0">FIP1L1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="PCF11">
+  <data key="d0">PCF11</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="CLP1">
+  <data key="d0">CLP1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="CPSF3">
+  <data key="d0">CPSF3</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="CPSF2">
+  <data key="d0">CPSF2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="CPSF1">
+  <data key="d0">CPSF1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="CPSF4">
+  <data key="d0">CPSF4</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="CSTF1">
+  <data key="d0">CSTF1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="CSTF2">
+  <data key="d0">CSTF2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="CSTF3">
+  <data key="d0">CSTF3</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="SYMPK">
+  <data key="d0">SYMPK</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="WDR82">
+  <data key="d0">WDR82</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="SSU72">
+  <data key="d0">SSU72</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="NCBP1">
+  <data key="d0">NCBP1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="NCBP2">
+  <data key="d0">NCBP2</data>
+  <data key="d1">ortholog</data>
+</node>
+<edge source="SMG1" target="SMG7">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PCrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="SMG1" target="UPF1">
+  <data key="d2">green</data>
+  <data key="d3">activation/phosphorylation/binding/association</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="SMG5" target="UPF1">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PCrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="SMG7" target="SMG5">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PCrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="SMG7" target="UPF1">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PCrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="SMG6" target="UPF1">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PCrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="ETF1" target="UPF1">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PCrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="ETF1" target="UPF2">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PCrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="FIP1L1" target="WDR82">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="FIP1L1" target="SSU72">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="CLP1" target="PCF11">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PCrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="CPSF3" target="WDR82">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="CPSF3" target="SSU72">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="CPSF2" target="WDR82">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="CPSF2" target="SSU72">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="CPSF1" target="WDR82">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="CPSF1" target="SSU72">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="CPSF4" target="WDR82">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="CPSF4" target="SSU72">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="SYMPK" target="CSTF1">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PCrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="SYMPK" target="CSTF2">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PCrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="SYMPK" target="CSTF3">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PCrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="NCBP1" target="NCBP2">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PCrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="NCBP1" target="UPF1">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PCrel</data>
+  <data key="d5">a</data>
+</edge>
+</graph></graphml>

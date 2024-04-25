@@ -1,0 +1,216 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d5" for="edge" attr.name="type" attr.type="string"/>
+<key id="d4" for="edge" attr.name="subtype" attr.type="string"/>
+<key id="d3" for="edge" attr.name="color" attr.type="string"/>
+<key id="d2" for="edge" attr.name="signal" attr.type="string"/>
+<key id="d1" for="node" attr.name="type" attr.type="string"/>
+<key id="d0" for="node" attr.name="name" attr.type="string"/>
+<graph edgedefault="directed"><node id="IGF1R">
+  <data key="d0">IGF1R</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="GRB2">
+  <data key="d0">GRB2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="MDM2">
+  <data key="d0">MDM2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="CDKN2A">
+  <data key="d0">CDKN2A</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="TP53">
+  <data key="d0">TP53</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="CCND1">
+  <data key="d0">CCND1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="RB1">
+  <data key="d0">RB1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="BAX">
+  <data key="d0">BAX</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="DDB2">
+  <data key="d0">DDB2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="POLK">
+  <data key="d0">POLK</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="CAMK1"/>
+<node id="CAMK4"/>
+<node id="PRKCA"/>
+<node id="PRKCB"/>
+<node id="SHC1"/>
+<node id="BRAF"/>
+<node id="RAF1"/>
+<node id="ARAF"/>
+<node id="MAP2K1"/>
+<node id="MAP2K2"/>
+<node id="CDK4"/>
+<node id="CDK6"/>
+<node id="E2F3"/>
+<node id="PLCG1"/>
+<node id="PLCG2"/>
+<node id="HRAS"/>
+<node id="KRAS"/>
+<node id="NRAS"/>
+<edge source="IGF1R" target="SHC1">
+  <data key="d2">a</data>
+</edge>
+<edge source="IGF1R" target="PLCG1">
+  <data key="d2">a</data>
+</edge>
+<edge source="IGF1R" target="PLCG2">
+  <data key="d2">a</data>
+</edge>
+<edge source="MDM2" target="TP53">
+  <data key="d3">red</data>
+  <data key="d4">inhibition</data>
+  <data key="d5">PPrel</data>
+  <data key="d2">i</data>
+</edge>
+<edge source="CDKN2A" target="MDM2">
+  <data key="d3">black</data>
+  <data key="d4">missing interaction</data>
+  <data key="d5">PPrel</data>
+  <data key="d2">a</data>
+</edge>
+<edge source="CDKN2A" target="CCND1">
+  <data key="d3">black</data>
+  <data key="d4">missing interaction</data>
+  <data key="d5">PPrel</data>
+  <data key="d2">a</data>
+</edge>
+<edge source="CDKN2A" target="CDK4">
+  <data key="d2">a</data>
+</edge>
+<edge source="CDKN2A" target="CDK6">
+  <data key="d2">a</data>
+</edge>
+<edge source="TP53" target="BAX">
+  <data key="d3">black</data>
+  <data key="d4">missing interaction</data>
+  <data key="d5">PPrel</data>
+  <data key="d2">a</data>
+</edge>
+<edge source="TP53" target="DDB2">
+  <data key="d3">black</data>
+  <data key="d4">missing interaction</data>
+  <data key="d5">PPrel</data>
+  <data key="d2">a</data>
+</edge>
+<edge source="TP53" target="POLK">
+  <data key="d3">black</data>
+  <data key="d4">missing interaction</data>
+  <data key="d5">PPrel</data>
+  <data key="d2">a</data>
+</edge>
+<edge source="CCND1" target="RB1">
+  <data key="d3">green</data>
+  <data key="d4">activation/phosphorylation</data>
+  <data key="d5">PPrel</data>
+  <data key="d2">a</data>
+</edge>
+<edge source="RB1" target="E2F3">
+  <data key="d2">i</data>
+</edge>
+<edge source="CAMK1" target="HRAS">
+  <data key="d2">a</data>
+</edge>
+<edge source="CAMK1" target="KRAS">
+  <data key="d2">a</data>
+</edge>
+<edge source="CAMK1" target="NRAS">
+  <data key="d2">a</data>
+</edge>
+<edge source="CAMK4" target="HRAS">
+  <data key="d2">a</data>
+</edge>
+<edge source="CAMK4" target="KRAS">
+  <data key="d2">a</data>
+</edge>
+<edge source="CAMK4" target="NRAS">
+  <data key="d2">a</data>
+</edge>
+<edge source="PRKCA" target="HRAS">
+  <data key="d2">a</data>
+</edge>
+<edge source="PRKCA" target="KRAS">
+  <data key="d2">a</data>
+</edge>
+<edge source="PRKCA" target="NRAS">
+  <data key="d2">a</data>
+</edge>
+<edge source="PRKCB" target="HRAS">
+  <data key="d2">a</data>
+</edge>
+<edge source="PRKCB" target="KRAS">
+  <data key="d2">a</data>
+</edge>
+<edge source="PRKCB" target="NRAS">
+  <data key="d2">a</data>
+</edge>
+<edge source="SHC1" target="GRB2">
+  <data key="d2">a</data>
+</edge>
+<edge source="BRAF" target="MAP2K1">
+  <data key="d2">a</data>
+</edge>
+<edge source="BRAF" target="MAP2K2">
+  <data key="d2">a</data>
+</edge>
+<edge source="RAF1" target="MAP2K1">
+  <data key="d2">a</data>
+</edge>
+<edge source="RAF1" target="MAP2K2">
+  <data key="d2">a</data>
+</edge>
+<edge source="ARAF" target="MAP2K1">
+  <data key="d2">a</data>
+</edge>
+<edge source="ARAF" target="MAP2K2">
+  <data key="d2">a</data>
+</edge>
+<edge source="CDK4" target="RB1">
+  <data key="d2">a</data>
+</edge>
+<edge source="CDK6" target="RB1">
+  <data key="d2">a</data>
+</edge>
+<edge source="HRAS" target="BRAF">
+  <data key="d2">a</data>
+</edge>
+<edge source="HRAS" target="RAF1">
+  <data key="d2">a</data>
+</edge>
+<edge source="HRAS" target="ARAF">
+  <data key="d2">a</data>
+</edge>
+<edge source="KRAS" target="BRAF">
+  <data key="d2">a</data>
+</edge>
+<edge source="KRAS" target="RAF1">
+  <data key="d2">a</data>
+</edge>
+<edge source="KRAS" target="ARAF">
+  <data key="d2">a</data>
+</edge>
+<edge source="NRAS" target="BRAF">
+  <data key="d2">a</data>
+</edge>
+<edge source="NRAS" target="RAF1">
+  <data key="d2">a</data>
+</edge>
+<edge source="NRAS" target="ARAF">
+  <data key="d2">a</data>
+</edge>
+</graph></graphml>

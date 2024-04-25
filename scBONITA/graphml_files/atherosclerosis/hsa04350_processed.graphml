@@ -1,0 +1,346 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d5" for="edge" attr.name="type" attr.type="string"/>
+<key id="d4" for="edge" attr.name="subtype" attr.type="string"/>
+<key id="d3" for="edge" attr.name="color" attr.type="string"/>
+<key id="d2" for="edge" attr.name="signal" attr.type="string"/>
+<key id="d1" for="node" attr.name="type" attr.type="string"/>
+<key id="d0" for="node" attr.name="name" attr.type="string"/>
+<graph edgedefault="directed"><node id="CUL1">
+  <data key="d0">CUL1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="RBX1">
+  <data key="d0">RBX1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="SMAD4">
+  <data key="d0">SMAD4</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="MYC">
+  <data key="d0">MYC</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="TFDP1">
+  <data key="d0">TFDP1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="RBL1">
+  <data key="d0">RBL1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="ROCK1">
+  <data key="d0">ROCK1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="RHOA">
+  <data key="d0">RHOA</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="SKP1">
+  <data key="d0">SKP1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="TGFBR2">
+  <data key="d0">TGFBR2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="TGFBR1">
+  <data key="d0">TGFBR1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="TNF">
+  <data key="d0">TNF</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="IFNG">
+  <data key="d0">IFNG</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="NEO1">
+  <data key="d0">NEO1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="EMP3">
+  <data key="d0">EMP3</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="SKI">
+  <data key="d0">SKI</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="NCOR1">
+  <data key="d0">NCOR1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="SKIL">
+  <data key="d0">SKIL</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="SIN3A">
+  <data key="d0">SIN3A</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="TFR2">
+  <data key="d0">TFR2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="HFE">
+  <data key="d0">HFE</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="TFRC">
+  <data key="d0">TFRC</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="ACVR2A"/>
+<node id="SMAD2"/>
+<node id="SMAD3"/>
+<node id="SMAD7"/>
+<node id="ID1"/>
+<node id="ID2"/>
+<node id="ID3"/>
+<node id="ACVR1"/>
+<node id="TGFB1"/>
+<node id="TGFB3"/>
+<node id="BMPR2"/>
+<node id="BMPR1A"/>
+<node id="SMAD5"/>
+<node id="TGIF1"/>
+<node id="TGIF2"/>
+<node id="NRROS"/>
+<edge source="CUL1" target="SMAD2">
+  <data key="d2">i</data>
+</edge>
+<edge source="CUL1" target="SMAD3">
+  <data key="d2">i</data>
+</edge>
+<edge source="RBX1" target="SMAD2">
+  <data key="d2">i</data>
+</edge>
+<edge source="RBX1" target="SMAD3">
+  <data key="d2">i</data>
+</edge>
+<edge source="SMAD4" target="TFDP1">
+  <data key="d3">green</data>
+  <data key="d4">activation</data>
+  <data key="d5">PPrel</data>
+  <data key="d2">a</data>
+</edge>
+<edge source="SMAD4" target="RBL1">
+  <data key="d3">green</data>
+  <data key="d4">activation</data>
+  <data key="d5">PPrel</data>
+  <data key="d2">a</data>
+</edge>
+<edge source="SMAD4" target="ID1">
+  <data key="d2">a</data>
+</edge>
+<edge source="SMAD4" target="ID2">
+  <data key="d2">a</data>
+</edge>
+<edge source="SMAD4" target="ID3">
+  <data key="d2">a</data>
+</edge>
+<edge source="TFDP1" target="MYC">
+  <data key="d3">red</data>
+  <data key="d4">repression</data>
+  <data key="d5">GErel</data>
+  <data key="d2">i</data>
+</edge>
+<edge source="RBL1" target="MYC">
+  <data key="d3">red</data>
+  <data key="d4">repression</data>
+  <data key="d5">GErel</data>
+  <data key="d2">i</data>
+</edge>
+<edge source="RHOA" target="ROCK1">
+  <data key="d3">green</data>
+  <data key="d4">activation</data>
+  <data key="d5">PPrel</data>
+  <data key="d2">a</data>
+</edge>
+<edge source="SKP1" target="SMAD2">
+  <data key="d2">i</data>
+</edge>
+<edge source="SKP1" target="SMAD3">
+  <data key="d2">i</data>
+</edge>
+<edge source="TGFBR2" target="RHOA">
+  <data key="d3">green</data>
+  <data key="d4">activation</data>
+  <data key="d5">PPrel</data>
+  <data key="d2">a</data>
+</edge>
+<edge source="TGFBR1" target="SMAD2">
+  <data key="d2">a</data>
+</edge>
+<edge source="TGFBR1" target="SMAD3">
+  <data key="d2">a</data>
+</edge>
+<edge source="TNF" target="SMAD7">
+  <data key="d2">a</data>
+</edge>
+<edge source="IFNG" target="SMAD7">
+  <data key="d2">a</data>
+</edge>
+<edge source="EMP3" target="TGFBR2">
+  <data key="d3">purple</data>
+  <data key="d4">binding/association</data>
+  <data key="d5">PPrel</data>
+  <data key="d2">a</data>
+</edge>
+<edge source="SKI" target="NCOR1">
+  <data key="d3">purple</data>
+  <data key="d4">binding/association</data>
+  <data key="d5">PPrel</data>
+  <data key="d2">a</data>
+</edge>
+<edge source="SKI" target="SKIL">
+  <data key="d3">purple</data>
+  <data key="d4">binding/association</data>
+  <data key="d5">PPrel</data>
+  <data key="d2">a</data>
+</edge>
+<edge source="SKI" target="SIN3A">
+  <data key="d3">purple</data>
+  <data key="d4">binding/association</data>
+  <data key="d5">PPrel</data>
+  <data key="d2">a</data>
+</edge>
+<edge source="SKI" target="SMAD4">
+  <data key="d3">red</data>
+  <data key="d4">inhibition</data>
+  <data key="d5">PPrel</data>
+  <data key="d2">i</data>
+</edge>
+<edge source="NCOR1" target="SMAD4">
+  <data key="d3">red</data>
+  <data key="d4">inhibition</data>
+  <data key="d5">PPrel</data>
+  <data key="d2">i</data>
+</edge>
+<edge source="SKIL" target="SMAD4">
+  <data key="d3">red</data>
+  <data key="d4">inhibition</data>
+  <data key="d5">PPrel</data>
+  <data key="d2">i</data>
+</edge>
+<edge source="SIN3A" target="SMAD4">
+  <data key="d3">red</data>
+  <data key="d4">inhibition</data>
+  <data key="d5">PPrel</data>
+  <data key="d2">i</data>
+</edge>
+<edge source="HFE" target="TFR2">
+  <data key="d3">purple</data>
+  <data key="d4">binding/association</data>
+  <data key="d5">PPrel</data>
+  <data key="d2">a</data>
+</edge>
+<edge source="TFRC" target="TFR2">
+  <data key="d3">green</data>
+  <data key="d4">activation</data>
+  <data key="d5">PPrel</data>
+  <data key="d2">a</data>
+</edge>
+<edge source="TFRC" target="HFE">
+  <data key="d3">green</data>
+  <data key="d4">activation</data>
+  <data key="d5">PPrel</data>
+  <data key="d2">a</data>
+</edge>
+<edge source="SMAD2" target="SMAD4">
+  <data key="d2">a</data>
+</edge>
+<edge source="SMAD2" target="TFDP1">
+  <data key="d2">a</data>
+</edge>
+<edge source="SMAD2" target="RBL1">
+  <data key="d2">a</data>
+</edge>
+<edge source="SMAD3" target="SMAD4">
+  <data key="d2">a</data>
+</edge>
+<edge source="SMAD3" target="TFDP1">
+  <data key="d2">a</data>
+</edge>
+<edge source="SMAD3" target="RBL1">
+  <data key="d2">a</data>
+</edge>
+<edge source="SMAD7" target="SMAD2">
+  <data key="d2">i</data>
+</edge>
+<edge source="SMAD7" target="SMAD3">
+  <data key="d2">i</data>
+</edge>
+<edge source="SMAD7" target="SMAD5">
+  <data key="d2">i</data>
+</edge>
+<edge source="ACVR1" target="SMAD2">
+  <data key="d2">a</data>
+</edge>
+<edge source="ACVR1" target="SMAD3">
+  <data key="d2">a</data>
+</edge>
+<edge source="ACVR1" target="NEO1">
+  <data key="d2">a</data>
+</edge>
+<edge source="ACVR1" target="SMAD5">
+  <data key="d2">a</data>
+</edge>
+<edge source="ACVR1" target="BMPR2">
+  <data key="d2">a</data>
+</edge>
+<edge source="ACVR1" target="ACVR2A">
+  <data key="d2">a</data>
+</edge>
+<edge source="TGFB1" target="TGFBR2">
+  <data key="d2">a</data>
+</edge>
+<edge source="TGFB3" target="TGFBR2">
+  <data key="d2">a</data>
+</edge>
+<edge source="BMPR1A" target="NEO1">
+  <data key="d2">a</data>
+</edge>
+<edge source="BMPR1A" target="SMAD5">
+  <data key="d2">a</data>
+</edge>
+<edge source="BMPR1A" target="BMPR2">
+  <data key="d2">a</data>
+</edge>
+<edge source="BMPR1A" target="ACVR2A">
+  <data key="d2">a</data>
+</edge>
+<edge source="SMAD5" target="SMAD4">
+  <data key="d2">a</data>
+</edge>
+<edge source="SMAD5" target="ID1">
+  <data key="d2">a</data>
+</edge>
+<edge source="SMAD5" target="ID2">
+  <data key="d2">a</data>
+</edge>
+<edge source="SMAD5" target="ID3">
+  <data key="d2">a</data>
+</edge>
+<edge source="TGIF1" target="SMAD2">
+  <data key="d2">i</data>
+</edge>
+<edge source="TGIF1" target="SMAD3">
+  <data key="d2">i</data>
+</edge>
+<edge source="TGIF2" target="SMAD2">
+  <data key="d2">i</data>
+</edge>
+<edge source="TGIF2" target="SMAD3">
+  <data key="d2">i</data>
+</edge>
+<edge source="NRROS" target="TGFB1">
+  <data key="d2">a</data>
+</edge>
+<edge source="NRROS" target="TGFB3">
+  <data key="d2">a</data>
+</edge>
+</graph></graphml>

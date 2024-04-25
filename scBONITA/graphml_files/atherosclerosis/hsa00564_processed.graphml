@@ -1,0 +1,337 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d5" for="edge" attr.name="signal" attr.type="string"/>
+<key id="d4" for="edge" attr.name="type" attr.type="string"/>
+<key id="d3" for="edge" attr.name="subtype" attr.type="string"/>
+<key id="d2" for="edge" attr.name="color" attr.type="string"/>
+<key id="d1" for="node" attr.name="type" attr.type="string"/>
+<key id="d0" for="node" attr.name="name" attr.type="string"/>
+<graph edgedefault="directed"><node id="PTDSS2">
+  <data key="d0">PTDSS2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="PTDSS1">
+  <data key="d0">PTDSS1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="PCYT2">
+  <data key="d0">PCYT2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="LCAT">
+  <data key="d0">LCAT</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="GPCPD1">
+  <data key="d0">GPCPD1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="LPCAT4"/>
+<node id="LPCAT3"/>
+<node id="CHPT1"/>
+<node id="CEPT1"/>
+<node id="PLA2G16"/>
+<node id="DAD1"/>
+<node id="PLA2G6"/>
+<node id="DGKA"/>
+<node id="GDE1"/>
+<node id="AGPAT5"/>
+<node id="LCLAT1"/>
+<node id="EPT1"/>
+<node id="LYPLA1"/>
+<node id="LYPLA2"/>
+<node id="PEMT"/>
+<edge source="PTDSS2" target="PTDSS1">
+  <data key="d2">purple</data>
+  <data key="d3">compound</data>
+  <data key="d4">ECrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="PTDSS2" target="PLA2G16">
+  <data key="d5">a</data>
+</edge>
+<edge source="PTDSS2" target="DAD1">
+  <data key="d5">a</data>
+</edge>
+<edge source="PTDSS2" target="PLA2G6">
+  <data key="d5">a</data>
+</edge>
+<edge source="PTDSS2" target="EPT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="PTDSS2" target="CEPT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="PTDSS2" target="LPCAT4">
+  <data key="d5">a</data>
+</edge>
+<edge source="PTDSS2" target="LPCAT3">
+  <data key="d5">a</data>
+</edge>
+<edge source="PTDSS2" target="PEMT">
+  <data key="d5">a</data>
+</edge>
+<edge source="PTDSS1" target="LCAT">
+  <data key="d2">purple</data>
+  <data key="d3">compound</data>
+  <data key="d4">ECrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="PTDSS1" target="LPCAT4">
+  <data key="d5">a</data>
+</edge>
+<edge source="PTDSS1" target="LPCAT3">
+  <data key="d5">a</data>
+</edge>
+<edge source="PTDSS1" target="CHPT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="PTDSS1" target="CEPT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="PTDSS1" target="PLA2G16">
+  <data key="d5">a</data>
+</edge>
+<edge source="PTDSS1" target="DAD1">
+  <data key="d5">a</data>
+</edge>
+<edge source="PTDSS1" target="PLA2G6">
+  <data key="d5">a</data>
+</edge>
+<edge source="PTDSS1" target="PEMT">
+  <data key="d5">a</data>
+</edge>
+<edge source="PCYT2" target="EPT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="PCYT2" target="CEPT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="LCAT" target="PEMT">
+  <data key="d5">a</data>
+</edge>
+<edge source="LCAT" target="LYPLA1">
+  <data key="d5">a</data>
+</edge>
+<edge source="GPCPD1" target="LYPLA2">
+  <data key="d5">a</data>
+</edge>
+<edge source="GPCPD1" target="LYPLA1">
+  <data key="d5">a</data>
+</edge>
+<edge source="LPCAT4" target="CHPT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="LPCAT4" target="CEPT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="LPCAT4" target="PLA2G16">
+  <data key="d5">a</data>
+</edge>
+<edge source="LPCAT4" target="DAD1">
+  <data key="d5">a</data>
+</edge>
+<edge source="LPCAT4" target="PTDSS2">
+  <data key="d5">a</data>
+</edge>
+<edge source="LPCAT4" target="PTDSS1">
+  <data key="d5">a</data>
+</edge>
+<edge source="LPCAT4" target="PEMT">
+  <data key="d5">a</data>
+</edge>
+<edge source="LPCAT4" target="LYPLA1">
+  <data key="d5">a</data>
+</edge>
+<edge source="LPCAT3" target="CHPT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="LPCAT3" target="CEPT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="LPCAT3" target="PLA2G16">
+  <data key="d5">a</data>
+</edge>
+<edge source="LPCAT3" target="DAD1">
+  <data key="d5">a</data>
+</edge>
+<edge source="LPCAT3" target="PTDSS2">
+  <data key="d5">a</data>
+</edge>
+<edge source="LPCAT3" target="PTDSS1">
+  <data key="d5">a</data>
+</edge>
+<edge source="LPCAT3" target="PEMT">
+  <data key="d5">a</data>
+</edge>
+<edge source="LPCAT3" target="LYPLA1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CHPT1" target="LCAT">
+  <data key="d5">a</data>
+</edge>
+<edge source="CHPT1" target="PLA2G16">
+  <data key="d5">a</data>
+</edge>
+<edge source="CHPT1" target="DAD1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CHPT1" target="PLA2G6">
+  <data key="d5">a</data>
+</edge>
+<edge source="CHPT1" target="DGKA">
+  <data key="d5">a</data>
+</edge>
+<edge source="CHPT1" target="EPT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CHPT1" target="CEPT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CHPT1" target="PEMT">
+  <data key="d5">a</data>
+</edge>
+<edge source="CEPT1" target="LCAT">
+  <data key="d5">a</data>
+</edge>
+<edge source="CEPT1" target="PLA2G16">
+  <data key="d5">a</data>
+</edge>
+<edge source="CEPT1" target="DAD1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CEPT1" target="PLA2G6">
+  <data key="d5">a</data>
+</edge>
+<edge source="CEPT1" target="DGKA">
+  <data key="d5">a</data>
+</edge>
+<edge source="CEPT1" target="EPT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CEPT1" target="LPCAT4">
+  <data key="d5">a</data>
+</edge>
+<edge source="CEPT1" target="LPCAT3">
+  <data key="d5">a</data>
+</edge>
+<edge source="CEPT1" target="PEMT">
+  <data key="d5">a</data>
+</edge>
+<edge source="PLA2G16" target="LCAT">
+  <data key="d5">a</data>
+</edge>
+<edge source="PLA2G16" target="PLA2G6">
+  <data key="d5">a</data>
+</edge>
+<edge source="PLA2G16" target="DAD1">
+  <data key="d5">a</data>
+</edge>
+<edge source="PLA2G16" target="EPT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="PLA2G16" target="CEPT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="PLA2G16" target="LYPLA1">
+  <data key="d5">a</data>
+</edge>
+<edge source="PLA2G16" target="LPCAT4">
+  <data key="d5">a</data>
+</edge>
+<edge source="PLA2G16" target="LPCAT3">
+  <data key="d5">a</data>
+</edge>
+<edge source="PLA2G16" target="LYPLA2">
+  <data key="d5">a</data>
+</edge>
+<edge source="PLA2G16" target="PEMT">
+  <data key="d5">a</data>
+</edge>
+<edge source="DAD1" target="LCAT">
+  <data key="d5">a</data>
+</edge>
+<edge source="DAD1" target="PLA2G6">
+  <data key="d5">a</data>
+</edge>
+<edge source="DAD1" target="PLA2G16">
+  <data key="d5">a</data>
+</edge>
+<edge source="DAD1" target="EPT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="DAD1" target="CEPT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="DAD1" target="LPCAT4">
+  <data key="d5">a</data>
+</edge>
+<edge source="DAD1" target="LPCAT3">
+  <data key="d5">a</data>
+</edge>
+<edge source="DAD1" target="LYPLA2">
+  <data key="d5">a</data>
+</edge>
+<edge source="DAD1" target="PEMT">
+  <data key="d5">a</data>
+</edge>
+<edge source="PLA2G6" target="PLA2G16">
+  <data key="d5">a</data>
+</edge>
+<edge source="PLA2G6" target="DAD1">
+  <data key="d5">a</data>
+</edge>
+<edge source="PLA2G6" target="EPT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="PLA2G6" target="CEPT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="PLA2G6" target="LYPLA1">
+  <data key="d5">a</data>
+</edge>
+<edge source="PLA2G6" target="PEMT">
+  <data key="d5">a</data>
+</edge>
+<edge source="DGKA" target="AGPAT5">
+  <data key="d5">a</data>
+</edge>
+<edge source="DGKA" target="LCLAT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="DGKA" target="EPT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="DGKA" target="CEPT1">
+  <data key="d5">a</data>
+</edge>
+<edge source="GDE1" target="LYPLA1">
+  <data key="d5">a</data>
+</edge>
+<edge source="GDE1" target="LYPLA2">
+  <data key="d5">a</data>
+</edge>
+<edge source="EPT1" target="LPCAT4">
+  <data key="d5">a</data>
+</edge>
+<edge source="EPT1" target="LPCAT3">
+  <data key="d5">a</data>
+</edge>
+<edge source="EPT1" target="PEMT">
+  <data key="d5">a</data>
+</edge>
+<edge source="LYPLA1" target="GPCPD1">
+  <data key="d5">a</data>
+</edge>
+<edge source="LYPLA1" target="LPCAT4">
+  <data key="d5">a</data>
+</edge>
+<edge source="LYPLA1" target="LPCAT3">
+  <data key="d5">a</data>
+</edge>
+<edge source="LYPLA2" target="GPCPD1">
+  <data key="d5">a</data>
+</edge>
+<edge source="LYPLA2" target="GDE1">
+  <data key="d5">a</data>
+</edge>
+</graph></graphml>

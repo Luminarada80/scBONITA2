@@ -206,8 +206,11 @@ class Game:
         #         counter += 1
 
         # Boolean Nodes
+        # for i in range(1, num_nodes+1):
+        #     self.nodes.append(Node('', (self.WIDTH/2+350,self.HEIGHT/2+(50*i)), "light blue"))
+
         for i in range(1, num_nodes+1):
-            self.nodes.append(Node('', (self.WIDTH/2+350,self.HEIGHT/2+(50*i)), "light blue"))
+            self.nodes.append(Node(f'Node {i}', (self.WIDTH/2+350,self.HEIGHT/2+(50*i)), "light blue"))
 
         # Change the size and color of the nodes for relative abundance. Manual entry required
         if relative_abundance:

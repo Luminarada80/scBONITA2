@@ -1,0 +1,243 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d5" for="edge" attr.name="type" attr.type="string"/>
+<key id="d4" for="edge" attr.name="subtype" attr.type="string"/>
+<key id="d3" for="edge" attr.name="color" attr.type="string"/>
+<key id="d2" for="edge" attr.name="signal" attr.type="string"/>
+<key id="d1" for="node" attr.name="type" attr.type="string"/>
+<key id="d0" for="node" attr.name="name" attr.type="string"/>
+<graph edgedefault="directed"><node id="ATXN3">
+  <data key="d0">ATXN3</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="ERN1">
+  <data key="d0">ERN1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="TRAF2">
+  <data key="d0">TRAF2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="MAP3K5">
+  <data key="d0">MAP3K5</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="MTOR">
+  <data key="d0">MTOR</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="OMA1">
+  <data key="d0">OMA1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="OPA1">
+  <data key="d0">OPA1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="ITPR1">
+  <data key="d0">ITPR1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="TBP">
+  <data key="d0">TBP</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="SP1">
+  <data key="d0">SP1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="NFYA">
+  <data key="d0">NFYA</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="XBP1">
+  <data key="d0">XBP1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="ITPR2"/>
+<node id="ITPR3"/>
+<node id="ULK1"/>
+<node id="ULK2"/>
+<node id="PSMA6"/>
+<node id="PSMA2"/>
+<node id="PSMA4"/>
+<node id="PSMA7"/>
+<node id="PSMA5"/>
+<node id="PSMA1"/>
+<node id="PSMA3"/>
+<node id="PSMB6"/>
+<node id="PSMB7"/>
+<node id="PSMB3"/>
+<node id="PSMB2"/>
+<node id="PSMB5"/>
+<node id="PSMB1"/>
+<node id="PSMB4"/>
+<node id="PSMC2"/>
+<node id="PSMC1"/>
+<node id="PSMC4"/>
+<node id="PSMC6"/>
+<node id="PSMC3"/>
+<node id="PSMC5"/>
+<node id="PSMD2"/>
+<node id="PSMD1"/>
+<node id="PSMD3"/>
+<node id="PSMD9"/>
+<node id="PSMD12"/>
+<node id="PSMD11"/>
+<node id="PSMD6"/>
+<node id="PSMD7"/>
+<node id="PSMD13"/>
+<node id="PSMD4"/>
+<node id="PSMD14"/>
+<node id="PSMD8"/>
+<node id="SHFM1"/>
+<edge source="ATXN3" target="ITPR1">
+  <data key="d2">a</data>
+</edge>
+<edge source="ATXN3" target="ITPR2">
+  <data key="d2">a</data>
+</edge>
+<edge source="ATXN3" target="ITPR3">
+  <data key="d2">a</data>
+</edge>
+<edge source="ATXN3" target="PSMA6">
+  <data key="d2">i</data>
+</edge>
+<edge source="ATXN3" target="PSMA2">
+  <data key="d2">i</data>
+</edge>
+<edge source="ATXN3" target="PSMA4">
+  <data key="d2">i</data>
+</edge>
+<edge source="ATXN3" target="PSMA7">
+  <data key="d2">i</data>
+</edge>
+<edge source="ATXN3" target="PSMA5">
+  <data key="d2">i</data>
+</edge>
+<edge source="ATXN3" target="PSMA1">
+  <data key="d2">i</data>
+</edge>
+<edge source="ATXN3" target="PSMA3">
+  <data key="d2">i</data>
+</edge>
+<edge source="ATXN3" target="PSMB6">
+  <data key="d2">i</data>
+</edge>
+<edge source="ATXN3" target="PSMB7">
+  <data key="d2">i</data>
+</edge>
+<edge source="ATXN3" target="PSMB3">
+  <data key="d2">i</data>
+</edge>
+<edge source="ATXN3" target="PSMB2">
+  <data key="d2">i</data>
+</edge>
+<edge source="ATXN3" target="PSMB5">
+  <data key="d2">i</data>
+</edge>
+<edge source="ATXN3" target="PSMB1">
+  <data key="d2">i</data>
+</edge>
+<edge source="ATXN3" target="PSMB4">
+  <data key="d2">i</data>
+</edge>
+<edge source="ATXN3" target="PSMC2">
+  <data key="d2">i</data>
+</edge>
+<edge source="ATXN3" target="PSMC1">
+  <data key="d2">i</data>
+</edge>
+<edge source="ATXN3" target="PSMC4">
+  <data key="d2">i</data>
+</edge>
+<edge source="ATXN3" target="PSMC6">
+  <data key="d2">i</data>
+</edge>
+<edge source="ATXN3" target="PSMC3">
+  <data key="d2">i</data>
+</edge>
+<edge source="ATXN3" target="PSMC5">
+  <data key="d2">i</data>
+</edge>
+<edge source="ATXN3" target="PSMD2">
+  <data key="d2">i</data>
+</edge>
+<edge source="ATXN3" target="PSMD1">
+  <data key="d2">i</data>
+</edge>
+<edge source="ATXN3" target="PSMD3">
+  <data key="d2">i</data>
+</edge>
+<edge source="ATXN3" target="PSMD9">
+  <data key="d2">i</data>
+</edge>
+<edge source="ATXN3" target="PSMD12">
+  <data key="d2">i</data>
+</edge>
+<edge source="ATXN3" target="PSMD11">
+  <data key="d2">i</data>
+</edge>
+<edge source="ATXN3" target="PSMD6">
+  <data key="d2">i</data>
+</edge>
+<edge source="ATXN3" target="PSMD7">
+  <data key="d2">i</data>
+</edge>
+<edge source="ATXN3" target="PSMD13">
+  <data key="d2">i</data>
+</edge>
+<edge source="ATXN3" target="PSMD4">
+  <data key="d2">i</data>
+</edge>
+<edge source="ATXN3" target="PSMD14">
+  <data key="d2">i</data>
+</edge>
+<edge source="ATXN3" target="PSMD8">
+  <data key="d2">i</data>
+</edge>
+<edge source="ATXN3" target="SHFM1">
+  <data key="d2">i</data>
+</edge>
+<edge source="ERN1" target="MAP3K5">
+  <data key="d3">green</data>
+  <data key="d4">activation</data>
+  <data key="d5">PPrel</data>
+  <data key="d2">a</data>
+</edge>
+<edge source="TRAF2" target="MAP3K5">
+  <data key="d3">green</data>
+  <data key="d4">activation</data>
+  <data key="d5">PPrel</data>
+  <data key="d2">a</data>
+</edge>
+<edge source="MTOR" target="ULK1">
+  <data key="d2">i</data>
+</edge>
+<edge source="MTOR" target="ULK2">
+  <data key="d2">i</data>
+</edge>
+<edge source="OMA1" target="OPA1">
+  <data key="d3">green</data>
+  <data key="d4">activation</data>
+  <data key="d5">PPrel</data>
+  <data key="d2">a</data>
+</edge>
+<edge source="TBP" target="XBP1">
+  <data key="d3">black</data>
+  <data key="d4">missing interaction</data>
+  <data key="d5">PPrel</data>
+  <data key="d2">a</data>
+</edge>
+<edge source="TBP" target="SP1">
+  <data key="d3">red</data>
+  <data key="d4">inhibition</data>
+  <data key="d5">PPrel</data>
+  <data key="d2">i</data>
+</edge>
+<edge source="TBP" target="NFYA">
+  <data key="d3">red</data>
+  <data key="d4">inhibition</data>
+  <data key="d5">PPrel</data>
+  <data key="d2">i</data>
+</edge>
+</graph></graphml>

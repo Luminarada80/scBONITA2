@@ -1,0 +1,110 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d2" for="edge" attr.name="signal" attr.type="string"/>
+<key id="d1" for="node" attr.name="type" attr.type="string"/>
+<key id="d0" for="node" attr.name="name" attr.type="string"/>
+<graph edgedefault="directed"><node id="GNAS">
+  <data key="d0">GNAS</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="CAMK4">
+  <data key="d0">CAMK4</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="MAP2K1">
+  <data key="d0">MAP2K1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="FOSB">
+  <data key="d0">FOSB</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="CREB1"/>
+<node id="ATF2"/>
+<node id="ATF4"/>
+<node id="CREB3"/>
+<node id="ATF6B"/>
+<node id="CAMKK1"/>
+<node id="CAMKK2"/>
+<node id="ADORA2A"/>
+<node id="HRAS"/>
+<node id="KRAS"/>
+<node id="NRAS"/>
+<node id="ARAF"/>
+<node id="BRAF"/>
+<node id="RAF1"/>
+<edge source="CAMK4" target="CREB1">
+  <data key="d2">a</data>
+</edge>
+<edge source="CAMK4" target="ATF2">
+  <data key="d2">a</data>
+</edge>
+<edge source="CAMK4" target="ATF4">
+  <data key="d2">a</data>
+</edge>
+<edge source="CAMK4" target="CREB3">
+  <data key="d2">a</data>
+</edge>
+<edge source="CAMK4" target="ATF6B">
+  <data key="d2">a</data>
+</edge>
+<edge source="CREB1" target="FOSB">
+  <data key="d2">a</data>
+</edge>
+<edge source="ATF2" target="FOSB">
+  <data key="d2">a</data>
+</edge>
+<edge source="ATF4" target="FOSB">
+  <data key="d2">a</data>
+</edge>
+<edge source="CREB3" target="FOSB">
+  <data key="d2">a</data>
+</edge>
+<edge source="ATF6B" target="FOSB">
+  <data key="d2">a</data>
+</edge>
+<edge source="CAMKK1" target="CAMK4">
+  <data key="d2">a</data>
+</edge>
+<edge source="CAMKK2" target="CAMK4">
+  <data key="d2">a</data>
+</edge>
+<edge source="ADORA2A" target="GNAS">
+  <data key="d2">a</data>
+</edge>
+<edge source="HRAS" target="ARAF">
+  <data key="d2">a</data>
+</edge>
+<edge source="HRAS" target="BRAF">
+  <data key="d2">a</data>
+</edge>
+<edge source="HRAS" target="RAF1">
+  <data key="d2">a</data>
+</edge>
+<edge source="KRAS" target="ARAF">
+  <data key="d2">a</data>
+</edge>
+<edge source="KRAS" target="BRAF">
+  <data key="d2">a</data>
+</edge>
+<edge source="KRAS" target="RAF1">
+  <data key="d2">a</data>
+</edge>
+<edge source="NRAS" target="ARAF">
+  <data key="d2">a</data>
+</edge>
+<edge source="NRAS" target="BRAF">
+  <data key="d2">a</data>
+</edge>
+<edge source="NRAS" target="RAF1">
+  <data key="d2">a</data>
+</edge>
+<edge source="ARAF" target="MAP2K1">
+  <data key="d2">a</data>
+</edge>
+<edge source="BRAF" target="MAP2K1">
+  <data key="d2">a</data>
+</edge>
+<edge source="RAF1" target="MAP2K1">
+  <data key="d2">a</data>
+</edge>
+</graph></graphml>
