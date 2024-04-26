@@ -139,6 +139,8 @@ class NetworkSetup:
         # --- Find the predecessors of each node ---
         predecessors_final, predCorr_temp = self.parse_connections(node, nodeList, graph, nodeDict, possibilityLister)
 
+        print(f'\nPredecessors final: {predecessors_final}')
+
         # Store the correlations between incoming nodes in "rvalues"
         top_three_incoming_node_correlations = sorted(predCorr_temp, reverse=True)[:3]
         self.rvalues.append(top_three_incoming_node_correlations)
@@ -173,6 +175,7 @@ class NetworkSetup:
             zip(predecessors_temp, predCorr_temp),
             reverse=True,
             key=lambda corrs: corrs[1], )[:3]
+        
         return predecessors_final, predCorr_temp
     
     def calculate_spearman_correlation(self, node, predecessors_temp):
@@ -200,6 +203,7 @@ class NetworkSetup:
             # find binarized expression data for predecessor
             predData = (self.binarized_matrix[predIndex, :].todense().tolist()[0])
             mi, pvalue = spearmanr(nodeData, predData)
+
             if np.isnan(mi):
                 predCorr_temp.append(0)
             else:
@@ -234,18 +238,17 @@ class NetworkSetup:
         """
         Calculate the possible combinations of incoming nodes
         """
-        # Write the node names from predecessors_final and repeat('empty')
-        withNones = zip(
-            [nodeList.index(corr_tuple[0]) for corr_tuple in predecessors_final],
-            itertool.repeat("empty"),
-        )
+
+
+        predecessor_indices = [nodeList.index(corr_tuple[0]) for corr_tuple in predecessors_final]
+
+        options = [[node, 'empty'] for node in predecessor_indices]
 
         # Iterate through every possibility for the node, with 'empty' as the filler for 2 or 1 incoming AND node possibilites
-        possibilities = list(itertool.product(*withNones))  # Make a list of 0's
+        possibilities = list(itertool.product(*options))  # Make a list of 0's
 
         # Trim out any of the "empty" values
         for j in range(0, len(possibilities)):
-            possibilities[j] = list(possibilities[j])
             while "empty" in possibilities[j]:
                 possibilities[j].remove("empty")
             while [] in possibilities[j]:
@@ -322,6 +325,13 @@ class NetworkSetup:
                 if len(possibility) == 1:
                     one_node_possibilities.append(possibility)
             self.combinations["one_incoming_nodes"][node] = one_node_possibilities
+
+        # print(f'Combinations:')
+        # for key, value in self.combinations.items():
+        #     print(f'\t{key}')
+        #     for key2, value2 in value.items():
+        #         print(f'\t\t\tNode: {key2} possibilities = {value2}')
+
 
     # 1.5.1 Calculates the inversion rules for each combination
     def calculate_inversion_rules(self, node):

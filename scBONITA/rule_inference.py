@@ -71,6 +71,7 @@ class RuleInference(NetworkSetup):
         else:
             # Handle the case where no samples were selected
             raise ValueError("No samples selected for binarization")
+            
         
         full_matrix = self.binarized_matrix.todense()
 
