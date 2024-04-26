@@ -382,6 +382,7 @@ class Pathways:
         """
         logging.info("\t\tFinding KEGG pathways...")
         kegg_dict = self.parse_kegg_dict()  # parse the dictionary of ko codes
+        logging.info("\t\t\tLoaded KEGG code dictionary")
         
         try:  # try to retrieve and parse the dictionary containing organism gene names to codes conversion
             url = requests.get("http://rest.kegg.jp/list/" + organism, stream=True)
