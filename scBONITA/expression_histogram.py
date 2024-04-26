@@ -1,7 +1,9 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-datafile = "../../kazer_data/merged_data.csv"
+datafile = "../../george_data/hiv_dataset/HIV_dataset_normalized_integrated_counts.csv"
+
+# "../../kazer_data/merged_data.csv"
 
 data = pd.read_csv(datafile, index_col=0)
 
@@ -13,7 +15,7 @@ filtered_array = array[array != 0]
 fig, axs = plt.subplots(1, 2, figsize=(12, 6))  # 2 rows, 1 column of subplots
 
 # Plotting the histogram of the filtered array (non-zero values) with log scale
-axs[0].hist(array, bins=250, log=False)
+axs[0].hist(filtered_array, bins=250, log=False)
 axs[0].set_title('Frequency of Expression Values')
 axs[0].set_xlabel('Expression Value')
 axs[0].set_ylabel('Frequency')

@@ -80,17 +80,17 @@ class Pipeline():
                 minimumOverlap=25
             )
 
-            pathways.add_pathways(pathways.pathway_graphs, minOverlap=1, organism=self.organism)
+            pathways.add_pathways(pathways.pathway_graphs, minOverlap=25, organism=self.organism)
         
         # Use the pathway(s) specified by pathway_list
         else:
             if isinstance(self.pathway_list, str):
                 logging.info(f'\tPathways = {self.pathway_list}')
-                pathways.add_pathways([self.pathway_list], minOverlap=1, organism=self.organism)
+                pathways.add_pathways([self.pathway_list], minOverlap=25, organism=self.organism)
 
             elif isinstance(self.pathway_list, list):
                 logging.info(f'\tPathways = {self.pathway_list}')
-                pathways.add_pathways(self.pathway_list, minOverlap=1, organism=self.organism)
+                pathways.add_pathways(self.pathway_list, minOverlap=25, organism=self.organism)
 
             # Else throw an exception if no pathways are specified
             else:
@@ -100,30 +100,34 @@ class Pipeline():
 
         if len(self.network_files) > 0:
             logging.info(f'\tCustom pathway: {self.network_files}')
-            pathways.add_pathways(self.network_files, minOverlap=1, organism=self.organism)
+            pathways.add_pathways(self.network_files, minOverlap=25, organism=self.organism)
 
         # Get the information from each pathway and pass the network information into a ruleset object
         for pathway in pathways.pathway_graphs:
-            node_indices = []
-            graph = pathways.pathway_graphs[pathway]
             
-            for node in graph.nodes():
-                node_indices.append(pathways.gene_list.index(node))
-                
+            graph = pathways.pathway_graphs[pathway]
 
-            # node_indices = set(node_indices)  # Only keep unique values
-            self.node_indices = list(node_indices)  # Convert back to a list
+            # Catches if the graph does not have enough overlapping nodes after processing
+            if len(graph.nodes()) > 25:
+                node_indices = []
+            
+                for node in graph.nodes():
+                    node_indices.append(pathways.gene_list.index(node))
+                    
 
-            logging.info(f'\n-----RULE INFERENCE-----')
-            logging.info(f'Pathway: {pathway}')
-            logging.info(f'Num nodes: {len(node_indices)}')
+                # node_indices = set(node_indices)  # Only keep unique values
+                self.node_indices = list(node_indices)  # Convert back to a list
 
-            # Generate the rule inference object for the pathway
-            ruleset = self.generate_ruleset(pathway, node_indices, pathways.gene_list)
+                logging.info(f'\n-----RULE INFERENCE-----')
+                logging.info(f'Pathway: {pathway}')
+                logging.info(f'Num nodes: {len(node_indices)}')
 
-            processed_graphml_path = f'graphml_files/{self.dataset_name}/{self.organism}{pathway}_processed.graphml'
+                # Generate the rule inference object for the pathway
+                ruleset = self.generate_ruleset(pathway, node_indices, pathways.gene_list)
 
-            self.infer_rules(pathway, processed_graphml_path, ruleset)
+                processed_graphml_path = f'graphml_files/{self.dataset_name}/{self.organism}{pathway}_processed.graphml'
+
+                self.infer_rules(pathway, processed_graphml_path, ruleset)
     
     def generate_ruleset(self, network, node_indices, gene_list):
         # Create RuleInference object

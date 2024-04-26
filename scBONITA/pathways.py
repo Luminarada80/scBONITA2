@@ -500,73 +500,76 @@ class Pathways:
                 # Compute overlap based on node IDs first
                 overlap = len(nodes.intersection(pathwayGenes))
 
-                # Workaround to access raven's data, the gene names are found as a 'gene_symbol' attribute
-                if overlap == 0:
-                    try:
-                        node_names = set()  # Use a set for efficient intersection operation
-                        for node_id in G.nodes():
-                            gene_symbol = G.nodes[node_id].get("gene_symbol")
-                            if gene_symbol:  # Ensure gene_symbol is not None or empty
-                                node_names.add(gene_symbol)
-                        overlap = len(node_names.intersection(pathwayGenes))
-                        logging.info(f'Overlap: {overlap}')
-                        logging.info(f'\tPathway: {pathway} Overlap: {overlap} Edges: {len(G.edges())}')
-                        nodes = list(G.nodes())
-                        if removeSelfEdges:
-                            G.remove_edges_from(nx.selfloop_edges(G))  # remove self loops
-                        # remove genes not in dataset
-                        for node_id in list(G.nodes()):
-                            gene_symbol = G.nodes[node_id].get("gene_symbol")
-                            if gene_symbol not in pathwayGenes:
-                                G.remove_node(node_id)
+                # # Workaround to access raven's data, the gene names are found as a 'gene_symbol' attribute
+                # if overlap == 0:
+                #     try:
+                #         node_names = set()  # Use a set for efficient intersection operation
+                #         for node_id in G.nodes():
+                #             gene_symbol = G.nodes[node_id].get("gene_symbol")
+                #             if gene_symbol:  # Ensure gene_symbol is not None or empty
+                #                 node_names.add(gene_symbol)
+                #         overlap = len(node_names.intersection(pathwayGenes))
 
-                        # graph post-processing
-                        # remove singletons/isolates
-                        G.remove_nodes_from(list(nx.isolates(G)))
+                #         if overlap >= minOverlap:
+                #             logging.info(f'Overlap: {overlap}')
+                #             logging.info(f'\tPathway: {pathway} Overlap: {overlap} Edges: {len(G.edges())}')
+                #             nodes = list(G.nodes())
+                #             if removeSelfEdges:
+                #                 G.remove_edges_from(nx.selfloop_edges(G))  # remove self loops
+                #             # remove genes not in dataset
+                #             for node_id in list(G.nodes()):
+                #                 gene_symbol = G.nodes[node_id].get("gene_symbol")
+                #                 if gene_symbol not in pathwayGenes:
+                #                     G.remove_node(node_id)
 
-                        # Assuming G is your original graph loaded from GraphML
-                        original_graph = G
+                #             # graph post-processing
+                #             # remove singletons/isolates
+                #             G.remove_nodes_from(list(nx.isolates(G)))
 
-                        # Create a new graph, which could be directed or undirected similar to the original
-                        new_graph = nx.DiGraph() if original_graph.is_directed() else nx.Graph()
+                #             # Assuming G is your original graph loaded from GraphML
+                #             original_graph = G
 
-                        # Mapping from old node IDs to gene symbols for edge reassignment
-                        node_id_to_gene_symbol = {}
+                #             # Create a new graph, which could be directed or undirected similar to the original
+                #             new_graph = nx.DiGraph() if original_graph.is_directed() else nx.Graph()
 
-                        # Add nodes with gene_symbol as ID
-                        for node_id in original_graph.nodes():
-                            gene_symbol = original_graph.nodes[node_id].get("gene_symbol")
-                            if gene_symbol:
-                                new_graph.add_node(gene_symbol, **original_graph.nodes[node_id])
-                                node_id_to_gene_symbol[node_id] = gene_symbol
-                            else:
-                                # Handle case where gene_symbol is not defined
-                                # You might choose to skip these or add them with a placeholder
-                                logging.info(f"Node {node_id} has no gene_symbol")
+                #             # Mapping from old node IDs to gene symbols for edge reassignment
+                #             node_id_to_gene_symbol = {}
 
-                        # Add edges to the new graph, converting node IDs to gene symbols
-                        for (u, v, attribs) in original_graph.edges(data=True):
-                            # Convert node IDs to gene symbols, if available
-                            gene_symbol_u = node_id_to_gene_symbol.get(u)
-                            gene_symbol_v = node_id_to_gene_symbol.get(v)
+                #             # Add nodes with gene_symbol as ID
+                #             for node_id in original_graph.nodes():
+                #                 gene_symbol = original_graph.nodes[node_id].get("gene_symbol")
+                #                 if gene_symbol:
+                #                     new_graph.add_node(gene_symbol, **original_graph.nodes[node_id])
+                #                     node_id_to_gene_symbol[node_id] = gene_symbol
+                #                 else:
+                #                     # Handle case where gene_symbol is not defined
+                #                     # You might choose to skip these or add them with a placeholder
+                #                     logging.info(f"Node {node_id} has no gene_symbol")
 
-                            if gene_symbol_u and gene_symbol_v:
-                                # Check if the edge already exists to avoid duplicates when gene symbols are not unique
-                                if not new_graph.has_edge(gene_symbol_u, gene_symbol_v):
-                                    new_graph.add_edge(gene_symbol_u, gene_symbol_v, **attribs)
-                        # To do: remove complexes, remove dependences of a node on complexes that include that node (which is a form of self-loop)
-                        self.pathway_graphs[pathway] = new_graph
-                        logging.debug(f'\t\t\t\tEdges after processing: {len(G.edges())} Overlap: {len(set(node_names).intersection(pathwayGenes))}')
-                        
-                        if write_graphml:
-                            nx.write_graphml(
-                                G, self.output_path + organism + pathway + "_processed.graphml", infer_numeric_types=True
-                            )
+                #             # Add edges to the new graph, converting node IDs to gene symbols
+                #             for (u, v, attribs) in original_graph.edges(data=True):
+                #                 # Convert node IDs to gene symbols, if available
+                #                 gene_symbol_u = node_id_to_gene_symbol.get(u)
+                #                 gene_symbol_v = node_id_to_gene_symbol.get(v)
 
-                    except Exception as e:  # Catching any exception and logging it
-                        logging.error(f'Error while extracting gene symbols: {e}')
-    
-                elif overlap >= minOverlap:
+                #                 if gene_symbol_u and gene_symbol_v:
+                #                     # Check if the edge already exists to avoid duplicates when gene symbols are not unique
+                #                     if not new_graph.has_edge(gene_symbol_u, gene_symbol_v):
+                #                         new_graph.add_edge(gene_symbol_u, gene_symbol_v, **attribs)
+                #             # To do: remove complexes, remove dependences of a node on complexes that include that node (which is a form of self-loop)
+                #             self.pathway_graphs[pathway] = new_graph
+                #             logging.debug(f'\t\t\t\tEdges after processing: {len(G.edges())} Overlap: {len(set(node_names).intersection(pathwayGenes))}')
+                            
+                #             if write_graphml:
+                #                 nx.write_graphml(
+                #                     G, self.output_path + organism + pathway + "_processed.graphml", infer_numeric_types=True
+                #                 )
+
+                #     except Exception as e:  # Catching any exception and logging it
+                #         logging.error(f'Error while extracting gene symbols: {e}')
+
+                
+                if overlap >= minOverlap:
                     logging.info(f'\tPathway: {pathway} Overlap: {overlap} Edges: {len(G.edges())}')
                     nodes = list(G.nodes())
                     if removeSelfEdges:
@@ -580,9 +583,9 @@ class Pathways:
                     G.remove_nodes_from(list(nx.isolates(G)))
                     # To do: remove complexes, remove dependences of a node on complexes that include that node (which is a form of self-loop)
                     self.pathway_graphs[pathway] = G
-                    logging.info(f'\t\t\tEdges after processing: {len(G.edges())} Overlap: {len(set(G.nodes()).intersection(pathwayGenes))}')
+                    logging.info(f'\t\t\t\tEdges after processing: {len(G.edges())} Overlap: {len(set(G.nodes()).intersection(pathwayGenes))}')
                     
-                    if write_graphml:
+                    if write_graphml and filtered_overlap > minOverlap:
                         nx.write_graphml(
                             G, self.output_path + organism + pathway + "_processed.graphml", infer_numeric_types=True
                         )
@@ -594,7 +597,6 @@ class Pathways:
                           f'in front of the attribute name. To get the name to use, try: "print(next(iter(G.nodes(data=True))))"'\
                           f'to see how the keys are formatted.'
                     raise Exception(msg)
-                    exit(1)
         else:
             if isinstance(pathway_list, dict):
                 for pathway, G in pathway_list.items():
@@ -604,22 +606,28 @@ class Pathways:
                     if test >= minOverlap:
                         logging.info(f'\t\t\tPathway: {pathway} Overlap: {test} Edges: {len(G.edges())}')
                         nodes = list(G.nodes())
+
+                        # remove self loops
                         if removeSelfEdges:
                             G.remove_edges_from(
                                 nx.selfloop_edges(G)
-                            )  # remove self loops
+                            )  
+
                         # remove genes not in dataset
                         for pg in list(G.nodes()):
                             if pg not in pathwayGenes:
                                 G.remove_node(pg)
-                        # graph post-processing
+                        
                         # remove singletons/isolates
                         G.remove_nodes_from(list(nx.isolates(G)))
+
                         # To do: remove complexes, remove dependences of a node on complexes that include that node (which is a form of self-loop)
                         self.pathway_graphs[pathway] = G
-                        logging.info(f'\t\t\tEdges after processing: {len(G.edges())} Overlap: {len(set(G.nodes()).intersection(pathwayGenes))}')
+                        filtered_overlap = len(set(G.nodes()).intersection(pathwayGenes))
+                        logging.info(f'\t\t\t\tEdges after processing: {len(G.edges())} Overlap: {filtered_overlap}')
 
-                        if write_graphml:
+
+                        if write_graphml and filtered_overlap > minOverlap:
                             nx.write_graphml(
                                 G, self.output_path + organism + pathway +  "_processed.graphml", infer_numeric_types=True
                             )

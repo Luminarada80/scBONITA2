@@ -18,6 +18,7 @@ import csv
 import seaborn as sns
 import matplotlib.gridspec as gridspec
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+import requests
 
 from metadata_parser import metadata_parser
 from setup.user_input_prompts import *
@@ -179,7 +180,7 @@ def bubble_plot(network_names, p_values):
 
     # Calculate -log10 of Bonferroni-corrected p-values
     # Added a small constant inside the log10 function to avoid log10(0)
-    neg_log10_bonferroni_corrected_p_values = [-np.log10(p + 1e-100) for p in bonferroni_corrected_p_values]
+    neg_log10_bonferroni_corrected_p_values = [-np.log10(p + 1e-5) for p in bonferroni_corrected_p_values]
 
     # Sample sizes for the bubbles (you might want to scale these based on another metric)
     bubble_sizes = [300 for _ in range(len(network_names))]  # Uniform size for now
@@ -545,8 +546,15 @@ if __name__ == '__main__':
 
                 # Step 3: Calculate the p-value (two-tailed)
                 p_value_two_tailed = 2 * proportion_extreme
-                p_value = min(p_value_two_tailed, 1.0)  # Ensure p-value does not exceed 1
-                log_p_value = -np.log10(p_value + 1e-10)  # Added a small constant for numerical stability
+                
+                # Ensure p-value does not exceed 1
+                p_value = min(p_value_two_tailed, 1.0)  
+                
+                # Adjust for when the p-value is too small for the computer to represent
+                if p_value <= 0:
+                    log_p_value = 0 
+                else:
+                    log_p_value = -np.log10(p_value + 1e-10)
 
                 logging.info(f'\t\t\tP-value: {p_value}')
                 logging.info(f'\t\t\t-log10(P-value): {log_p_value}')
