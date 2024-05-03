@@ -139,7 +139,6 @@ class NetworkSetup:
         # --- Find the predecessors of each node ---
         predecessors_final, predCorr_temp = self.parse_connections(node, nodeList, graph, nodeDict, possibilityLister)
 
-        print(f'\nPredecessors final: {predecessors_final}')
 
         # Store the correlations between incoming nodes in "rvalues"
         top_three_incoming_node_correlations = sorted(predCorr_temp, reverse=True)[:3]
