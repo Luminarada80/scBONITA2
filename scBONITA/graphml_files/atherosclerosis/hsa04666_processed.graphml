@@ -1,0 +1,246 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d5" for="edge" attr.name="signal" attr.type="string"/>
+<key id="d4" for="edge" attr.name="type" attr.type="string"/>
+<key id="d3" for="edge" attr.name="subtype" attr.type="string"/>
+<key id="d2" for="edge" attr.name="color" attr.type="string"/>
+<key id="d1" for="node" attr.name="type" attr.type="string"/>
+<key id="d0" for="node" attr.name="name" attr.type="string"/>
+<graph edgedefault="directed"><node id="FCGR2A">
+  <data key="d0">FCGR2A</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="FCGR1A">
+  <data key="d0">FCGR1A</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="SYK">
+  <data key="d0">SYK</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="PTPRC">
+  <data key="d0">PTPRC</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="RAF1">
+  <data key="d0">RAF1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="MAP2K1">
+  <data key="d0">MAP2K1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="CDC42">
+  <data key="d0">CDC42</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="WAS">
+  <data key="d0">WAS</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="CRK">
+  <data key="d0">CRK</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="PAK1">
+  <data key="d0">PAK1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="VASP">
+  <data key="d0">VASP</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="PLA2G6">
+  <data key="d0">PLA2G6</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="ARF6">
+  <data key="d0">ARF6</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="NCF1">
+  <data key="d0">NCF1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="HCK"/>
+<node id="LYN"/>
+<node id="PLCG1"/>
+<node id="PLCG2"/>
+<node id="PRKCD"/>
+<node id="PRKCE"/>
+<node id="RAC1"/>
+<node id="RAC2"/>
+<node id="WASF2"/>
+<node id="ACTR2"/>
+<node id="ACTR3"/>
+<node id="ARPC5"/>
+<node id="ARPC4"/>
+<node id="ARPC3"/>
+<node id="ARPC2"/>
+<node id="LIMK1"/>
+<node id="LIMK2"/>
+<node id="MARCKSL1"/>
+<node id="PRKCA"/>
+<node id="PRKCB"/>
+<edge source="FCGR2A" target="SYK">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="FCGR2A" target="CRK">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association/indirect effect</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="FCGR1A" target="SYK">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="FCGR1A" target="CRK">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association/indirect effect</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="SYK" target="ARF6">
+  <data key="d2">green</data>
+  <data key="d3">activation/indirect effect</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="SYK" target="PLCG1">
+  <data key="d5">a</data>
+</edge>
+<edge source="SYK" target="PLCG2">
+  <data key="d5">a</data>
+</edge>
+<edge source="PTPRC" target="HCK">
+  <data key="d5">a</data>
+</edge>
+<edge source="PTPRC" target="LYN">
+  <data key="d5">a</data>
+</edge>
+<edge source="RAF1" target="MAP2K1">
+  <data key="d2">green</data>
+  <data key="d3">activation/phosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="CDC42" target="WAS">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="CDC42" target="VASP">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="WAS" target="ACTR2">
+  <data key="d5">a</data>
+</edge>
+<edge source="WAS" target="ACTR3">
+  <data key="d5">a</data>
+</edge>
+<edge source="WAS" target="ARPC5">
+  <data key="d5">a</data>
+</edge>
+<edge source="WAS" target="ARPC4">
+  <data key="d5">a</data>
+</edge>
+<edge source="WAS" target="ARPC3">
+  <data key="d5">a</data>
+</edge>
+<edge source="WAS" target="ARPC2">
+  <data key="d5">a</data>
+</edge>
+<edge source="PAK1" target="LIMK1">
+  <data key="d5">a</data>
+</edge>
+<edge source="PAK1" target="LIMK2">
+  <data key="d5">a</data>
+</edge>
+<edge source="HCK" target="FCGR1A">
+  <data key="d5">a</data>
+</edge>
+<edge source="HCK" target="FCGR2A">
+  <data key="d5">a</data>
+</edge>
+<edge source="LYN" target="FCGR1A">
+  <data key="d5">a</data>
+</edge>
+<edge source="LYN" target="FCGR2A">
+  <data key="d5">a</data>
+</edge>
+<edge source="PRKCD" target="RAF1">
+  <data key="d5">a</data>
+</edge>
+<edge source="PRKCD" target="PLA2G6">
+  <data key="d5">a</data>
+</edge>
+<edge source="PRKCD" target="MARCKSL1">
+  <data key="d5">i</data>
+</edge>
+<edge source="PRKCE" target="RAF1">
+  <data key="d5">a</data>
+</edge>
+<edge source="PRKCE" target="PLA2G6">
+  <data key="d5">a</data>
+</edge>
+<edge source="PRKCE" target="MARCKSL1">
+  <data key="d5">i</data>
+</edge>
+<edge source="RAC1" target="PAK1">
+  <data key="d5">a</data>
+</edge>
+<edge source="RAC1" target="ARF6">
+  <data key="d5">a</data>
+</edge>
+<edge source="RAC1" target="WASF2">
+  <data key="d5">a</data>
+</edge>
+<edge source="RAC2" target="PAK1">
+  <data key="d5">a</data>
+</edge>
+<edge source="RAC2" target="ARF6">
+  <data key="d5">a</data>
+</edge>
+<edge source="RAC2" target="WASF2">
+  <data key="d5">a</data>
+</edge>
+<edge source="WASF2" target="ACTR2">
+  <data key="d5">a</data>
+</edge>
+<edge source="WASF2" target="ACTR3">
+  <data key="d5">a</data>
+</edge>
+<edge source="WASF2" target="ARPC5">
+  <data key="d5">a</data>
+</edge>
+<edge source="WASF2" target="ARPC4">
+  <data key="d5">a</data>
+</edge>
+<edge source="WASF2" target="ARPC3">
+  <data key="d5">a</data>
+</edge>
+<edge source="WASF2" target="ARPC2">
+  <data key="d5">a</data>
+</edge>
+<edge source="PRKCA" target="PLA2G6">
+  <data key="d5">a</data>
+</edge>
+<edge source="PRKCA" target="NCF1">
+  <data key="d5">a</data>
+</edge>
+<edge source="PRKCB" target="PLA2G6">
+  <data key="d5">a</data>
+</edge>
+<edge source="PRKCB" target="NCF1">
+  <data key="d5">a</data>
+</edge>
+</graph></graphml>

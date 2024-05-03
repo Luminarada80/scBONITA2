@@ -71,6 +71,7 @@ class RuleInference(NetworkSetup):
         else:
             # Handle the case where no samples were selected
             raise ValueError("No samples selected for binarization")
+            
         
         full_matrix = self.binarized_matrix.todense()
 
@@ -131,12 +132,12 @@ class RuleInference(NetworkSetup):
             data = np.empty(data_shape, dtype="float")
             gene_names = []
             data_row_index = 0  # Separate index for data array
-
             for i, row in enumerate(reader):
-                if (i + 1) in node_indices:  # Adjust index for skipped header
+                if (i + 1) in node_indices:  # Only keeps the nodes involved, skips the cell name row
                     gene_names.append(row[0])
+                    
                     # Offset cell indices by 1 to skip the gene name column
-                    selected_data = [float(row[cell_index + 1]) for cell_index in sampled_cell_indices]
+                    selected_data = [float(row[cell_index+1]) for cell_index in sampled_cell_indices]
                     data[data_row_index, :] = selected_data
                     data_row_index += 1
 
@@ -209,36 +210,49 @@ class RuleInference(NetworkSetup):
             node.calculation_function = node.find_calculation_function(node.best_rule[2])
 
     def plot_graph_from_graphml(self, network):
-        # Load the graph
         G = network
-        logging.debug(f'\n-----IMPORTANCE SCORE GRAPH-----')
 
-        # Assuming each node has an attribute 'value' that is a number between 0 and 1
+        # Extract values and ensure they are within [0, 1]
         values = [node.importance_score for node in self.nodes]
-        logging.debug(f'Values: {values}')
+        logging.debug(f'\nNormalized Values: {values}')
 
-        # Choose a colormap (e.g., 'viridis', 'plasma', 'inferno', 'magma', 'cividis')
+        # Choose a colormap
         cmap = plt.cm.Greys
 
+        def scale_numbers(numbers, new_min, new_max):
+            # Calculate the min and max of the input numbers
+            old_min = min(numbers)
+            old_max = max(numbers)
+            
+            # Scale the numbers to the new range
+            scaled_numbers = []
+            for num in numbers:
+                scaled_num = ((num - old_min) / (old_max - old_min)) * (new_max - new_min) + new_min
+                scaled_numbers.append(scaled_num)
+            
+            return scaled_numbers
+
+        new_min = 0.1
+        new_max = 0.7
+        scaled_numbers = scale_numbers(values, new_min, new_max)
+
+        node_colors = [cmap(value) for value in scaled_numbers]
+
         # Map 'values' to colors
-        node_colors = [cmap(value) for value in values]
-        logging.debug(f'node_color: {node_colors}')
+        logging.debug(f'\nNode Colors: {node_colors}')
 
-        pos = nx.spring_layout(G, k=1)
-
-        # Invert the text color if the value is above a certain value, so the gene name can still be read
-        text_colors = ['white' if value > 0.8 else 'black' for value in values]
-
+        pos = nx.spring_layout(G, k=1)  # Layout for visualizing the graph
 
         # Draw the graph
-        fig = plt.figure(figsize=(12, 8))
-        # Draw the graph
-        fig = plt.figure(figsize=(12, 8))
-        nx.draw_networkx_nodes(G, pos, node_color=node_colors, node_size=500)
-        nx.draw_networkx_edges(G, pos, edge_color='gray')
-        nx.draw_networkx_labels(G, pos, font_color=text_colors, font_size=10)
-        plt.title("Importance score for each node in the network")
-        
+        fig, ax = plt.subplots(figsize=(12, 8))
+        nx.draw_networkx_nodes(G, pos, node_color=node_colors, node_size=500, ax=ax)
+        nx.draw_networkx_edges(G, pos, edge_color='gray', ax=ax)
+        nx.draw_networkx_labels(G, pos, font_color="black", font_size=10, ax=ax)
+
+        ax.set_title("Importance Score for Each Node in the Network")
+        ax.set_axis_off()  # Hide the axes
+        # plt.show()
+
         return fig
     
     def __inherit(

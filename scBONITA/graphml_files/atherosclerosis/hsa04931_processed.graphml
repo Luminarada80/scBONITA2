@@ -1,0 +1,186 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d5" for="edge" attr.name="signal" attr.type="string"/>
+<key id="d4" for="edge" attr.name="type" attr.type="string"/>
+<key id="d3" for="edge" attr.name="subtype" attr.type="string"/>
+<key id="d2" for="edge" attr.name="color" attr.type="string"/>
+<key id="d1" for="node" attr.name="type" attr.type="string"/>
+<key id="d0" for="node" attr.name="name" attr.type="string"/>
+<graph edgedefault="directed"><node id="TNF">
+  <data key="d0">TNF</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="TNFRSF1A">
+  <data key="d0">TNFRSF1A</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="IKBKB">
+  <data key="d0">IKBKB</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="GSK3B">
+  <data key="d0">GSK3B</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="PPP2R4">
+  <data key="d0">PPP2R4</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="STAT3">
+  <data key="d0">STAT3</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="SOCS3">
+  <data key="d0">SOCS3</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="NFKBIA">
+  <data key="d0">NFKBIA</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="IRS2">
+  <data key="d0">IRS2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="ACACB">
+  <data key="d0">ACACB</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="MLX">
+  <data key="d0">MLX</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="PPARGC1B">
+  <data key="d0">PPARGC1B</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="FOXO1">
+  <data key="d0">FOXO1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="PDPK1">
+  <data key="d0">PDPK1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="OGT">
+  <data key="d0">OGT</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="CRTC2">
+  <data key="d0">CRTC2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="NFKB1"/>
+<node id="RELA"/>
+<node id="NR1H3"/>
+<node id="NR1H2"/>
+<node id="CREB1"/>
+<node id="CREB3"/>
+<edge source="TNF" target="TNFRSF1A">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="TNFRSF1A" target="IKBKB">
+  <data key="d2">green</data>
+  <data key="d3">activation/indirect effect</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="IKBKB" target="NFKBIA">
+  <data key="d2">green</data>
+  <data key="d3">activation/phosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="IKBKB" target="IRS2">
+  <data key="d2">red</data>
+  <data key="d3">inhibition/phosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">i</data>
+</edge>
+<edge source="PPP2R4" target="MLX">
+  <data key="d2">green</data>
+  <data key="d3">activation/dephosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="STAT3" target="SOCS3">
+  <data key="d2">green</data>
+  <data key="d3">expression</data>
+  <data key="d4">GErel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="SOCS3" target="IRS2">
+  <data key="d2">red</data>
+  <data key="d3">inhibition</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">i</data>
+</edge>
+<edge source="NFKBIA" target="NFKB1">
+  <data key="d5">i</data>
+</edge>
+<edge source="NFKBIA" target="RELA">
+  <data key="d5">i</data>
+</edge>
+<edge source="MLX" target="ACACB">
+  <data key="d2">green</data>
+  <data key="d3">expression</data>
+  <data key="d4">GErel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="PPARGC1B" target="MLX">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="OGT" target="PDPK1">
+  <data key="d2">green</data>
+  <data key="d3">inhibition/glycosylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="OGT" target="GSK3B">
+  <data key="d2">green</data>
+  <data key="d3">glycosylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="OGT" target="MLX">
+  <data key="d2">green</data>
+  <data key="d3">glycosylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="OGT" target="CRTC2">
+  <data key="d2">green</data>
+  <data key="d3">glycosylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="OGT" target="FOXO1">
+  <data key="d2">green</data>
+  <data key="d3">glycosylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="OGT" target="NR1H3">
+  <data key="d5">a</data>
+</edge>
+<edge source="OGT" target="NR1H2">
+  <data key="d5">a</data>
+</edge>
+<edge source="CRTC2" target="CREB1">
+  <data key="d5">a</data>
+</edge>
+<edge source="CRTC2" target="CREB3">
+  <data key="d5">a</data>
+</edge>
+<edge source="NFKB1" target="TNF">
+  <data key="d5">a</data>
+</edge>
+<edge source="RELA" target="TNF">
+  <data key="d5">a</data>
+</edge>
+</graph></graphml>

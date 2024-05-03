@@ -1,0 +1,194 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d5" for="edge" attr.name="type" attr.type="string"/>
+<key id="d4" for="edge" attr.name="subtype" attr.type="string"/>
+<key id="d3" for="edge" attr.name="color" attr.type="string"/>
+<key id="d2" for="edge" attr.name="signal" attr.type="string"/>
+<key id="d1" for="node" attr.name="type" attr.type="string"/>
+<key id="d0" for="node" attr.name="name" attr.type="string"/>
+<graph edgedefault="directed"><node id="IGF1R">
+  <data key="d0">IGF1R</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="SOD2">
+  <data key="d0">SOD2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="TSC2">
+  <data key="d0">TSC2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="TSC1">
+  <data key="d0">TSC1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="RHEB">
+  <data key="d0">RHEB</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="EIF4EBP1">
+  <data key="d0">EIF4EBP1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="EIF4E">
+  <data key="d0">EIF4E</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="TP53">
+  <data key="d0">TP53</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="BAX">
+  <data key="d0">BAX</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="SIRT1">
+  <data key="d0">SIRT1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="ULK1">
+  <data key="d0">ULK1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="CAMKK2">
+  <data key="d0">CAMKK2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="CAMK4">
+  <data key="d0">CAMK4</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="ATG5">
+  <data key="d0">ATG5</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="RB1CC1">
+  <data key="d0">RB1CC1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="ATG13">
+  <data key="d0">ATG13</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="ATG101">
+  <data key="d0">ATG101</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="FOXO1"/>
+<node id="FOXO3"/>
+<node id="MTOR"/>
+<node id="AKT1S1"/>
+<node id="HRAS"/>
+<node id="KRAS"/>
+<node id="NRAS"/>
+<node id="SESN2"/>
+<node id="NFKB1"/>
+<node id="RELA"/>
+<edge source="IGF1R" target="HRAS">
+  <data key="d2">a</data>
+</edge>
+<edge source="IGF1R" target="KRAS">
+  <data key="d2">a</data>
+</edge>
+<edge source="IGF1R" target="NRAS">
+  <data key="d2">a</data>
+</edge>
+<edge source="TSC2" target="RHEB">
+  <data key="d3">red</data>
+  <data key="d4">inhibition</data>
+  <data key="d5">PPrel</data>
+  <data key="d2">i</data>
+</edge>
+<edge source="TSC1" target="RHEB">
+  <data key="d3">red</data>
+  <data key="d4">inhibition</data>
+  <data key="d5">PPrel</data>
+  <data key="d2">i</data>
+</edge>
+<edge source="RHEB" target="MTOR">
+  <data key="d2">a</data>
+</edge>
+<edge source="RHEB" target="AKT1S1">
+  <data key="d2">a</data>
+</edge>
+<edge source="EIF4EBP1" target="EIF4E">
+  <data key="d3">red</data>
+  <data key="d4">inhibition</data>
+  <data key="d5">PPrel</data>
+  <data key="d2">i</data>
+</edge>
+<edge source="TP53" target="SESN2">
+  <data key="d2">a</data>
+</edge>
+<edge source="SIRT1" target="BAX">
+  <data key="d3">red</data>
+  <data key="d4">inhibition</data>
+  <data key="d5">PPrel</data>
+  <data key="d2">i</data>
+</edge>
+<edge source="SIRT1" target="TP53">
+  <data key="d3">red</data>
+  <data key="d4">inhibition</data>
+  <data key="d5">PPrel</data>
+  <data key="d2">i</data>
+</edge>
+<edge source="SIRT1" target="FOXO1">
+  <data key="d2">a</data>
+</edge>
+<edge source="SIRT1" target="FOXO3">
+  <data key="d2">a</data>
+</edge>
+<edge source="SIRT1" target="NFKB1">
+  <data key="d2">i</data>
+</edge>
+<edge source="SIRT1" target="RELA">
+  <data key="d2">i</data>
+</edge>
+<edge source="CAMKK2" target="CAMK4">
+  <data key="d3">green</data>
+  <data key="d4">activation/phosphorylation</data>
+  <data key="d5">PPrel</data>
+  <data key="d2">a</data>
+</edge>
+<edge source="FOXO1" target="SOD2">
+  <data key="d2">a</data>
+</edge>
+<edge source="FOXO1" target="ATG5">
+  <data key="d2">a</data>
+</edge>
+<edge source="FOXO3" target="SOD2">
+  <data key="d2">a</data>
+</edge>
+<edge source="FOXO3" target="ATG5">
+  <data key="d2">a</data>
+</edge>
+<edge source="MTOR" target="ULK1">
+  <data key="d2">i</data>
+</edge>
+<edge source="MTOR" target="RB1CC1">
+  <data key="d2">i</data>
+</edge>
+<edge source="MTOR" target="ATG13">
+  <data key="d2">i</data>
+</edge>
+<edge source="MTOR" target="ATG101">
+  <data key="d2">i</data>
+</edge>
+<edge source="MTOR" target="EIF4EBP1">
+  <data key="d2">i</data>
+</edge>
+<edge source="AKT1S1" target="ULK1">
+  <data key="d2">i</data>
+</edge>
+<edge source="AKT1S1" target="RB1CC1">
+  <data key="d2">i</data>
+</edge>
+<edge source="AKT1S1" target="ATG13">
+  <data key="d2">i</data>
+</edge>
+<edge source="AKT1S1" target="ATG101">
+  <data key="d2">i</data>
+</edge>
+<edge source="AKT1S1" target="EIF4EBP1">
+  <data key="d2">i</data>
+</edge>
+</graph></graphml>

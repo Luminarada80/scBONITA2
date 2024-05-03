@@ -1,0 +1,208 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d5" for="edge" attr.name="signal" attr.type="string"/>
+<key id="d4" for="edge" attr.name="type" attr.type="string"/>
+<key id="d3" for="edge" attr.name="subtype" attr.type="string"/>
+<key id="d2" for="edge" attr.name="color" attr.type="string"/>
+<key id="d1" for="node" attr.name="type" attr.type="string"/>
+<key id="d0" for="node" attr.name="name" attr.type="string"/>
+<graph edgedefault="directed"><node id="ATF4">
+  <data key="d0">ATF4</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="DDIT3">
+  <data key="d0">DDIT3</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="TRAF2">
+  <data key="d0">TRAF2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="MAP3K5">
+  <data key="d0">MAP3K5</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="MAP2K7">
+  <data key="d0">MAP2K7</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="EIF2S1">
+  <data key="d0">EIF2S1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="PPP1R15A">
+  <data key="d0">PPP1R15A</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="VCP">
+  <data key="d0">VCP</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="NPLOC4">
+  <data key="d0">NPLOC4</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="ERN1">
+  <data key="d0">ERN1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="EIF2AK3">
+  <data key="d0">EIF2AK3</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="XBP1">
+  <data key="d0">XBP1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="SVIP">
+  <data key="d0">SVIP</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="NFE2L2">
+  <data key="d0">NFE2L2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="BCL2">
+  <data key="d0">BCL2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="CAPN1"/>
+<node id="CAPN2"/>
+<node id="BAX"/>
+<node id="ATF6B"/>
+<node id="UBXN2A"/>
+<node id="UBXN6"/>
+<node id="UBXN8"/>
+<node id="NSFL1C"/>
+<edge source="ATF4" target="DDIT3">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="ATF4" target="PPP1R15A">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="DDIT3" target="BCL2">
+  <data key="d2">red</data>
+  <data key="d3">inhibition</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">i</data>
+</edge>
+<edge source="TRAF2" target="MAP3K5">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="MAP3K5" target="MAP2K7">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="EIF2S1" target="ATF4">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="PPP1R15A" target="EIF2S1">
+  <data key="d2">red</data>
+  <data key="d3">inhibition/dephosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">i</data>
+</edge>
+<edge source="NPLOC4" target="VCP">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="ERN1" target="TRAF2">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="ERN1" target="XBP1">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="EIF2AK3" target="EIF2S1">
+  <data key="d2">green</data>
+  <data key="d3">activation/phosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="EIF2AK3" target="NFE2L2">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="XBP1" target="DDIT3">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="SVIP" target="VCP">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="SVIP" target="NPLOC4">
+  <data key="d2">red</data>
+  <data key="d3">inhibition</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">i</data>
+</edge>
+<edge source="SVIP" target="UBXN2A">
+  <data key="d5">i</data>
+</edge>
+<edge source="SVIP" target="UBXN6">
+  <data key="d5">i</data>
+</edge>
+<edge source="SVIP" target="UBXN8">
+  <data key="d5">i</data>
+</edge>
+<edge source="SVIP" target="NSFL1C">
+  <data key="d5">i</data>
+</edge>
+<edge source="NFE2L2" target="DDIT3">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="BCL2" target="BAX">
+  <data key="d5">i</data>
+</edge>
+<edge source="BAX" target="CAPN1">
+  <data key="d5">a</data>
+</edge>
+<edge source="BAX" target="CAPN2">
+  <data key="d5">a</data>
+</edge>
+<edge source="ATF6B" target="DDIT3">
+  <data key="d5">a</data>
+</edge>
+<edge source="UBXN2A" target="VCP">
+  <data key="d5">a</data>
+</edge>
+<edge source="UBXN6" target="VCP">
+  <data key="d5">a</data>
+</edge>
+<edge source="UBXN8" target="VCP">
+  <data key="d5">a</data>
+</edge>
+<edge source="NSFL1C" target="VCP">
+  <data key="d5">a</data>
+</edge>
+</graph></graphml>

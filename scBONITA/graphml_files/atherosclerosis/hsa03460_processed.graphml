@@ -1,0 +1,334 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d5" for="edge" attr.name="signal" attr.type="string"/>
+<key id="d4" for="edge" attr.name="type" attr.type="string"/>
+<key id="d3" for="edge" attr.name="subtype" attr.type="string"/>
+<key id="d2" for="edge" attr.name="color" attr.type="string"/>
+<key id="d1" for="node" attr.name="type" attr.type="string"/>
+<key id="d0" for="node" attr.name="name" attr.type="string"/>
+<graph edgedefault="directed"><node id="FANCM">
+  <data key="d0">FANCM</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="FANCA">
+  <data key="d0">FANCA</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="FANCB">
+  <data key="d0">FANCB</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="FANCD2">
+  <data key="d0">FANCD2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="FANCI">
+  <data key="d0">FANCI</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="FANCE">
+  <data key="d0">FANCE</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="FANCF">
+  <data key="d0">FANCF</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="FANCG">
+  <data key="d0">FANCG</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="FANCL">
+  <data key="d0">FANCL</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="FAAP100">
+  <data key="d0">FAAP100</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="BLM">
+  <data key="d0">BLM</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="ATR">
+  <data key="d0">ATR</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="TELO2">
+  <data key="d0">TELO2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="MLH1">
+  <data key="d0">MLH1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="BRCA1">
+  <data key="d0">BRCA1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="USP1">
+  <data key="d0">USP1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="WDR48">
+  <data key="d0">WDR48</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="UBE2T">
+  <data key="d0">UBE2T</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="PMS2">
+  <data key="d0">PMS2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="FAAP24">
+  <data key="d0">FAAP24</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="FAN1">
+  <data key="d0">FAN1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="RMI1"/>
+<node id="RPA3"/>
+<node id="RPA4"/>
+<node id="APITD1"/>
+<node id="STRA13"/>
+<edge source="FANCM" target="FAAP24">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="FANCM" target="FANCI">
+  <data key="d2">cyan</data>
+  <data key="d3">ubiquitination</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">i</data>
+</edge>
+<edge source="FANCM" target="FANCD2">
+  <data key="d2">cyan</data>
+  <data key="d3">ubiquitination</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">i</data>
+</edge>
+<edge source="FANCM" target="APITD1">
+  <data key="d5">a</data>
+</edge>
+<edge source="FANCM" target="STRA13">
+  <data key="d5">a</data>
+</edge>
+<edge source="FANCA" target="FANCI">
+  <data key="d2">cyan</data>
+  <data key="d3">ubiquitination</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">i</data>
+</edge>
+<edge source="FANCA" target="FANCD2">
+  <data key="d2">cyan</data>
+  <data key="d3">ubiquitination</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">i</data>
+</edge>
+<edge source="FANCB" target="FANCI">
+  <data key="d2">cyan</data>
+  <data key="d3">ubiquitination</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">i</data>
+</edge>
+<edge source="FANCB" target="FANCD2">
+  <data key="d2">cyan</data>
+  <data key="d3">ubiquitination</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">i</data>
+</edge>
+<edge source="FANCD2" target="FAN1">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="FANCE" target="FANCI">
+  <data key="d2">cyan</data>
+  <data key="d3">ubiquitination</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">i</data>
+</edge>
+<edge source="FANCE" target="FANCD2">
+  <data key="d2">cyan</data>
+  <data key="d3">ubiquitination</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">i</data>
+</edge>
+<edge source="FANCF" target="FANCI">
+  <data key="d2">cyan</data>
+  <data key="d3">ubiquitination</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">i</data>
+</edge>
+<edge source="FANCF" target="FANCD2">
+  <data key="d2">cyan</data>
+  <data key="d3">ubiquitination</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">i</data>
+</edge>
+<edge source="FANCG" target="FANCI">
+  <data key="d2">cyan</data>
+  <data key="d3">ubiquitination</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">i</data>
+</edge>
+<edge source="FANCG" target="FANCD2">
+  <data key="d2">cyan</data>
+  <data key="d3">ubiquitination</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">i</data>
+</edge>
+<edge source="FANCL" target="FANCI">
+  <data key="d2">cyan</data>
+  <data key="d3">ubiquitination</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">i</data>
+</edge>
+<edge source="FANCL" target="FANCD2">
+  <data key="d2">cyan</data>
+  <data key="d3">ubiquitination</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">i</data>
+</edge>
+<edge source="FAAP100" target="FANCI">
+  <data key="d2">cyan</data>
+  <data key="d3">ubiquitination</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">i</data>
+</edge>
+<edge source="FAAP100" target="FANCD2">
+  <data key="d2">cyan</data>
+  <data key="d3">ubiquitination</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">i</data>
+</edge>
+<edge source="BLM" target="FANCM">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="BLM" target="RPA3">
+  <data key="d5">a</data>
+</edge>
+<edge source="BLM" target="RPA4">
+  <data key="d5">a</data>
+</edge>
+<edge source="ATR" target="FANCM">
+  <data key="d2">orange</data>
+  <data key="d3">phosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="ATR" target="FANCA">
+  <data key="d2">orange</data>
+  <data key="d3">phosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="ATR" target="FANCG">
+  <data key="d2">orange</data>
+  <data key="d3">phosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="ATR" target="FANCI">
+  <data key="d2">orange</data>
+  <data key="d3">phosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="ATR" target="BRCA1">
+  <data key="d2">orange</data>
+  <data key="d3">phosphorylation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="TELO2" target="ATR">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="USP1" target="FANCL">
+  <data key="d2">red</data>
+  <data key="d3">inhibition</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">i</data>
+</edge>
+<edge source="WDR48" target="FANCL">
+  <data key="d2">red</data>
+  <data key="d3">inhibition</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">i</data>
+</edge>
+<edge source="UBE2T" target="FANCI">
+  <data key="d2">cyan</data>
+  <data key="d3">ubiquitination</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">i</data>
+</edge>
+<edge source="UBE2T" target="FANCD2">
+  <data key="d2">cyan</data>
+  <data key="d3">ubiquitination</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">i</data>
+</edge>
+<edge source="FAAP24" target="FANCI">
+  <data key="d2">cyan</data>
+  <data key="d3">ubiquitination</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">i</data>
+</edge>
+<edge source="FAAP24" target="FANCD2">
+  <data key="d2">cyan</data>
+  <data key="d3">ubiquitination</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">i</data>
+</edge>
+<edge source="FAAP24" target="TELO2">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="FAN1" target="MLH1">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="FAN1" target="PMS2">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="RMI1" target="FANCM">
+  <data key="d5">a</data>
+</edge>
+<edge source="RMI1" target="RPA3">
+  <data key="d5">a</data>
+</edge>
+<edge source="RMI1" target="RPA4">
+  <data key="d5">a</data>
+</edge>
+<edge source="APITD1" target="FANCI">
+  <data key="d5">i</data>
+</edge>
+<edge source="APITD1" target="FANCD2">
+  <data key="d5">i</data>
+</edge>
+<edge source="STRA13" target="FANCI">
+  <data key="d5">i</data>
+</edge>
+<edge source="STRA13" target="FANCD2">
+  <data key="d5">i</data>
+</edge>
+</graph></graphml>

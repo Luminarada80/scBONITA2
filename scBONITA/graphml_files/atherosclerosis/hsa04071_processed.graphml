@@ -1,0 +1,216 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d5" for="edge" attr.name="type" attr.type="string"/>
+<key id="d4" for="edge" attr.name="subtype" attr.type="string"/>
+<key id="d3" for="edge" attr.name="color" attr.type="string"/>
+<key id="d2" for="edge" attr.name="signal" attr.type="string"/>
+<key id="d1" for="node" attr.name="type" attr.type="string"/>
+<key id="d0" for="node" attr.name="name" attr.type="string"/>
+<graph edgedefault="directed"><node id="RAF1">
+  <data key="d0">RAF1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="S1PR2">
+  <data key="d0">S1PR2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="S1PR4">
+  <data key="d0">S1PR4</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="S1PR5">
+  <data key="d0">S1PR5</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="GNAQ">
+  <data key="d0">GNAQ</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="RHOA">
+  <data key="d0">RHOA</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="PTEN">
+  <data key="d0">PTEN</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="TNF">
+  <data key="d0">TNF</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="NSMAF">
+  <data key="d0">NSMAF</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="SMPD2">
+  <data key="d0">SMPD2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="CTSD">
+  <data key="d0">CTSD</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="BID">
+  <data key="d0">BID</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="BAX">
+  <data key="d0">BAX</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="TP53">
+  <data key="d0">TP53</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="BCL2">
+  <data key="d0">BCL2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="TNFRSF1A">
+  <data key="d0">TNFRSF1A</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="FYN">
+  <data key="d0">FYN</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="TRADD">
+  <data key="d0">TRADD</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="TRAF2">
+  <data key="d0">TRAF2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="MAP2K1"/>
+<node id="MAP2K2"/>
+<node id="GNA12"/>
+<node id="GNA13"/>
+<node id="HRAS"/>
+<node id="KRAS"/>
+<node id="NRAS"/>
+<node id="ROCK1"/>
+<node id="ROCK2"/>
+<node id="NFKB1"/>
+<node id="RELA"/>
+<node id="FCER1G"/>
+<edge source="RAF1" target="MAP2K1">
+  <data key="d2">a</data>
+</edge>
+<edge source="RAF1" target="MAP2K2">
+  <data key="d2">a</data>
+</edge>
+<edge source="S1PR2" target="GNAQ">
+  <data key="d3">green</data>
+  <data key="d4">activation</data>
+  <data key="d5">PPrel</data>
+  <data key="d2">a</data>
+</edge>
+<edge source="S1PR2" target="GNA12">
+  <data key="d2">a</data>
+</edge>
+<edge source="S1PR2" target="GNA13">
+  <data key="d2">a</data>
+</edge>
+<edge source="S1PR4" target="GNA12">
+  <data key="d2">a</data>
+</edge>
+<edge source="S1PR4" target="GNA13">
+  <data key="d2">a</data>
+</edge>
+<edge source="S1PR5" target="GNA12">
+  <data key="d2">a</data>
+</edge>
+<edge source="S1PR5" target="GNA13">
+  <data key="d2">a</data>
+</edge>
+<edge source="RHOA" target="ROCK1">
+  <data key="d2">a</data>
+</edge>
+<edge source="RHOA" target="ROCK2">
+  <data key="d2">a</data>
+</edge>
+<edge source="TNF" target="TNFRSF1A">
+  <data key="d3">green</data>
+  <data key="d4">activation</data>
+  <data key="d5">PPrel</data>
+  <data key="d2">a</data>
+</edge>
+<edge source="NSMAF" target="SMPD2">
+  <data key="d3">green</data>
+  <data key="d4">activation</data>
+  <data key="d5">PPrel</data>
+  <data key="d2">a</data>
+</edge>
+<edge source="CTSD" target="BID">
+  <data key="d3">green</data>
+  <data key="d4">activation/indirect effect</data>
+  <data key="d5">PPrel</data>
+  <data key="d2">a</data>
+</edge>
+<edge source="BID" target="BAX">
+  <data key="d3">green</data>
+  <data key="d4">activation</data>
+  <data key="d5">PPrel</data>
+  <data key="d2">a</data>
+</edge>
+<edge source="BCL2" target="TP53">
+  <data key="d3">purple</data>
+  <data key="d4">binding/association</data>
+  <data key="d5">PPrel</data>
+  <data key="d2">a</data>
+</edge>
+<edge source="TNFRSF1A" target="NSMAF">
+  <data key="d3">green</data>
+  <data key="d4">activation</data>
+  <data key="d5">PPrel</data>
+  <data key="d2">a</data>
+</edge>
+<edge source="TNFRSF1A" target="TRADD">
+  <data key="d3">green</data>
+  <data key="d4">activation</data>
+  <data key="d5">PPrel</data>
+  <data key="d2">a</data>
+</edge>
+<edge source="TRADD" target="TRAF2">
+  <data key="d3">green</data>
+  <data key="d4">activation</data>
+  <data key="d5">PPrel</data>
+  <data key="d2">a</data>
+</edge>
+<edge source="GNA12" target="RHOA">
+  <data key="d2">a</data>
+</edge>
+<edge source="GNA13" target="RHOA">
+  <data key="d2">a</data>
+</edge>
+<edge source="HRAS" target="RAF1">
+  <data key="d2">a</data>
+</edge>
+<edge source="KRAS" target="RAF1">
+  <data key="d2">a</data>
+</edge>
+<edge source="NRAS" target="RAF1">
+  <data key="d2">a</data>
+</edge>
+<edge source="ROCK1" target="PTEN">
+  <data key="d2">a</data>
+</edge>
+<edge source="ROCK1" target="NFKB1">
+  <data key="d2">a</data>
+</edge>
+<edge source="ROCK1" target="RELA">
+  <data key="d2">a</data>
+</edge>
+<edge source="ROCK2" target="PTEN">
+  <data key="d2">a</data>
+</edge>
+<edge source="ROCK2" target="NFKB1">
+  <data key="d2">a</data>
+</edge>
+<edge source="ROCK2" target="RELA">
+  <data key="d2">a</data>
+</edge>
+<edge source="FCER1G" target="FYN">
+  <data key="d2">a</data>
+</edge>
+</graph></graphml>

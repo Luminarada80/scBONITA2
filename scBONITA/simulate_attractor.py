@@ -124,7 +124,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     dataset_name = check_dataset_name(args.dataset_name)
-    network_name = args.network_name
+    network_name = input("Enter network name: ")
     attractor_num = input("Enter attractor number: ")
 
     # Specify file paths

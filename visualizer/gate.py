@@ -10,7 +10,6 @@ class Gate(Object):
         self.gate_type = gate_type
         self.activation_threshold = self.incoming_connections
 
-
         # General attributes
         self.size = self.size/1.5 # This represents half the width/height of the gate for drawing purposes
         self.draw_object_function = self.draw_gate
@@ -38,7 +37,7 @@ class Gate(Object):
         self.rect = self.image.get_rect(center=self.position)
         self.original_image = self.image  # This will hold the currently displayed image
 
-        self.font_size = 24
+        self.font_size = 16
         self.font = pygame.freetype.Font('visualizer/arial.ttf', self.font_size)
 
         self.angle = 0
@@ -140,8 +139,8 @@ class Gate(Object):
         elif len(self.active_incoming_connections) == 0:
             self.activation_threshold = 0
 
-    def update_object(self, events, connections, gates, nodes, uuid_dict, game):
-        self.update(events, connections, gates, nodes, uuid_dict, self.rect, self.draw_gate, game)
+    def update_object(self, events, connections, gate_ids, node_ids, uuid_dict, game):
+        self.update(events, connections, gate_ids, node_ids, uuid_dict, self.rect, self.draw_gate, game)
         # self.calculate_desired_orientation()
 
         if self.gate_type == 'AND':
