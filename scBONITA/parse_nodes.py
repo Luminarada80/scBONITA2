@@ -218,6 +218,7 @@ class Node:
         else:
             msg = f'ERROR: rule "{rule}" is not in the list of possible rules'
             assert Exception(msg)
+            
 
     # Print information about the node
     def print_info(self):

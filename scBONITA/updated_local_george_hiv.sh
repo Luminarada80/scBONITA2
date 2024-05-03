@@ -52,7 +52,7 @@ if [ "$RUN_RULE_DETERMINATION" = "True" ]; then
         # Using a list of KEGG pathways:
         KEGG_PATHWAYS_ARGS="${KEGG_PATHWAYS[@]}"
 
-        /home/emoeller/anaconda3/envs/scBonita/bin/python pipeline_class.py \
+        /home/emoeller/anaconda3/envs/scBonita/bin/python updated_pipeline_class.py \
             --data_file "$DATA_FILE" \
             --dataset_name "$DATASET_NAME" \
             --datafile_sep "$DATAFILE_SEP" \
