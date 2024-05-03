@@ -145,7 +145,8 @@ def add_list_of_kegg_pathways(parser):
         nargs="+",
         type=str,
         help="Which KEGG pathways should scBonita download? Specify the five letter pathway IDs.",
-        required=False
+        required=False,
+        default=""
     )
 
 def add_organism_code(parser):

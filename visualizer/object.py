@@ -2,11 +2,12 @@ import pygame
 import math
 import uuid
 
+
 class Object(pygame.sprite.Sprite):
     def __init__(self, name, position, color):
         super().__init__()
 
-        self.size = 150
+        self.size = 100
         self.name = name
         self.position = position
         self.color = color
@@ -17,8 +18,8 @@ class Object(pygame.sprite.Sprite):
         self.activation_threshold = 0
         self.locked = False
 
-        self.nodes_group = None
-        self.gates_group = None
+        self.node_ids = []
+        self.gate_ids = []
         
         self.id = uuid.uuid4()
 
@@ -60,8 +61,6 @@ class Object(pygame.sprite.Sprite):
 
         if self.outgoing_connections is not None:
             for object in self.outgoing_connections:
-                
-
                 # Vector from this node to the connected node
                 direction = (object.position[0] - self.position[0], object.position[1] - self.position[1])
 
@@ -123,6 +122,38 @@ class Object(pygame.sprite.Sprite):
             if self.moving:
                 self.position = pygame.mouse.get_pos()
                 rect.center = self.position
+    
+    def line_with_arrow(self):
+        mouse_pos = pygame.mouse.get_pos()
+        adjustment = 0.0000001
+
+        # Vector from this node to the connected node
+        direction = (mouse_pos[0] - self.position[0] + adjustment, mouse_pos[1] - self.position[1] + adjustment)
+
+        # Distance between the nodes
+        distance = math.sqrt(direction[0] ** 2 + direction[1] ** 2)
+
+        # Normalize the direction vector
+        unit_direction = (direction[0] / distance, direction[1] / distance)
+
+        node_edge = (self.position[0] + unit_direction[0] * self.size, self.position[1] + unit_direction[1] * self.size)
+        mouse = (mouse_pos[0] - unit_direction[0], mouse_pos[1] - unit_direction[1])
+
+        pygame.draw.line(self.display_surface, self.line_color, node_edge, mouse, 2)
+
+        arrow_length = 10
+        arrow_degrees = math.radians(30)
+
+        # Calculate points for the arrowhead
+        angle = math.atan2(direction[1], direction[0])
+        arrow_point_1 = (mouse[0] - arrow_length * math.cos(angle + arrow_degrees), 
+                        mouse[1] - arrow_length * math.sin(angle + arrow_degrees))
+        
+        arrow_point_2 = (mouse[0] - arrow_length * math.cos(angle - arrow_degrees), 
+                        mouse[1] - arrow_length * math.sin(angle - arrow_degrees))
+
+        # Draw the arrowhead
+        pygame.draw.polygon(self.display_surface, self.line_color, [mouse, arrow_point_1, arrow_point_2])
 
     # Draw an arrow from this object by hovering over it with the mouse and holding down 1
     def draw_edge(self, connections, rect):
@@ -137,35 +168,9 @@ class Object(pygame.sprite.Sprite):
                 self.is_drawing_line = False
             
             else:
-                adjustment = 0.0000001
-
-                # Vector from this node to the connected node
-                direction = (mouse_pos[0] - self.position[0] + adjustment, mouse_pos[1] - self.position[1] + adjustment)
-
-                # Distance between the nodes
-                distance = math.sqrt(direction[0] ** 2 + direction[1] ** 2)
-
-                # Normalize the direction vector
-                unit_direction = (direction[0] / distance, direction[1] / distance)
-
-                node_edge = (self.position[0] + unit_direction[0] * self.size, self.position[1] + unit_direction[1] * self.size)
-                mouse = (mouse_pos[0] - unit_direction[0], mouse_pos[1] - unit_direction[1])
-
-                pygame.draw.line(self.display_surface, self.line_color, node_edge, mouse, 2)
-
-                arrow_length = 10
-                arrow_degrees = math.radians(30)
-
-                # Calculate points for the arrowhead
-                angle = math.atan2(direction[1], direction[0])
-                arrow_point_1 = (mouse[0] - arrow_length * math.cos(angle + arrow_degrees), 
-                                mouse[1] - arrow_length * math.sin(angle + arrow_degrees))
-                
-                arrow_point_2 = (mouse[0] - arrow_length * math.cos(angle - arrow_degrees), 
-                                mouse[1] - arrow_length * math.sin(angle - arrow_degrees))
-
-                # Draw the arrowhead
-                pygame.draw.polygon(self.display_surface, self.line_color, [mouse, arrow_point_1, arrow_point_2])
+                self.line_with_arrow()
+        
+        
     
     # Connect to an object by pressing the '1' key while drawing a line and hovering over the object
     def connect_to_object(self, events, objects):
@@ -184,8 +189,10 @@ class Object(pygame.sprite.Sprite):
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         if object not in self.incoming_connections:
                             self.outgoing_connections.append(object)
+                            print(self.outgoing_connections)
                         if self not in object.incoming_connections:
                             object.incoming_connections.append(self)
+                            print(object.incoming_connections)
                         self.is_drawing_line = False
 
     
@@ -380,9 +387,19 @@ class Object(pygame.sprite.Sprite):
         self.velocity = -self.velocity
         other_sprite.velocity = -other_sprite.velocity
     
-    def update(self, events, connections, gates, nodes, uuid_dict, rect, draw_object_function, game):
+    def request_uuid_objects(self, uuid_dict, object_uuids):
+        """Requests the objects from main.py in a group"""
+        objects = []
+        for id in object_uuids:
+            objects.append(uuid_dict[id])
 
-        objects = pygame.sprite.Group([gates, nodes])
+        return objects
+            
+    def update(self, events, connections, gate_ids, node_ids, uuid_dict, rect, draw_object_function, game):
+        gates = self.request_uuid_objects(uuid_dict, gate_ids)
+        nodes = self.request_uuid_objects(uuid_dict, node_ids)
+        objects = nodes + gates
+        self.draw_connections()
         self.lock_state(rect)
         self.move(events, rect, game)
         self.simulation_step_cooldown()

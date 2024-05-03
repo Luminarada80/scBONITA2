@@ -1,0 +1,91 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d5" for="edge" attr.name="signal" attr.type="string"/>
+<key id="d4" for="edge" attr.name="type" attr.type="string"/>
+<key id="d3" for="edge" attr.name="subtype" attr.type="string"/>
+<key id="d2" for="edge" attr.name="color" attr.type="string"/>
+<key id="d1" for="node" attr.name="type" attr.type="string"/>
+<key id="d0" for="node" attr.name="name" attr.type="string"/>
+<graph edgedefault="directed"><node id="ADRB2">
+  <data key="d0">ADRB2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="GNAS">
+  <data key="d0">GNAS</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="CREM">
+  <data key="d0">CREM</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="BCL2">
+  <data key="d0">BCL2</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="RPS6KA5">
+  <data key="d0">RPS6KA5</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="ADCY3"/>
+<node id="ADCY4"/>
+<node id="ADCY7"/>
+<node id="ADCY9"/>
+<node id="CREB1"/>
+<node id="ATF2"/>
+<node id="ATF4"/>
+<node id="CREB3"/>
+<node id="ATF6B"/>
+<edge source="ADRB2" target="GNAS">
+  <data key="d2">green</data>
+  <data key="d3">activation</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="GNAS" target="ADCY3">
+  <data key="d5">a</data>
+</edge>
+<edge source="GNAS" target="ADCY4">
+  <data key="d5">a</data>
+</edge>
+<edge source="GNAS" target="ADCY7">
+  <data key="d5">a</data>
+</edge>
+<edge source="GNAS" target="ADCY9">
+  <data key="d5">a</data>
+</edge>
+<edge source="CREM" target="BCL2">
+  <data key="d2">red</data>
+  <data key="d3">inhibition</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">i</data>
+</edge>
+<edge source="CREM" target="CREB1">
+  <data key="d5">i</data>
+</edge>
+<edge source="CREM" target="ATF2">
+  <data key="d5">i</data>
+</edge>
+<edge source="CREM" target="ATF4">
+  <data key="d5">i</data>
+</edge>
+<edge source="CREM" target="CREB3">
+  <data key="d5">i</data>
+</edge>
+<edge source="CREM" target="ATF6B">
+  <data key="d5">i</data>
+</edge>
+<edge source="RPS6KA5" target="CREB1">
+  <data key="d5">a</data>
+</edge>
+<edge source="RPS6KA5" target="ATF2">
+  <data key="d5">a</data>
+</edge>
+<edge source="RPS6KA5" target="ATF4">
+  <data key="d5">a</data>
+</edge>
+<edge source="RPS6KA5" target="CREB3">
+  <data key="d5">a</data>
+</edge>
+<edge source="RPS6KA5" target="ATF6B">
+  <data key="d5">a</data>
+</edge>
+</graph></graphml>

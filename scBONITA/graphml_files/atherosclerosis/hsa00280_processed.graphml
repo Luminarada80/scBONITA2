@@ -1,0 +1,299 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d5" for="edge" attr.name="signal" attr.type="string"/>
+<key id="d4" for="edge" attr.name="type" attr.type="string"/>
+<key id="d3" for="edge" attr.name="subtype" attr.type="string"/>
+<key id="d2" for="edge" attr.name="color" attr.type="string"/>
+<key id="d1" for="node" attr.name="type" attr.type="string"/>
+<key id="d0" for="node" attr.name="name" attr.type="string"/>
+<graph edgedefault="directed"><node id="DLD">
+  <data key="d0">DLD</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="HMGCL">
+  <data key="d0">HMGCL</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="IVD">
+  <data key="d0">IVD</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="DBT">
+  <data key="d0">DBT</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="MCEE">
+  <data key="d0">MCEE</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="HIBCH">
+  <data key="d0">HIBCH</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="HSD17B10">
+  <data key="d0">HSD17B10</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="ACADM">
+  <data key="d0">ACADM</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="ACADS">
+  <data key="d0">ACADS</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="ACAD8">
+  <data key="d0">ACAD8</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="AACS">
+  <data key="d0">AACS</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="BCKDHA"/>
+<node id="BCKDHB"/>
+<node id="AUH"/>
+<node id="MCCC1"/>
+<node id="MCCC2"/>
+<node id="HADHA"/>
+<node id="ECHS1"/>
+<node id="ACAA1"/>
+<node id="ACAA2"/>
+<node id="HADHB"/>
+<node id="ACADSB"/>
+<node id="MUT"/>
+<node id="PCCA"/>
+<node id="PCCB"/>
+<node id="ALDH9A1"/>
+<node id="ABAT"/>
+<node id="HADH"/>
+<node id="ACSF3"/>
+<node id="HIBADH"/>
+<edge source="DLD" target="DBT">
+  <data key="d2">purple</data>
+  <data key="d3">compound</data>
+  <data key="d4">ECrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="DLD" target="BCKDHA">
+  <data key="d5">a</data>
+</edge>
+<edge source="DLD" target="BCKDHB">
+  <data key="d5">a</data>
+</edge>
+<edge source="HMGCL" target="AUH">
+  <data key="d5">a</data>
+</edge>
+<edge source="HMGCL" target="ACAA1">
+  <data key="d5">a</data>
+</edge>
+<edge source="HMGCL" target="ACAA2">
+  <data key="d5">a</data>
+</edge>
+<edge source="HMGCL" target="HADHB">
+  <data key="d5">a</data>
+</edge>
+<edge source="IVD" target="DBT">
+  <data key="d2">purple</data>
+  <data key="d3">compound</data>
+  <data key="d4">ECrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="DBT" target="ACADM">
+  <data key="d2">purple</data>
+  <data key="d3">compound</data>
+  <data key="d4">ECrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="DBT" target="ACADS">
+  <data key="d2">purple</data>
+  <data key="d3">compound</data>
+  <data key="d4">ECrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="DBT" target="ACADSB">
+  <data key="d5">a</data>
+</edge>
+<edge source="MCEE" target="PCCA">
+  <data key="d5">a</data>
+</edge>
+<edge source="MCEE" target="PCCB">
+  <data key="d5">a</data>
+</edge>
+<edge source="HIBCH" target="HADHA">
+  <data key="d5">a</data>
+</edge>
+<edge source="HIBCH" target="ECHS1">
+  <data key="d5">a</data>
+</edge>
+<edge source="ACADM" target="DBT">
+  <data key="d2">purple</data>
+  <data key="d3">compound</data>
+  <data key="d4">ECrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="ACAD8" target="DBT">
+  <data key="d2">purple</data>
+  <data key="d3">compound</data>
+  <data key="d4">ECrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="ACAD8" target="HADHA">
+  <data key="d5">a</data>
+</edge>
+<edge source="ACAD8" target="ECHS1">
+  <data key="d5">a</data>
+</edge>
+<edge source="AACS" target="HMGCL">
+  <data key="d2">purple</data>
+  <data key="d3">compound</data>
+  <data key="d4">ECrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="BCKDHA" target="DBT">
+  <data key="d5">a</data>
+</edge>
+<edge source="BCKDHA" target="DLD">
+  <data key="d5">a</data>
+</edge>
+<edge source="BCKDHB" target="DBT">
+  <data key="d5">a</data>
+</edge>
+<edge source="BCKDHB" target="DLD">
+  <data key="d5">a</data>
+</edge>
+<edge source="AUH" target="MCCC1">
+  <data key="d5">a</data>
+</edge>
+<edge source="AUH" target="MCCC2">
+  <data key="d5">a</data>
+</edge>
+<edge source="MCCC1" target="IVD">
+  <data key="d5">a</data>
+</edge>
+<edge source="MCCC1" target="ACADM">
+  <data key="d5">a</data>
+</edge>
+<edge source="MCCC1" target="HADHA">
+  <data key="d5">a</data>
+</edge>
+<edge source="MCCC1" target="ECHS1">
+  <data key="d5">a</data>
+</edge>
+<edge source="MCCC2" target="IVD">
+  <data key="d5">a</data>
+</edge>
+<edge source="MCCC2" target="ACADM">
+  <data key="d5">a</data>
+</edge>
+<edge source="MCCC2" target="HADHA">
+  <data key="d5">a</data>
+</edge>
+<edge source="MCCC2" target="ECHS1">
+  <data key="d5">a</data>
+</edge>
+<edge source="HADHA" target="IVD">
+  <data key="d5">a</data>
+</edge>
+<edge source="HADHA" target="ACADM">
+  <data key="d5">a</data>
+</edge>
+<edge source="HADHA" target="HSD17B10">
+  <data key="d5">a</data>
+</edge>
+<edge source="HADHA" target="ACADS">
+  <data key="d5">a</data>
+</edge>
+<edge source="HADHA" target="ACADSB">
+  <data key="d5">a</data>
+</edge>
+<edge source="HADHA" target="HADH">
+  <data key="d5">a</data>
+</edge>
+<edge source="ECHS1" target="IVD">
+  <data key="d5">a</data>
+</edge>
+<edge source="ECHS1" target="ACADM">
+  <data key="d5">a</data>
+</edge>
+<edge source="ECHS1" target="HSD17B10">
+  <data key="d5">a</data>
+</edge>
+<edge source="ECHS1" target="ACADS">
+  <data key="d5">a</data>
+</edge>
+<edge source="ECHS1" target="ACADSB">
+  <data key="d5">a</data>
+</edge>
+<edge source="ECHS1" target="HADH">
+  <data key="d5">a</data>
+</edge>
+<edge source="ACAA1" target="HSD17B10">
+  <data key="d5">a</data>
+</edge>
+<edge source="ACAA1" target="PCCA">
+  <data key="d5">a</data>
+</edge>
+<edge source="ACAA1" target="PCCB">
+  <data key="d5">a</data>
+</edge>
+<edge source="ACAA1" target="HADH">
+  <data key="d5">a</data>
+</edge>
+<edge source="ACAA2" target="HSD17B10">
+  <data key="d5">a</data>
+</edge>
+<edge source="ACAA2" target="PCCA">
+  <data key="d5">a</data>
+</edge>
+<edge source="ACAA2" target="PCCB">
+  <data key="d5">a</data>
+</edge>
+<edge source="ACAA2" target="HADH">
+  <data key="d5">a</data>
+</edge>
+<edge source="HADHB" target="HSD17B10">
+  <data key="d5">a</data>
+</edge>
+<edge source="HADHB" target="PCCA">
+  <data key="d5">a</data>
+</edge>
+<edge source="HADHB" target="PCCB">
+  <data key="d5">a</data>
+</edge>
+<edge source="HADHB" target="HADH">
+  <data key="d5">a</data>
+</edge>
+<edge source="ACADSB" target="DBT">
+  <data key="d5">a</data>
+</edge>
+<edge source="ACADSB" target="HADHA">
+  <data key="d5">a</data>
+</edge>
+<edge source="ACADSB" target="ECHS1">
+  <data key="d5">a</data>
+</edge>
+<edge source="MUT" target="MCEE">
+  <data key="d5">a</data>
+</edge>
+<edge source="MUT" target="ACSF3">
+  <data key="d5">a</data>
+</edge>
+<edge source="ALDH9A1" target="ABAT">
+  <data key="d5">a</data>
+</edge>
+<edge source="ALDH9A1" target="HIBADH">
+  <data key="d5">a</data>
+</edge>
+<edge source="ABAT" target="HIBADH">
+  <data key="d5">a</data>
+</edge>
+<edge source="ACSF3" target="MCEE">
+  <data key="d5">a</data>
+</edge>
+<edge source="ACSF3" target="ALDH9A1">
+  <data key="d5">a</data>
+</edge>
+<edge source="HIBADH" target="HIBCH">
+  <data key="d5">a</data>
+</edge>
+</graph></graphml>

@@ -1,0 +1,163 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d5" for="edge" attr.name="signal" attr.type="string"/>
+<key id="d4" for="edge" attr.name="type" attr.type="string"/>
+<key id="d3" for="edge" attr.name="subtype" attr.type="string"/>
+<key id="d2" for="edge" attr.name="color" attr.type="string"/>
+<key id="d1" for="node" attr.name="type" attr.type="string"/>
+<key id="d0" for="node" attr.name="name" attr.type="string"/>
+<graph edgedefault="directed"><node id="STAM">
+  <data key="d0">STAM</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="HGS">
+  <data key="d0">HGS</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="LDLR">
+  <data key="d0">LDLR</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="EPS15">
+  <data key="d0">EPS15</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="LDLRAP1">
+  <data key="d0">LDLRAP1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="SH3KBP1">
+  <data key="d0">SH3KBP1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="EHD3">
+  <data key="d0">EHD3</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="EHD1">
+  <data key="d0">EHD1</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="RAB4A">
+  <data key="d0">RAB4A</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="RBSN">
+  <data key="d0">RBSN</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="VPS45">
+  <data key="d0">VPS45</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="RHOA">
+  <data key="d0">RHOA</data>
+  <data key="d1">ortholog</data>
+</node>
+<node id="CBL"/>
+<node id="CBLB"/>
+<node id="MDM2"/>
+<node id="TRAF6"/>
+<node id="RNF41"/>
+<node id="ITCH"/>
+<node id="WWP1"/>
+<node id="IGF1R"/>
+<node id="SH3GLB1"/>
+<node id="SH3GLB2"/>
+<node id="TGFBR1"/>
+<node id="TGFBR2"/>
+<node id="SMAD2"/>
+<node id="SMAD3"/>
+<node id="IL2RA"/>
+<node id="IL2RB"/>
+<node id="IL2RG"/>
+<edge source="HGS" target="STAM">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="EPS15" target="IGF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="LDLRAP1" target="LDLR">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="SH3KBP1" target="IGF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="EHD3" target="RBSN">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="RBSN" target="RAB4A">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="RBSN" target="EHD1">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="VPS45" target="RBSN">
+  <data key="d2">purple</data>
+  <data key="d3">binding/association</data>
+  <data key="d4">PPrel</data>
+  <data key="d5">a</data>
+</edge>
+<edge source="RHOA" target="IL2RA">
+  <data key="d5">a</data>
+</edge>
+<edge source="RHOA" target="IL2RB">
+  <data key="d5">a</data>
+</edge>
+<edge source="RHOA" target="IL2RG">
+  <data key="d5">a</data>
+</edge>
+<edge source="CBL" target="IGF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="CBLB" target="IGF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="MDM2" target="IGF1R">
+  <data key="d5">i</data>
+</edge>
+<edge source="TRAF6" target="IGF1R">
+  <data key="d5">i</data>
+</edge>
+<edge source="RNF41" target="IGF1R">
+  <data key="d5">i</data>
+</edge>
+<edge source="ITCH" target="IGF1R">
+  <data key="d5">i</data>
+</edge>
+<edge source="WWP1" target="IGF1R">
+  <data key="d5">i</data>
+</edge>
+<edge source="SH3GLB1" target="IGF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="SH3GLB2" target="IGF1R">
+  <data key="d5">a</data>
+</edge>
+<edge source="TGFBR1" target="SMAD2">
+  <data key="d5">a</data>
+</edge>
+<edge source="TGFBR1" target="SMAD3">
+  <data key="d5">a</data>
+</edge>
+<edge source="TGFBR2" target="SMAD2">
+  <data key="d5">a</data>
+</edge>
+<edge source="TGFBR2" target="SMAD3">
+  <data key="d5">a</data>
+</edge>
+</graph></graphml>

@@ -11,8 +11,10 @@ class SaveState():
         self.object_names = []
         self.object_positions = []
         self.object_color = []
-        self.object_outgoing_connections = []
-        self.object_incoming_connections = []
+        self.object_ids = []
+        self.outgoing_connections = []
+        self.incoming_connections = []
+
 
     def save_objects(self, objects):
         # I want the name, position, size, outgoing_connections, and incoming_connections
@@ -21,26 +23,48 @@ class SaveState():
             self.object_names.append(object.name)
             self.object_positions.append(object.position)
             self.object_color.append(object.color)
-            self.object_outgoing_connections.append(object.outgoing_connections)
-            self.object_incoming_connections.append(object.incoming_connections)
+            self.object_ids.append(object.id)
+
+            object_outgoing_connections = []
+            object_incoming_connections = []
+
+            for connected_object in object.outgoing_connections:
+                object_outgoing_connections.append(connected_object.id)
+
+            for connected_object in object.incoming_connections:
+                object_incoming_connections.append(connected_object.id)
+
+            self.outgoing_connections.append(object_outgoing_connections)
+            self.incoming_connections.append(object_incoming_connections)
     
     def load_objects(self):
         nodes = []
         gates = []
+        uuid_dict = {}  # Dictionary to map UUIDs to object instances
 
+        # Instantiate all objects and map them
         for i, object_type in enumerate(self.object_types):
             if object_type == "Node":
                 node = Node(self.object_names[i], self.object_positions[i], self.object_color[i])
-                node.outgoing_connections = self.object_outgoing_connections[i]
-                node.incoming_connections = self.object_incoming_connections[i]
+                node.id = self.object_ids[i]
                 nodes.append(node)
-            
+                uuid_dict[node.id] = node
             elif object_type == "Gate":
                 gate = Gate(self.object_names[i], self.object_positions[i])
-                gate.outgoing_connections = self.object_outgoing_connections[i]
-                gate.incoming_connections = self.object_incoming_connections[i]
+                gate.id = self.object_ids[i]
                 gates.append(gate)
-        
+                uuid_dict[gate.id] = gate
+
+        # Restore connections using the UUID dictionary
+        for node in nodes:
+            node.outgoing_connections = [uuid_dict[uid] for uid in self.outgoing_connections[i]]
+            node.incoming_connections = [uuid_dict[uid] for uid in self.incoming_connections[i]]
+        for gate in gates:
+            gate.outgoing_connections = [uuid_dict[uid] for uid in self.outgoing_connections[i]]
+            gate.incoming_connections = [uuid_dict[uid] for uid in self.incoming_connections[i]]
+
+
+        # Group the objects into sprite groups
         nodes_group = pygame.sprite.Group(*nodes)
         gates_group = pygame.sprite.Group(*gates)
         objects_group = pygame.sprite.Group([gates_group, nodes_group])
@@ -204,8 +228,11 @@ class Game:
         #         counter += 1
 
         # Boolean Nodes
+        # for i in range(1, num_nodes+1):
+        #     self.nodes.append(Node('', (self.WIDTH/2+350,self.HEIGHT/2+(50*i)), "light blue"))
+
         for i in range(1, num_nodes+1):
-            self.nodes.append(Node('', (self.WIDTH/2+350,self.HEIGHT/2+(50*i)), "light blue"))
+            self.nodes.append(Node(f'Node {i}', (self.WIDTH/2+350,self.HEIGHT/2+(50*i)), "light blue"))
 
         # Change the size and color of the nodes for relative abundance. Manual entry required
         if relative_abundance:
@@ -228,14 +255,20 @@ class Game:
         for i in range(num_not_gates):
             self.gates.append(Gate('NOT', (self.WIDTH/2+400, self.HEIGHT/2-150 - (15*i))))
 
+        # Create a list of the unique IDs for the objects
+        self.node_ids = [node.id for node in self.nodes]
+        self.gate_ids = [gate.id for gate in self.gates]
+
         self.nodes_group = pygame.sprite.Group(*self.nodes)
         self.gates_group = pygame.sprite.Group(*self.gates)
-        self.objects_group = pygame.sprite.Group([self.gates_group, self.nodes_group])
+
+        self.objects_group = pygame.sprite.Group(*self.nodes, *self.gates)
+
 
         for object in self.objects_group:
             self.uuids[object.id] = object
-            object.nodes_group = self.nodes_group
-            object.gates_group = self.gates_group
+            object.node_ids = self.node_ids
+            object.gate_ids = self.gate_ids
 
         self.connections = 0        
 
@@ -255,24 +288,33 @@ class Game:
                     pygame.quit()
                     sys.exit()
 
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_s]:
+                game_state = SaveState()
+                game_state.save_objects(self.objects_group)
+                save_game_state(game_state, 'save_game.pickle')
+
+            if keys[pygame.K_l]:
+                game_state = load_game_state('save_game.pickle')
+                self.nodes_group, self.gates_group, self.objects_group = game_state.load_objects()
+
             self.screen.fill("white")      
             for node in self.nodes_group:
-                node.draw_connections()
-                node.update_object(events, self.connections, self.gates_group, self.nodes_group, self.uuids, self)
+                # node.draw_connections()
+                node.update_object(events, self.connections, self.gate_ids, self.node_ids, self.uuids, self)
                 if node.is_drawing_line == True:
                     self.connections += 1  
             
             for gate in self.gates_group:
-                gate.draw_connections()
-                gate.update_object(events, self.connections, self.gates_group, self.nodes_group, self.uuids, self)
+                # gate.draw_connections()
+                gate.update_object(events, self.connections, self.gate_ids, self.node_ids, self.uuids, self)
                 if gate.is_drawing_line == True:
                     self.connections += 1
 
             # Reset the number of connections if the 1 key is not pressed
-            keys = pygame.key.get_pressed()
+            
             if not keys[pygame.K_1]:
                 self.connections = 0
-
             self.nodes_group.draw(self.screen)
 
             for node in self.nodes_group:
@@ -300,15 +342,6 @@ class Game:
 
             else:
                 self.states = {}
-            
-            if keys[pygame.K_s]:
-                game_state = SaveState()
-                game_state.save_objects(self.objects_group)
-                save_game_state(game_state, 'save_game.pickle')
-
-            if keys[pygame.K_l]:
-                game_state = load_game_state('save_game.pickle')
-                self.nodes_group, self.gates_group, self.objects_group = game_state.load_objects()
 
             pygame.display.update()
             self.clock.tick(60)
