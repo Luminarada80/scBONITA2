@@ -22,11 +22,15 @@ class Node:
         self.inversions = inversions
 
         # Upstream nodes signaling to this node (dictionary where keys = node index, value = node name)
-        self.predecessors = predecessors
+        # If there are no upstream nodes, set the predecessor to itself
+        if len(predecessors) == 0:
+            self.predecessors = {self.index : self.name}
+        else:
+            self.predecessors = predecessors
 
         # Finds the possible rules based on the number of predecessors and chooses one using one-hot encoding
         self.possibilities = self.enumerate_possibilities()
-        self.bitstring, self.selected_rule = self.choose_rule()
+        self.bitstring, self.selected_rule = self.choose_rule(self.possibilities)
         self.node_rules = [self.name, [i for i in predecessors], self.selected_rule, self.inversions]
 
         # Indices in the individuals where the rules for this node start and end
@@ -51,6 +55,10 @@ class Node:
         self.relative_abundance = None
     
     def enumerate_possibilities(self):
+        # logging.debug(f'Node {self.name} enumerate_possibilities function:')
+
+        # This creates all possible AND and OR possibilities between all input strings
+        # See: https://stackoverflow.com/questions/76611116/explore-all-possible-boolean-combinations-of-variables
         cache = dict()
         or0,or1,and0,and1 = "  or  "," or ","  and  "," and "  
         
@@ -95,30 +103,41 @@ class Node:
                     for left,right in product(*map(boolCombo,(leftKeys,rightKeys))):
                         addResult(left,right)
             return cacheResult(keys,result)
+        
+        # logging.debug(f'\tNode {self.name}\nPredecessors: {self.predecessors} ({len(self.predecessors)} incoming nodes)')
 
-        possibilities = None
         num_incoming_nodes = len(self.predecessors)
+        
+        # Find the possible combinations based on the number of incoming nodes
+        if num_incoming_nodes == 4:
+            possibilities = np.array(boolCombo("ABCD") + boolCombo("ABC") + boolCombo("AB") + boolCombo("AC") + boolCombo("BC") + ["A"] + ["B"] + ["C"])
         if num_incoming_nodes == 3:
             possibilities = np.array(boolCombo("ABC") + boolCombo("AB") + boolCombo("AC") + boolCombo("BC") + ["A"] + ["B"] + ["C"])
         elif num_incoming_nodes == 2:
             possibilities = np.array(boolCombo("AB") + ["A"] + ["B"])
-        elif num_incoming_nodes == 1:
+        elif num_incoming_nodes == 1 or num_incoming_nodes == 0:
             possibilities = np.array(["A"])
         else:
             assert IndexError('Num incoming nodes out of range')
+        
+        # logging.debug(f'\tPossibilities = {possibilities}')
 
         return possibilities
 
-    def choose_rule(self):
-        random_rule_index = random.choice(range(len(self.possibilities)))
-        # print(f'Random rule index: {random_rule_index}\n')
+    def choose_rule(self, possibilities):
+        # logging.debug(f'Node {self.name} choose_rule function:')
 
-        # Creates a bitstring for the rule
-        bitstring = np.array([1 if i == random_rule_index else 0 for i, _ in enumerate(self.possibilities)])
+        # Selects a random rule
+        random_rule_index = random.choice(range(len(possibilities)))
+        
+        # logging.debug(f'\tRandom rule index: {random_rule_index}')
 
+        # Creates a bitstring for the rule, where the index of the randomly selected rule is 1 and every other combination is 0
+        bitstring = np.array([1 if i == random_rule_index else 0 for i, _ in enumerate(possibilities)])
+        
         # Finds the predicted rule from the bitstring
-        selected_rule = self.possibilities[bitstring == 1][0].replace("  "," ")
-
+        selected_rule = possibilities[bitstring == 1][0].replace("  "," ")
+        
         # Formats the rule with not values
         for i, invert_node in enumerate(self.inversions):
             if invert_node == 1:
@@ -128,15 +147,20 @@ class Node:
                     selected_rule = selected_rule.replace('B', 'not B')
                 elif i == 2:
                     selected_rule = selected_rule.replace('C', 'not C')
+        
+        # logging.debug(f'\tBitstring = {bitstring}')
+        # logging.debug(f'\nSelected_rule: {selected_rule}\n')
 
         return bitstring, selected_rule
     
     def find_multiple_rule_predictions(self, individual_bitstring):
-        
+        # logging.info(f'Node {self.name} find_multiple_rule_predictions:')
         rule_predictions = []
 
         # Extract the bitstring for this node from the individual
         bitstring_length = self.rule_end_index - self.rule_start_index
+        # logging.info(f'\tRule start: {self.rule_start_index}')
+        # logging.info(f'\tRule end: {self.rule_end_index}')
 
         if bitstring_length >= 1:
             bitstring = np.array(individual_bitstring[self.rule_start_index:self.rule_end_index])
@@ -144,8 +168,11 @@ class Node:
         elif bitstring_length == 0:
             bitstring = np.array(individual_bitstring[self.rule_start_index])
         
-        # Replace all 1 values in the bitstring with the rule name
-        selected_rules = self.possibilities[bitstring == 1][0].replace("  "," ")
+        # logging.info(f'\tBitstring = {bitstring}')
+        
+        selected_rules = [rule.replace("  ", " ") for rule in self.possibilities[bitstring == 1]]
+        # logging.info(f'\tPossible rules = {self.possibilities}')
+        # logging.info(f'\tSelected rules = {selected_rules}')
 
         # Add in the inversion rules
         for rule in selected_rules:
@@ -160,8 +187,18 @@ class Node:
             rule_predictions.append(rule)
 
         # Update the predicted rules for this node
+        node_rules = []
         for rule in rule_predictions:
-            self.node_rules = [self.name, [i for i in self.predecessors], rule, self.inversions]
+            node_rules.append([self.name, [i for i in self.predecessors], rule, self.inversions])
+        self.node_rules = node_rules
+
+        # logging.info(f'\tRule predictions:')
+        # for predicted_rule in rule_predictions:
+        #     logging.info(f'\t\t{predicted_rule}')
+
+        # logging.info(f'\tNode rules:')
+        # for rule in self.node_rules:
+        #     logging.info(f'\t\t{rule}')
         
         return rule_predictions
 

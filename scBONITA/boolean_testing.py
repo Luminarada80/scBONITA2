@@ -100,6 +100,7 @@ inversions = [1, 0, 1]
 
 test_node = Node('test_node', 0, predecessors, inversions)
 
+print(f'Possible rules: {possibilities}')
 print(f'Bitstring: {test_node.bitstring}\n')
 print(f'Selected rule: {test_node.selected_rule}\n')
 
