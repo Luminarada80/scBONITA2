@@ -26,6 +26,14 @@ class ErrorCalculation:
         self.gate_dict_twogenes = {func.__name__: func for func in self.gate_choices_twogenes}
         self.gate_dict_threegenes = {func.__name__: func for func in self.gate_choices_threegenes}
 
+    def evaluate_rule(self, A, B, C, predicted_rule):
+        return eval(predicted_rule)
+    
+    def calculate_error(self, A, B, C, node, predicted_rule):
+        predicted = np.vectorize(self.evaluate_rule(A, B, C, predicted_rule))
+
+
+
     def rule_calculation_1input(self, A, node_evaluated, invert_node):
         if invert_node:
             A = np.logical_not(A)
@@ -142,58 +150,37 @@ class ErrorCalculation:
         incoming_nodes = predicted_rule[1] # The incoming nodes and predicted rule is the second element
         rule = predicted_rule[2]
         inversion = predicted_rule[3]
-        # logging.info(f'\n\t\tCalculate node error:')
-        # logging.info(f'\t\t\tnode_name = {node_name}')
-        # logging.info(f'\t\t\tIncoming nodes = {incoming_nodes}')
-        # logging.info(f'\t\t\trule = {rule}')
-        # logging.info(f'\t\t\tinversion = {inversion}')
 
         node_data = dataset[self.nodeDict[node_name]]
-
-
+        
+        # Check if an index exists
+        def index_exists(lst, index):
+            try:
+                _ = lst[index]
+                return True
+            except IndexError:
+                return False
+        
+        # Set A, B, and C to 0
+        A = 0
+        B = 0
+        C = 0
+        
+        # Update the values of A, B, and C based on the gene index in the dataset
+        if index_exists(incoming_nodes, 0):
+            A = dataset[incoming_nodes[0]]
+        if index_exists(incoming_nodes, 1):
+            B = dataset[incoming_nodes[1]]
+        if index_exists(incoming_nodes, 2):
+            C = dataset[incoming_nodes[2]]
+        
+        predicted = np.vectorize(eval(predicted_rule))
+        expected = dataset[node.dataset_index]
 
         difference = 0
         count = 0
-        # logging.info(f'\t\t\tIncoming node length: {len(incoming_nodes)}')
-        # For nodes with only 1 input
-        if len(incoming_nodes) == 1:
-            input_gene1 = incoming_nodes
-            difference, count = self.rule_calculation_1input(
-                dataset[self.nodeDict[input_gene1[0]]], # The data for the input gene
-                node_data, # The data for the node being looked at
-                inversion[0]
-            )
 
-        # For nodes with 2 inputs
-        elif len(incoming_nodes) == 2:
-            input_gene1, input_gene2 = incoming_nodes
-            difference, count = self.rule_calculation_2input(
-                dataset[self.nodeDict[input_gene1]], # A
-                dataset[self.nodeDict[input_gene2]], # B
-                inversion[0],  # not_a
-                inversion[1],  # not_b
-                node_data, # node_evaluated
-                rule,
-                self.gate_dict_twogenes
-            )
-
-        # For nodes with 3 inputs
-        elif len(incoming_nodes) == 3:
-            input_gene1, input_gene2, input_gene3 = incoming_nodes
-            difference, count = self.rule_calculation_3input(
-                dataset[self.nodeDict[input_gene1]], # A
-                dataset[self.nodeDict[input_gene2]], # B
-                dataset[self.nodeDict[input_gene3]], # C
-                inversion[0], # not_a
-                inversion[1], # not_b
-                inversion[2], # not_c
-                node_data,
-                rule,
-                self.gate_dict_threegenes
-            )
-
-        # logging.info(f'\t\t\tDifference: {difference} count: {count}')
-        # logging.info(f'\n')
+        
 
         if count > 0:
             total_error = difference / count

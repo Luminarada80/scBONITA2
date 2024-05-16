@@ -42,8 +42,8 @@ class CustomDeap:
         self.individual_length = individual_length
         self.individualParse = [0] + [node.rule_end_index if node.rule_end_index else nodes[i-1].rule_end_index for i, node in enumerate(nodes)]
         self.size = len(self.individualParse)
-        self.node_combination_length = [node.total_combo_length for node in nodes]
-        self.total_combinations = [node.total_combos for node in nodes]
+        self.node_combination_length = [len(node.possibilities) for node in nodes]
+        self.total_combinations = [node.possibilities for node in nodes]
         self.total_inversions = [node.inversions for node in nodes]
         self.make_toolbox()
 
@@ -466,22 +466,30 @@ class CustomDeap:
         # Get the dataset row indices for the incoming nodes included in this rule
         incoming_node_indices = [index for index, name in node.predecessors.items() if name in predicted_rule[1]]
 
-        # Get the row(s) in the dataset for the incoming node(s)
-        incoming_node_data = [dataset[i] for i in incoming_node_indices]
-
-        # Find the logic function that should be used for this predicted rule
-        calculation_function = node.find_calculation_function(predicted_rule[2])
+        # Check if an index exists
+        def index_exists(lst, index):
+            try:
+                _ = lst[index]
+                return True
+            except IndexError:
+                return False
+        
+        # Set A, B, and C to 0
+        A = 0
+        B = 0
+        C = 0
+        
+        # Update the values of A, B, and C based on the gene index in the dataset
+        if index_exists(incoming_node_indices, 0):
+            A = dataset[incoming_node_indices[0]]
+        if index_exists(incoming_node_indices, 1):
+            B = dataset[incoming_node_indices[1]]
+        if index_exists(incoming_node_indices, 2):
+            C = dataset[incoming_node_indices[2]]
 
         # Allows for arrays to be passed into the function rather than one value at a time
-        predicted_logic_function = np.vectorize(calculation_function)
+        predicted = np.vectorize(eval(predicted_rule))
 
-        # Set up the argument to be passed into the logic function, allows for different number of input nodes
-        inversion_rules = predicted_rule[3]
-        function_argument = incoming_node_data + inversion_rules
-
-        # Apply the logic function to the data from the incoming nodes to get the predicted output
-        predicted = predicted_logic_function(*function_argument)
-        # logging.info(f'predicted = {predicted}')
         # Sum the number of differences between the predicted output and the actual data
         difference = np.sum(predicted != node_evaluated)
 
@@ -901,27 +909,18 @@ class CustomDeap:
 
                 # Reset the state of the node
                 node.reset_state()
+
+                individual_bitstring = individualRuleset[1]
+
+                node.find_multiple_rule_predictions(individual_bitstring)
                 
                 # If the node is in the individual
                 if node.rule_start_index is not None:
 
-                    number_of_rules = node.rule_end_index - node.rule_start_index
-
-                    # Set the rule predictions based on where the node starts and ends in the individual's prediction bitstring
-                    if number_of_rules >= 1:
-                        node.rule_predictions = individualRuleset[1][node.rule_start_index:node.rule_end_index]
-
-                    elif number_of_rules == 0:
-                        node.rule_predictions = individualRuleset[1][node.rule_start_index]
-
-                    # Find which rules are predicted in the individual (value of 1 in the individual's prediction bitstring)
-                    node.find_rule_predictions()
-
-                    # Format the predicted rules
-                    node.make_AND_OR_NOT_rules()
+                    rule_predictions = node.find_multiple_rule_predictions(individual_bitstring)
 
                     # For each predicted rule
-                    for predicted_rule in node.node_rules:
+                    for predicted_rule in rule_predictions:
                         # Calculate the error of that rule based on the dataset
                         difference, count = self.calculate_error(node, predicted_rule, dataset)
                     

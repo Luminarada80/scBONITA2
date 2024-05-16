@@ -1,7 +1,7 @@
 from itertools import combinations, product
 import random
 import numpy as np
-from updated_parse_node import Node
+from parse_node import Node
 
 A = 1
 B = 0

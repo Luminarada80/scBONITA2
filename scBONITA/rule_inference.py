@@ -205,10 +205,6 @@ class RuleInference(NetworkSetup):
         # Runs the genetic algorithm and rule refinement
         self.best_ruleset = self.genetic_algorithm(self.network)
 
-        # Finds the Boolean logic calculation function that matches the best rule
-        for node in self.nodes:
-            node.calculation_function = node.find_calculation_function(node.best_rule[2])
-
     def plot_graph_from_graphml(self, network):
         G = network
 
