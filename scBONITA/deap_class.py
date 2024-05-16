@@ -460,40 +460,58 @@ class CustomDeap:
         return (all_best_rules, ruleset_error)
 
     def calculate_error(self, node, predicted_rule, dataset):
+        # logging.info(f'CustomDeap calculate_error:')
         # Get the row in the dataset for the node being evaluated
         node_evaluated = dataset[node.index]
-
+        # logging.info(f'\tNode {node.name}, Dataset index {node.index}')
+        
         # Get the dataset row indices for the incoming nodes included in this rule
-        incoming_node_indices = [index for index, name in node.predecessors.items() if name in predicted_rule[1]]
+        # logging.info(f'\tPredicted rule: {predicted_rule}')
+        incoming_node_indices = [predecessor_index for predecessor_index in node.predecessors]
+        # logging.info(f'\tIncoming node indices: {incoming_node_indices}')
 
-        # Check if an index exists
-        def index_exists(lst, index):
-            try:
-                _ = lst[index]
-                return True
-            except IndexError:
-                return False
+        # Initialize A, B, C to False by default (adjust according to what makes sense in context)
+        A, B, C = (False,) * 3
         
-        # Set A, B, and C to 0
-        A = 0
-        B = 0
-        C = 0
+        data = {}
+
+        # Map dataset values to A, B, C based on their indices
+        if len(incoming_node_indices) > 0:
+            data['A'] = dataset[incoming_node_indices[0]]
+        if len(incoming_node_indices) > 1:
+            data['B'] = dataset[incoming_node_indices[1]]
+        if len(incoming_node_indices) > 2:
+            data['C'] = dataset[incoming_node_indices[2]]
+        if len(incoming_node_indices) > 3:
+            data['D'] = dataset[incoming_node_indices[3]]
+
+        def evaluate_expression(var_data, expression):
+            # logging.info(f'\tEvaluate_expression function:')
+            # logging.info(f'\t\tvar_data = {var_data}')
+            # logging.info(f'\t\texpression = {expression}')
+
+            def eval_func(*args):
+                local_vars = {name: arg for name, arg in zip(var_data.keys(), args)}
+                # logging.info(f'\t\tlocal_vars = {local_vars}')
+                return eval(expression, {}, local_vars)
+            
+            vectorized_eval = np.vectorize(eval_func)
+
+            # Prepare the argument list in the correct order, corresponding to the keys in var_data
+            arg_list = [var_data[key] for key in var_data.keys()]
+            return vectorized_eval(*arg_list)
+
+        # logging.info(f'\tdata = {data}')
+        predicted = evaluate_expression(data, predicted_rule)
+
+        # # Evaluate the rule using numpy's vectorize function
+        # predicted = np.vectorize(eval(predicted_rule))
         
-        # Update the values of A, B, and C based on the gene index in the dataset
-        if index_exists(incoming_node_indices, 0):
-            A = dataset[incoming_node_indices[0]]
-        if index_exists(incoming_node_indices, 1):
-            B = dataset[incoming_node_indices[1]]
-        if index_exists(incoming_node_indices, 2):
-            C = dataset[incoming_node_indices[2]]
-
-        # Allows for arrays to be passed into the function rather than one value at a time
-        predicted = np.vectorize(eval(predicted_rule))
-
-        # Sum the number of differences between the predicted output and the actual data
+        # logging.info(f'Predicted: {predicted}')
         difference = np.sum(predicted != node_evaluated)
+        # logging.info(f'\tDifferences: {difference}')
+        # logging.info(f'\tError = {difference / len(predicted) * 100}%')
 
-        # Store the number of total predictions for error calculation (different / total)
         count = len(predicted)
 
         return difference, count
