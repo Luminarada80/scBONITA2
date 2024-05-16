@@ -13,6 +13,7 @@ from scipy.sparse import csr_matrix
 import logging
 from alive_progress import alive_bar
 import os
+import random
 
 # -------- Genetic Algorithm Code --------
 class CustomDeap:
@@ -151,7 +152,7 @@ class CustomDeap:
             total_fitnesses.append(raw_fitnesses)
 
             if gen == self.generations:
-                # self.graph_results(total_fitnesses)
+                self.graph_genetic_algorithm_results(total_fitnesses)
                 with open("deap_results.txt", "w") as temp_file:
 
                     joined_generations = ",".join([str(i) for i in range(self.generations+1)])
@@ -193,15 +194,14 @@ class CustomDeap:
 
 
     def graph_genetic_algorithm_results(self, total_fitnesses):
-        x = [i for i in range(self.generations + 1)]
-        y = total_fitnesses
+        x_values = [i for i in range(self.generations + 1)]
+        y_values = total_fitnesses
         plt.xlabel("Generations")
         plt.ylabel("Error")
         plt.title("Error over time")
-        for i in range(len(y[0])):
-            plt.plot(x, [pt[i] for pt in y])
+        for x, y in zip(x_values, y_values):
+            plt.scatter([x] * len(y), y)
         plt.ylim([0, 0.5])
-        plt.legend()
         plt.show()
 
 
@@ -673,7 +673,7 @@ class CustomDeap:
 
         # INITIALIZATION
         # register our bitstring generator and how to create an individual, population
-        toolbox.register("genRandomBitString", self.__genBits)  # , model=self)
+        toolbox.register("genRandomBitString", self.__genNodeBits)  # , model=self)
         toolbox.register(
             "individual",
             tools.initIterate,
@@ -723,16 +723,27 @@ class CustomDeap:
                     counter = 0
 
                     while np.sum(startInd[start:end]) > 5 and counter < float("Inf"):
-                        chosen = math.floor(random() * (end - start))
+                        chosen = math.floor(random.random() * (end - start))
                         startInd[start + int(chosen)] = 0
                         counter += 1
                     if np.sum(startInd[start:end]) == 0:
-                        chosen = math.floor(random() * (end - start))
+                        chosen = math.floor(random.random() * (end - start))
                         startInd[start + int(chosen)] = 1
                 elif (end - start) == 1:
                     startInd[start] = 1
 
         return [copy.deepcopy(self), startInd]
+
+    def __genNodeBits(self):
+        individual_bitstring = []
+        for node in self.nodes:
+            random_rule_index = random.choice(range(len(node.possibilities)))
+            for i, _ in enumerate(node.possibilities):
+                if i == random_rule_index:
+                    individual_bitstring.append(1)
+                else:
+                    individual_bitstring.append(0)
+        return [copy.deepcopy(self), individual_bitstring]            
 
     # 1.1.1.1 Generates a random string of 1's and 0's for the individuals with length = number of possible combinations
     def __genRandBits(self):
@@ -973,7 +984,7 @@ class CustomDeap:
         )
         offspring = []
         for _ in range(self.child_population_size):
-            op_choice = random()
+            op_choice = random.random()
             if op_choice < self.crossover_probability:  # Apply crossover
                 inds = []
                 for samp in sample(population, 2):
@@ -1090,17 +1101,17 @@ class CustomDeap:
             end = node.rule_end_index
 
             # mutate the inputs some of the time
-            if len(model.total_combinations[focusNode]) > 3 and random() < mutModel:
+            if len(model.total_combinations[focusNode]) > 3 and random.random() < mutModel:
                 temppermup = []  # temporary upstream nodes
                 upstreamAdders = list(model.total_combinations[focusNode])
                 rvals = list(node.rvalues)
                 while len(temppermup) < 3:
-                    randy = random()  # randomly select a node to mutate
+                    randy = random.random()  # randomly select a node to mutate
                     tempsum = sum(rvals)
                     if tempsum == 0:
                         addNoder = randint(
                             0, len(rvals) - 1
-                        )  # int(math.floor(random()*len(upstreamAdders)))
+                        )  # int(math.floor(random.random()*len(upstreamAdders)))
                         # print(addNoder)
                     else:
                         recalc = np.cumsum([1.0 * rval / tempsum for rval in rvals])
@@ -1115,7 +1126,7 @@ class CustomDeap:
                 # model._ruleMaker__update_upstream(focusNode, temppermup)
             for i in range(start, end):
                 # print("i: " + str(i))
-                if random() < 2 / (end - start + 1):
+                if random.random() < 2 / (end - start + 1):
                     individual[i] = 1
                 else:
                     individual[i] = 0
@@ -1150,6 +1161,6 @@ class CustomDeap:
             probabilities = np.cumsum(normerrors)
 
             # Select the node
-            selected_node = next(i for i in range(len(probabilities)) if probabilities[i] > random())
+            selected_node = next(i for i in range(len(probabilities)) if probabilities[i] > random.random())
 
         return selected_node

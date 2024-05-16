@@ -147,6 +147,8 @@ class Node:
                     selected_rule = selected_rule.replace('B', 'not B')
                 elif i == 2:
                     selected_rule = selected_rule.replace('C', 'not C')
+                elif i == 3:
+                    selected_rule = selected_rule.replace('D', 'not D')
         
         # logging.debug(f'\tBitstring = {bitstring}')
         # logging.debug(f'\nSelected_rule: {selected_rule}\n')
