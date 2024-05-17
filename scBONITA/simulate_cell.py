@@ -158,10 +158,10 @@ if __name__ == '__main__':
     # Save the attractor states to a csv file
     logging.info(f'Saved file to: "{file_path}"')
 
-    save_attractor_simulation(file_path, network, simulated_attractor)
+    save_attractor_simulation(f'{outfile_folder}/cell_{cell_index}_trajectory.txt', network, simulated_attractor)
     plt.close(fig)
 
-    create_heatmap(file_path, f'Simulation for {dataset_name} {network_name} cell {cell_index} pathway ')
-
-
-    
+    heatmap = create_heatmap(f'{outfile_folder}/cell_{cell_index}_trajectory.txt', f'Simulation for {dataset_name} {network_name} cell {cell_index} pathway ')
+    heatmap.show()
+    heatmap.savefig(f'{outfile_folder}/cell_{cell_index}_trajectory.png', format='png')
+    plt.close(heatmap)

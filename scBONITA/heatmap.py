@@ -28,7 +28,7 @@ def create_heatmap(path, title):
     norm = mcolors.BoundaryNorm(bounds, cmap.N)
 
     # Create a heatmap
-    plt.figure(figsize=(12, 8))
+    plot = plt.figure(figsize=(12, 8))
     sns.heatmap(data_array, cmap=cmap, norm=norm, cbar=False, yticklabels=gene_names, xticklabels=True)
     plt.title(title)
     plt.xlabel('Time Steps')
@@ -46,8 +46,7 @@ def create_heatmap(path, title):
 
     plt.subplots_adjust(top=0.958, bottom=0.07, left=0.076, right=0.85, hspace=2, wspace=1)
 
-
-    plt.show()
+    return plot
 
 if __name__ == '__main__':
 
