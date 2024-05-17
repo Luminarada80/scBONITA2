@@ -1,15 +1,9 @@
-from importance_scores import CalculateImportanceScore
 import matplotlib.pyplot as plt
-import matplotlib.animation as animation
-from matplotlib.patches import Circle
 import networkx as nx
 import numpy as np
 import pickle
-from argparse import ArgumentParser
 from setup.user_input_prompts import *
 import logging
-import random
-import pandas
 from heatmap import create_heatmap
 
 def get_starting_state(file):
@@ -22,10 +16,19 @@ def get_starting_state(file):
     
     return starting_state
 
+def use_cell_starting_state(file):
+    with open(file, 'rb') as f:
+        network_object = pickle.load(f)
+        return network_object
+
 def simulate_network(nodes, filename):
     steps = 100
 
-    starting_state = get_starting_state(filename)
+    # starting_state = get_starting_state(filename)
+    starting_state = []
+    for i in filename:
+        starting_state.append(i[0])
+
 
     total_simulation_states = vectorized_run_simulation(nodes, starting_state, steps)
     
@@ -115,94 +118,50 @@ def save_attractor_simulation(filename, network, simulated_attractor):
         for gene_num, expression in enumerate(simulated_attractor):
             file.write(f'{network.nodes[gene_num].name},{",".join([str(i) for i in list(expression)])}\n')
 
-def add_dataset_name_arg(parser):
-    parser.add_argument('--dataset_name', type=str, required=True, help='Name of the dataset')
-
-def add_network_name(parser):
-    parser.add_argument('--network_name', type=str, required=True, help='Name of the network')
-
 if __name__ == '__main__':
 
     logging.basicConfig(format='%(message)s', level=logging.INFO)
 
     # Add in arguments to find the attractor file
-    parser = ArgumentParser()
+    dataset_name = input("Enter dataset name: ")
+    network_name = input("Enter network name: ")
 
-    add_dataset_name_arg(parser)
-    add_network_name(parser)
+    pickle_file = f'/home/emoeller/github/scBONITA/scBONITA/pickle_files/{dataset_name}_pickle_files/network_pickle_files/{dataset_name}_{network_name}.network.pickle'
 
-    args = parser.parse_args()
+    network = use_cell_starting_state(pickle_file)
 
-    dataset_name = check_dataset_name(args.dataset_name)
-    network_name = args.network_name
+    dataset = network.dataset
+    dense_dataset = np.array(dataset.todense())
 
-    attractor_num = input("Enter attractor number: ")
+    # Select a random row
+    cell_index = input("Select a cell index or hit enter for random index: ")
+    if not cell_index:
+        cell_index = np.random.choice(dense_dataset.shape[1])
 
-    # Simulates and saves heatmaps for all attractors for the network if you type 'all'
-    if attractor_num == "all":
-        directory = f'attractor_analysis_output/{dataset_name}_attractors/{network_name}_attractors'
-        attractors = []
-        for dirpath, dirnames, filenames in os.walk(directory):
-            for filename in filenames:
-                if 'attractor_' in filename:
-                    front = filename.split('attractor_')[-1]
-                    num = int(front[0])
-                    if num not in attractors:
-                        attractors.append(num)
-        
-        for attractor in attractors:
-            # Specify file paths
-            network_pickle_file_path = f'pickle_files/{dataset_name}_pickle_files/network_pickle_files/{dataset_name}_{network_name}.network.pickle'
-            attractor_path = f'attractor_analysis_output/{dataset_name}_attractors/{network_name}_attractors/attractor_{attractor}/{dataset_name}_{network_name}_attractor_{attractor}.txt'
-            outfile = f'attractor_analysis_output/{dataset_name}_attractors/{network_name}_attractors/attractor_{attractor}/{dataset_name}_{network_name}_simulated_attractor_{attractor}.txt'
-
-            # Load the network pickle file
-            network = pickle.load(open(network_pickle_file_path, "rb"))
-
-            # Simulate the network
-            simulated_attractor = simulate_network(network.nodes, attractor_path)
-
-            # Visualize the network
-            visualize_simulation(network.network, simulated_attractor, network, "False")
-
-            # Save the attractor states to a csv file
-            logging.info(f'Saved file to: "{outfile}"')
-            save_attractor_simulation(outfile, network, simulated_attractor)
-
-            plt.close()
-
-            heatmap = create_heatmap(outfile, f'Simulation for {dataset_name} {network_name}')
-
-            heatmap.savefig(f'attractor_analysis_output/{dataset_name}_attractors/{network_name}_attractors/attractor_{attractor}/{dataset_name}_{network_name}_simulated_attractor_{attractor}_heatmap.png', format='png')
-            plt.close(heatmap)
-    else:
-        # Specify file paths
-        network_pickle_file_path = f'pickle_files/{dataset_name}_pickle_files/network_pickle_files/{dataset_name}_{network_name}.network.pickle'
-        attractor_path = f'attractor_analysis_output/{dataset_name}_attractors/{network_name}_attractors/attractor_{attractor_num}/{dataset_name}_{network_name}_attractor_{attractor_num}.txt'
-        outfile = f'attractor_analysis_output/{dataset_name}_attractors/{network_name}_attractors/attractor_{attractor_num}/{dataset_name}_{network_name}_simulated_attractor_{attractor_num}.txt'
-
-        # Load the network pickle file
-        network = pickle.load(open(network_pickle_file_path, "rb"))
-
-        # Simulate the network
-        simulated_attractor = simulate_network(network.nodes, attractor_path)
-
-        # Visualize the network
-        visualize_simulation(network.network, simulated_attractor, network, "False")
-
-        # Save the attractor states to a csv file
-        logging.info(f'Saved file to: "{outfile}"')
-        save_attractor_simulation(outfile, network, simulated_attractor)
-
-        plt.close()
-
-        heatmap = create_heatmap(outfile, f'Simulation for {dataset_name} {network_name}')
-
-        heatmap.savefig(f'attractor_analysis_output/{dataset_name}_attractors/{network_name}_attractors/attractor_{attractor_num}/{dataset_name}_{network_name}_simulated_attractor_{attractor_num}_heatmap.png', format='png')
-        plt.close(heatmap)
+    selected_column = dense_dataset[:, cell_index]
 
 
+    transposed_random_column = selected_column.reshape(-1,1)
 
+    # Specify outfile path
+    outfile_folder = f'trajectories/{dataset_name}_{network_name}'
+    os.makedirs(outfile_folder, exist_ok=True)
 
-
+    file_path = f'{outfile_folder}/cell_{cell_index}_trajectory'
     
+    # Simulate the network
+    simulated_attractor = simulate_network(network.nodes, transposed_random_column)
+
+    # Visualize the network
+    fig = visualize_simulation(network.network, simulated_attractor, network, "False")
+
+    # Save the attractor states to a csv file
+    logging.info(f'Saved file to: "{file_path}"')
+
+    save_attractor_simulation(f'{outfile_folder}/cell_{cell_index}_trajectory.txt', network, simulated_attractor)
+    plt.close(fig)
+
+    heatmap = create_heatmap(f'{outfile_folder}/cell_{cell_index}_trajectory.txt', f'Simulation for {dataset_name} {network_name} cell {cell_index} pathway ')
+    heatmap.show()
+    heatmap.savefig(f'{outfile_folder}/cell_{cell_index}_trajectory.png', format='png')
+    plt.close(heatmap)
