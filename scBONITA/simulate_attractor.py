@@ -8,6 +8,10 @@ import pickle
 from argparse import ArgumentParser
 from setup.user_input_prompts import *
 import logging
+import random
+import pandas
+
+pickle_file = '/home/emoeller/github/scBONITA/scBONITA/pickle_files/george_hiv_pickle_files/network_pickle_files/george_hiv_hsa04010.network.pickle'
 
 def get_starting_state(file):
     starting_state = []
@@ -18,6 +22,11 @@ def get_starting_state(file):
             starting_state.append(node_starting_state)
     
     return starting_state
+
+def use_cell_starting_state(file):
+    with open(file, 'rb') as f:
+        network_object = pickle.load(f)
+        return network_object
 
 def simulate_network(nodes, filename):
     steps = 100
@@ -113,37 +122,46 @@ def save_attractor_simulation(filename, network, simulated_attractor):
             file.write(f'{network.nodes[gene_num].name},{",".join([str(i) for i in list(expression)])}\n')
 
 if __name__ == '__main__':
-    logging.basicConfig(format='%(message)s', level=logging.INFO)
 
-    # Add in arguments to find the attractor file
-    parser = ArgumentParser()
+    network_object = use_cell_starting_state(pickle_file)
+    print(network_object)
+    print(network_object.dataset)
 
-    add_dataset_name_arg(parser)
-    add_network_name(parser)
+    dataset = network_object.dataset
+    dense_dataset = dataset.todense()
+    print(dense_dataset)
 
-    args = parser.parse_args()
+    # logging.basicConfig(format='%(message)s', level=logging.INFO)
 
-    dataset_name = check_dataset_name(args.dataset_name)
-    network_name = input("Enter network name: ")
-    attractor_num = input("Enter attractor number: ")
+    # # Add in arguments to find the attractor file
+    # parser = ArgumentParser()
 
-    # Specify file paths
-    network_pickle_file_path = f'pickle_files/{dataset_name}_pickle_files/network_pickle_files/{dataset_name}_{network_name}.network.pickle'
-    attractor_path = f'attractor_analysis_output/{dataset_name}_attractors/{network_name}_attractors/attractor_{attractor_num}/{dataset_name}_{network_name}_attractor_{attractor_num}.txt'
-    outfile = f'attractor_analysis_output/{dataset_name}_attractors/{network_name}_attractors/attractor_{attractor_num}/{dataset_name}_{network_name}_simulated_attractor_{attractor_num}.txt'
+    # add_dataset_name_arg(parser)
+    # add_network_name(parser)
 
-    # Load the network pickle file
-    network = pickle.load(open(network_pickle_file_path, "rb"))
+    # args = parser.parse_args()
+
+    # dataset_name = check_dataset_name(args.dataset_name)
+    # network_name = input("Enter network name: ")
+    # attractor_num = input("Enter attractor number: ")
+
+    # # Specify file paths
+    # network_pickle_file_path = f'pickle_files/{dataset_name}_pickle_files/network_pickle_files/{dataset_name}_{network_name}.network.pickle'
+    # attractor_path = f'attractor_analysis_output/{dataset_name}_attractors/{network_name}_attractors/attractor_{attractor_num}/{dataset_name}_{network_name}_attractor_{attractor_num}.txt'
+    # outfile = f'attractor_analysis_output/{dataset_name}_attractors/{network_name}_attractors/attractor_{attractor_num}/{dataset_name}_{network_name}_simulated_attractor_{attractor_num}.txt'
+
+    # # Load the network pickle file
+    # network = pickle.load(open(network_pickle_file_path, "rb"))
     
-    # Simulate the network
-    simulated_attractor = simulate_network(network.nodes, attractor_path)
+    # # Simulate the network
+    # simulated_attractor = simulate_network(network.nodes, attractor_path)
 
-    # Visualize the network
-    visualize_simulation(network.network, simulated_attractor, network, "True")
+    # # Visualize the network
+    # visualize_simulation(network.network, simulated_attractor, network, "True")
 
-    # Save the attractor states to a csv file
-    logging.info(f'Saved file to: "{outfile}"')
-    save_attractor_simulation(outfile, network, simulated_attractor)
+    # # Save the attractor states to a csv file
+    # logging.info(f'Saved file to: "{outfile}"')
+    # save_attractor_simulation(outfile, network, simulated_attractor)
 
 
 
