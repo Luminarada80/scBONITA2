@@ -191,7 +191,8 @@ class Node:
         # Update the predicted rules for this node
         node_rules = []
         for rule in rule_predictions:
-            node_rules.append([self.name, [i for i in self.predecessors], rule, self.inversions])
+            node_rules.append([self.name, [i for i in self.predecessors], rule])
+
         self.node_rules = node_rules
 
         # logging.info(f'\tRule predictions:')
@@ -207,10 +208,9 @@ class Node:
 
     # Print information about the node
     def print_info(self):
-        logging.info(f'\nNode {self.name} Length: {self.rule_length}')
+        logging.info(f'\nNode {self.name} print_info function results:')
         logging.info(f'\tindex {self.index}')
         logging.info(f'\tpredecessors: {self.predecessors}')
-        logging.info(f'\tinversions: {self.inversions}')
         logging.info(f'\tNode rules: {self.node_rules}')
 
     # Reset the state of the node
