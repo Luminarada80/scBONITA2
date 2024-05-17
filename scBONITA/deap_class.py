@@ -334,71 +334,65 @@ class CustomDeap:
                     while continue_to_next_node == False:
                         node.reset_state() # Reset the state of the node predictions for this ruleset
                         if iteration == 1:
-                            logging.debug(f'\nRefining rules for node: {node.name} ({index+1} / {len(self.nodes)})')
+                            logging.info(f'\nRefining rules for node: {node.name} ({index+1} / {len(self.nodes)})')
 
                         # If this is the first iteration through the refinement process for this node, use the ruleset as is
                         if iteration != 1:
-                            logging.debug(f'\tIteration {iteration}')
+                            logging.info(f'\tIteration {iteration}')
                             individual = [1 for _ in individual_ruleset[1]]
 
                         # Get the rules for each of the lowest error individuals
                         if node.rule_start_index is not None: # Make sure this is not an empty node
                             rule_length = node.rule_end_index - node.rule_start_index
 
+                            logging.info(f'\tRule length {rule_length} (rule start = {node.rule_start_index}, rule end = {node.rule_end_index})')
+
                             # Make the predictions based on which rules are predicted by the ruleset
-                            if rule_length >= 1:
-                                node.rule_predictions = individual[node.rule_start_index:node.rule_end_index]
-                            elif rule_length == 0:
-                                node.rule_predictions = individual[node.rule_start_index]
-
-                            # Find which rules for the node are predicted by the individual
-                            node.find_rule_predictions()
+                            logging.info(f'\tindividual bitstring: {individual[node.rule_start_index:node.rule_end_index]}')
+                            node.find_multiple_rule_predictions(individual)
                             
-                            # Make and format the rules for the node
-                            node.make_AND_OR_NOT_rules()
-
                             # Append the rules for the node to a list of the total rules and a list of the number of rules predicted for this node
                             total_rules.append(node.node_rules)
                             rules_per_node.append(len(node.node_rules))
 
                             # rules = (None, None)
                             if passed_error_cutoff == True:
-                                logging.debug(f'\tPassed Error cutoff')
+                                logging.info(f'\tPassed Error cutoff, calculating refined errors')
                                 rules = self.calculate_refined_errors(node, self.chunked_data_numpy)
-                                logging.debug(f'\t\tRules: {rules}')
+                                logging.info(f'\t\tRules: {rules}')
                                 
                             # If the node did not pass the error cutoff, look at every rule combination coarsely,
                             # increasing for each iteration
                             else:
                                 rules = self.calculate_refined_errors(node, self.coarse_chunked_dataset)
                                 for rule, index, error in rules:
-                                    logging.debug(f'\tCOARSE SEARCH: rule {rule}, error = {error}')
+                                    logging.info(f'\tCOARSE SEARCH: rule {rule}, error = {error}')
                                 # If every node is wrong, try with different inversion rules
                                 for rule, index, error in rules:
                                     if error == 1:
-                                        logging.debug(f'\tError is 1, flipping inversion rule for incoming nodes')
+                                        logging.info(f'\tError is 1, flipping inversion rule for incoming nodes')
                                         for key, value in node.inversions.items():
-                                            logging.debug(f'\tInversion rule before: {node.inversions[key]}')
+                                            logging.info(f'\tInversion rule before: {node.inversions[key]}')
                                             if value == True:
                                                 node.inversions[key] = False
                                             elif value == False:
                                                 node.inversions[key] = True
-                                            logging.debug(f'\tInversion rule after: {node.inversions[key]}')
+                                            logging.info(f'\tInversion rule after: {node.inversions[key]}')
 
                                         # Re-make the rules for the node
-                                        node.make_AND_OR_NOT_rules()
+                                        node.find_multiple_rule_predictions(individual[node.rule_start_index:node.rule_end_index])
 
                                         rules = self.calculate_refined_errors(node, self.coarse_chunked_dataset)
                                         for rule, index, error in rules:
-                                            logging.debug(f'\tAFTER INVERSION: rule {rule}, error = {error}')
+                                            logging.info(f'\tAFTER INVERSION: rule {rule}, error = {error}')
                                 
                                 # random_equivalent_rule = rules[random.choice(len(rules))]
                             # Check if the error is below the cutoff
                             for rule, index, error in rules:
                                 # print(f'Checking rule {rule}, error = {error}')
                                 if error < 0.10:
-                                    logging.debug(f'\tError is under 0.10: {error}')
-                                    logging.debug(f'\trule: {rule}, index: {index}, error: {error}')
+                                    logging.info(f'\tError is under 0.10: {error}')
+                                    logging.info(f'\trule: {rule}, index: {index}, error: {error}')
                                     best_rules.append((rule, index, error))
                                     passed_error_cutoff = True
                                     continue_to_next_node = True
@@ -410,28 +404,29 @@ class CustomDeap:
 
                             # If the error is too high, iterate again
                             if not continue_to_next_node:
-                                logging.debug(f'\tDid not pass error cutoff, increasing iteration')
+                                logging.info(f'\tDid not pass error cutoff, increasing iteration')
                                 iteration += 1
 
                             # Break if no best rule is found (changed to leave in high error node rules)
                             if iteration >= max_iterations:
-                                logging.debug(f'\tMax iterations reached, finding the minimum error rule')
+                                logging.info(f'\tMax iterations reached, finding the minimum error rule')
 
                                 # Gets around using lambda with sorted so that the ruleset object can be pickled
                                 def get_third_element(item):
                                     return item[2]
 
                                 min_error_rule = sorted(rules, key=get_third_element)
-                                logging.debug(f'\t\tMin error rule: {min_error_rule}')
+                                logging.info(f'\t\tMin error rule: {min_error_rule}')
+                                print(rules)
                                 best_rules.append(min_error_rule[0])
                                 continue_to_next_node = True
                         
                         # If the node has no predictions, set the nodes expression to itself
                         else:
-                            logging.debug(f'\tException: {node.name} has no incoming nodes, signaling rule set to itself')
+                            logging.info(f'\tException: {node.name} has no incoming nodes, signaling rule set to itself')
                             if len(node.node_rules) == 0:
                                 # Add in self signaling for the node
-                                logging.debug(f'\t[{node.name}, [{node.name}], [False]]')
+                                logging.info(f'\t[{node.name}, [{node.name}], [False]]')
                                 node.node_rules = [node.name, [node.name], 'A', [False]]
                                 node.predecessors[node.index] = node.name
                                 node.inversions[node.index] = False
@@ -452,7 +447,7 @@ class CustomDeap:
             # print('FINAL BEST RULES:')
             final_error = 0
             for rule, index, error in best_rules:
-                logging.debug(f'{rule}: Error = {error}')
+                logging.info(f'{rule}: Error = {error}')
                 final_error += error
             ruleset_error.append(final_error / len(best_rules))
 
@@ -524,20 +519,22 @@ class CustomDeap:
         best_rule_indices = []
         best_rules = []
 
-        logging.debug(f'\tPredicted rule errors:')
-        for predicted_rule in node.node_rules:
-            logging.debug(f'\t\t{predicted_rule}')
-            logging.debug(f'\t\tNode rules: {node.node_rules}')
+        logging.info(f'\tPredicted rule errors:')
+        for rule in node.node_rules:
+            logging.info(f'\t\tPredicted rule: {predicted_rule}')
+            logging.info(f'\t\tNode rules: {node.node_rules}')
+
+            predicted_rule = rule[1]
 
             difference, count = self.calculate_error(node, predicted_rule, chunked_dataset)
             prediction_error = difference / count
             prediction_errors.append(prediction_error)
-            logging.debug(f'\t\t\tError: {prediction_error}')
+            logging.info(f'\t\t\tError: {prediction_error}')
 
         # Finding indices of all occurrences of the minimum value
-        logging.debug(f'\t\tPrediction_errors: {prediction_errors}')
+        logging.info(f'\t\tPrediction_errors: {prediction_errors}')
         if prediction_errors: # Excludes nodes with no predictions
-            logging.debug(f'\t\tPrediction errors: {prediction_errors}')
+            logging.info(f'\t\tPrediction errors: {prediction_errors}')
             minimum_error = min(prediction_errors)
             minimum_error_indices = [index for index, value in enumerate(prediction_errors) if
                                      value == minimum_error]
@@ -546,7 +543,7 @@ class CustomDeap:
             # (If three incoming nodes have the same error as two incoming nodes, the two incoming node rule is
             # probably a subset of the three incoming node rule)
 
-            logging.debug(f'\n\tMinimum error indices: {minimum_error_indices}, minimum error: {minimum_error}')
+            logging.info(f'\n\tMinimum error indices: {minimum_error_indices}, minimum error: {minimum_error}')
             # Append the length of the rules and the index to a list of node lengths
             num_incoming_nodes = [len(node.node_rules[value][1]) for value in minimum_error_indices]
 
@@ -555,13 +552,13 @@ class CustomDeap:
 
             for index in minimum_error_indices:  # iterate through each node
                 num_incoming_nodes = len(node.node_rules[index][1])
-                logging.debug(f'\t\tminimum error index: {index}')
-                logging.debug(f'\t\t\tmax_incoming_nodes = {max_incoming_nodes}')
-                logging.debug(f'\t\t\tnum_incoming_nodes = {num_incoming_nodes}')
+                logging.info(f'\t\tminimum error index: {index}')
+                logging.info(f'\t\t\tmax_incoming_nodes = {max_incoming_nodes}')
+                logging.info(f'\t\t\tnum_incoming_nodes = {num_incoming_nodes}')
                 # One incoming node rules in the best ruleset
                 if max_incoming_nodes == 1:  # If there is one incoming node possibilities in the lowest error rules
                     if num_incoming_nodes == 1:  # Only print the rules with one incoming nodes
-                        logging.debug(f'\t\tbest_rule: {node.node_rules[index]}, Index: {index}, error: {prediction_errors[index]}')
+                        logging.info(f'\t\tbest_rule: {node.node_rules[index]}, Index: {index}, error: {prediction_errors[index]}')
                         most_incoming_node_rules.append(node.node_rules[index])
                         best_rule_indices.append(index)
                         best_rule_errors.append(prediction_errors[index])
@@ -569,7 +566,7 @@ class CustomDeap:
                 # If there are no minimum error rules with one incoming node, look for rules with two incoming nodes
                 elif max_incoming_nodes == 2:
                     if num_incoming_nodes == 2:  # Only print the rules with two incoming nodes
-                        logging.debug(f'\t\tbest_rule: {node.node_rules[index]}, Index: {index}, error: {prediction_errors[index]}')
+                        logging.info(f'\t\tbest_rule: {node.node_rules[index]}, Index: {index}, error: {prediction_errors[index]}')
                         most_incoming_node_rules.append(node.node_rules[index])
                         best_rule_indices.append(index)
                         best_rule_errors.append(prediction_errors[index])
@@ -577,24 +574,24 @@ class CustomDeap:
                 # If no three or two incoming node rules, print the rule and the number of incoming nodes
                 elif max_incoming_nodes == 3:
                     if num_incoming_nodes == 3:
-                        logging.debug(f'\t\tbest_rule: {node.node_rules[index]}, Index: {index}, error: {prediction_errors[index]}')
+                        logging.info(f'\t\tbest_rule: {node.node_rules[index]}, Index: {index}, error: {prediction_errors[index]}')
                         most_incoming_node_rules.append(node.node_rules[index])
                         best_rule_indices.append(index)
                         best_rule_errors.append(prediction_errors[index])
             
-            logging.debug(f'\t\tMost incoming node rules: {most_incoming_node_rules}')
+            logging.info(f'\t\tMost incoming node rules: {most_incoming_node_rules}')
             # Find the best rules
             min_rules = min([rule[2].count("AND") for rule in most_incoming_node_rules])
 
-            logging.debug(f'\tmost_incoming_node_rules: {most_incoming_node_rules}')
+            logging.info(f'\tmost_incoming_node_rules: {most_incoming_node_rules}')
             for i, rule in enumerate(most_incoming_node_rules):
                 if rule[2].count("AND") == min_rules:
                     best_rules.append((most_incoming_node_rules[i], best_rule_indices[i], best_rule_errors[i]))
             
-            logging.debug('\tbest rules:')
+            logging.info('\tbest rules:')
             for i in best_rules:
-                logging.debug(f'\t\t{i[0]}')
-                logging.debug(f'\t\tError = {i[1]}')
+                logging.info(f'\t\t{i[0]}')
+                logging.info(f'\t\tError = {i[1]}')
 
 
         return best_rules

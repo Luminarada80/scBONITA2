@@ -180,8 +180,6 @@ class ErrorCalculation:
         difference = 0
         count = 0
 
-        
-
         if count > 0:
             total_error = difference / count
         else:
