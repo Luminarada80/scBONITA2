@@ -2,6 +2,7 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
+from matplotlib.patches import Patch
 
 
 def create_heatmap(path, title):
@@ -27,22 +28,36 @@ def create_heatmap(path, title):
     norm = mcolors.BoundaryNorm(bounds, cmap.N)
 
     # Create a heatmap
-    plt.figure(figsize=(12, 10))
+    plt.figure(figsize=(12, 8))
     sns.heatmap(data_array, cmap=cmap, norm=norm, cbar=False, yticklabels=gene_names, xticklabels=True)
     plt.title(title)
     plt.xlabel('Time Steps')
     plt.ylabel('Genes')
     plt.xticks(fontsize=8)
-    plt.yticks(fontsize=8)
+    plt.yticks(fontsize=6)
+    # plt.tight_layout()
+
+    legend_elements = [
+        Patch(facecolor='grey', edgecolor='grey', label='Gene Inactive'),
+        Patch(facecolor='green', edgecolor='green', label='Gene Active')
+    ]
+    plt.legend(handles=legend_elements, loc='upper left', bbox_to_anchor=(1, 1), title="Legend")
+
+
+    plt.subplots_adjust(top=0.958, bottom=0.07, left=0.076, right=0.85, hspace=2, wspace=1)
+
+
     plt.show()
 
-atherosclerosis_main_path = 'scBONITA/attractor_analysis_output/atherosclerosis_attractors/hsa05166_attractors/'
-george_hiv_main_path = 'scBONITA/attractor_analysis_output/george_hiv_attractors/hsa04010_attractors/'
+if __name__ == '__main__':
+
+    atherosclerosis_main_path = 'scBONITA/attractor_analysis_output/atherosclerosis_attractors/hsa05166_attractors/'
+    george_hiv_main_path = 'scBONITA/attractor_analysis_output/george_hiv_attractors/hsa04010_attractors/'
 
 
-create_heatmap(f'{george_hiv_main_path}/attractor_15/george_hiv_hsa04010_simulated_attractor_15.txt', 'George HIV hsa04010 attractor 15')
-create_heatmap(f'{george_hiv_main_path}/attractor_14/george_hiv_hsa04010_simulated_attractor_14.txt', 'George HIV hsa04010 attractor 14')
-create_heatmap(f'{george_hiv_main_path}/attractor_5/george_hiv_hsa04010_simulated_attractor_5.txt', 'George HIV hsa04010 attractor 5')
+    create_heatmap(f'{george_hiv_main_path}/attractor_15/george_hiv_hsa04010_simulated_attractor_15.txt', 'George HIV hsa04010 attractor 15')
+    create_heatmap(f'{george_hiv_main_path}/attractor_14/george_hiv_hsa04010_simulated_attractor_14.txt', 'George HIV hsa04010 attractor 14')
+    create_heatmap(f'{george_hiv_main_path}/attractor_5/george_hiv_hsa04010_simulated_attractor_5.txt', 'George HIV hsa04010 attractor 5')
 
 
 
