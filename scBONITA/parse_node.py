@@ -1,5 +1,4 @@
 import logging
-from boolean_rule_functions import *
 from itertools import combinations, product
 import numpy as np
 import random
@@ -178,8 +177,8 @@ class Node:
 
         # Add in the inversion rules
         for rule in selected_rules:
-            for i, invert_node in enumerate(self.inversions):
-                if invert_node == 1:
+            for i, invert_node in enumerate(self.inversions.values()):
+                if invert_node == True:
                     if i == 0:
                         rule = rule.replace('A', 'not A')
                     if i == 1:
@@ -204,6 +203,34 @@ class Node:
         #     logging.info(f'\t\t{rule}')
         
         return rule_predictions
+    
+    def find_all_rule_predictions(self):
+        # logging.info(f'Node {self.name} find_multiple_rule_predictions:')
+        rule_predictions = []
+        
+        rules = [rule.replace("  ", " ") for rule in self.possibilities]
+        # logging.info(f'\tPossible rules = {self.possibilities}')
+
+        # Add in the inversion rules
+        for rule in rules:
+            for i, invert_node in enumerate(self.inversions.values()):
+                if invert_node == True:
+                    if i == 0:
+                        rule = rule.replace('A', 'not A')
+                    if i == 1:
+                        rule = rule.replace('B', 'not B')
+                    elif i == 2:
+                        rule = rule.replace('C', 'not C')
+            rule_predictions.append(rule)
+        
+        # Update the predicted rules for this node
+        node_rules = []
+        for rule in rule_predictions:
+            node_rules.append([self.name, [i for i in self.predecessors], rule])
+
+        # self.node_rules = node_rules
+        
+        return node_rules
 
 
     # Print information about the node
