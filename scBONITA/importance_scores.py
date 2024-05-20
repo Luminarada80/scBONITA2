@@ -1,4 +1,3 @@
-from boolean_rule_functions import *
 import logging
 import random
 import numpy as np

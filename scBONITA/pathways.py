@@ -633,5 +633,7 @@ class Pathways:
                                 G, self.output_path + organism + pathway +  "_processed.graphml", infer_numeric_types=True
                             )
                     else:
-                        msg = f'Cant find an overlap between the network genes and the genes in the dataset, look at pathways.py'
-                        raise Exception(msg)
+                        logging.info(f'\t\t\tPathway does not have sufficient overlap with dataset genes: {pathway} Overlap: {test} Edges: {len(G.edges())}')
+                        continue
+                        # msg = f'Cant find an overlap between the network genes and the genes in the dataset, look at pathways.py'
+                        # raise Exception(msg)

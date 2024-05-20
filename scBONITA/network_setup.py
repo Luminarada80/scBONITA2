@@ -78,7 +78,7 @@ class NetworkSetup:
     def calculate_node_information(self):
         """
         Calculates the information for each node in the network and stores the information as object of class Node
-        from parse_nodes.py
+        from parse_node.py
         """
         # Iterate over all nodes to find predecessors and calculate possible connections
         for i, node in enumerate(self.nodeList):
@@ -266,7 +266,6 @@ class NetworkSetup:
                     predecessors[index] = inverted_nodeDict[index]
                 
                 node_inversions = self.calculate_inversion_rules(predecessors, node_index)
-                
                 # Create a new Node object
                 node = Node(name, node_index, predecessors, node_inversions)
 

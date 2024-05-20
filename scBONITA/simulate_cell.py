@@ -126,42 +126,47 @@ if __name__ == '__main__':
     dataset_name = input("Enter dataset name: ")
     network_name = input("Enter network name: ")
 
-    pickle_file = f'/home/emoeller/github/scBONITA/scBONITA/pickle_files/{dataset_name}_pickle_files/network_pickle_files/{dataset_name}_{network_name}.network.pickle'
+    # Specifies the path to the correct network pickle file
+    network_pickle_file = f'/home/emoeller/github/scBONITA/scBONITA/pickle_files/{dataset_name}_pickle_files/network_pickle_files/{dataset_name}_{network_name}.network.pickle'
 
-    network = use_cell_starting_state(pickle_file)
+    # Read in the network pickle file from the path
+    network = pickle.load(open(network_pickle_file, 'rb'))
 
+    # Convert the network's sparse dataset to a dense one
     dataset = network.dataset
     dense_dataset = np.array(dataset.todense())
 
-    # Select a random row
+    # Select a random column from the network dataset
     cell_index = input("Select a cell index or hit enter for random index: ")
     if not cell_index:
         cell_index = np.random.choice(dense_dataset.shape[1])
 
+    # Reads in all of the rows for that columns
     selected_column = dense_dataset[:, cell_index]
 
-
+    # Transposes the list of gene expression into a column
     transposed_random_column = selected_column.reshape(-1,1)
 
-    # Specify outfile path
+    # Specify outfile path for the simulation results
     outfile_folder = f'trajectories/{dataset_name}_{network_name}'
     os.makedirs(outfile_folder, exist_ok=True)
-
     file_path = f'{outfile_folder}/cell_{cell_index}_trajectory'
     
     # Simulate the network
     simulated_attractor = simulate_network(network.nodes, transposed_random_column)
 
-    # Visualize the network
+    # Visualize the network simulation results
     fig = visualize_simulation(network.network, simulated_attractor, network, "False")
 
     # Save the attractor states to a csv file
     logging.info(f'Saved file to: "{file_path}"')
-
     save_attractor_simulation(f'{outfile_folder}/cell_{cell_index}_trajectory.txt', network, simulated_attractor)
     plt.close(fig)
 
+    # Create a heatmap of the expression for easier attractor visualization
     heatmap = create_heatmap(f'{outfile_folder}/cell_{cell_index}_trajectory.txt', f'Simulation for {dataset_name} {network_name} cell {cell_index} pathway ')
     heatmap.show()
+
+    # Saves a png of the results
     heatmap.savefig(f'{outfile_folder}/cell_{cell_index}_trajectory.png', format='png')
     plt.close(heatmap)
