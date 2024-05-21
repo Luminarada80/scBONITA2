@@ -135,7 +135,7 @@ def calculate_refined_errors(node, chunked_dataset):
         minimum_error_indices = [index for index, value in enumerate(prediction_errors) if
                                     value == minimum_error]
 
-        # logging.info(f'\n\t\tMinimum error indices: {minimum_error_indices}, minimum error: {minimum_error}')
+        logging.info(f'\n\t\tMinimum error indices: {minimum_error_indices}, minimum error: {minimum_error}')
 
         # Now that we have found the rules with the minimum error, we want to minimize the number of incoming nodes
         # (Find the simplest rule that explains the data)
@@ -151,7 +151,7 @@ def calculate_refined_errors(node, chunked_dataset):
             if 'C' in rules[index][2]:
                 num_incoming_nodes += 1
             num_incoming_nodes_list.append(num_incoming_nodes)
-        # logging.info(f'\t\t\tNum incoming nodes list: {num_incoming_nodes_list}')
+        logging.info(f'\t\t\tNum incoming nodes list: {num_incoming_nodes_list}')
 
         # Find the maximum number of incoming nodes
         max_incoming_nodes = max(num_incoming_nodes_list)
@@ -161,13 +161,13 @@ def calculate_refined_errors(node, chunked_dataset):
 
             num_incoming_nodes = num_incoming_nodes_list[i]
 
-            # logging.info(f'\n\t\t\tRule: {rules[index]}')
-            # logging.info(f'\t\t\tminimum error index: {index}')
-            # logging.info(f'\t\t\t\tmax_incoming_nodes = {max_incoming_nodes}')
-            # logging.info(f'\t\t\t\tnum_incoming_nodes = {num_incoming_nodes}')
+            logging.info(f'\n\t\t\tRule: {rules[index]}')
+            logging.info(f'\t\t\tminimum error index: {index}')
+            logging.info(f'\t\t\t\tmax_incoming_nodes = {max_incoming_nodes}')
+            logging.info(f'\t\t\t\tnum_incoming_nodes = {num_incoming_nodes}')
 
             def append_best_rule(index):
-                # logging.info(f'\t\t\t\tbest_rule: {rules[index]}, Index: {index}, error: {prediction_errors[index]}')
+                logging.info(f'\t\t\t\tbest_rule: {rules[index]}, Index: {index}, error: {prediction_errors[index]}')
                 most_incoming_node_rules.append(rules[index])
                 best_rule_indices.append(index)
                 best_rule_errors.append(prediction_errors[index])
@@ -175,14 +175,50 @@ def calculate_refined_errors(node, chunked_dataset):
             # Prioritize nodes with 1 incoming rule
             if max_incoming_nodes == 1 and num_incoming_nodes == 1:
                 append_best_rule(index)
+
             # If there are no minimum error rules with one incoming node, look for rules with two incoming nodes
             elif max_incoming_nodes == 2 and num_incoming_nodes == 2:
                 append_best_rule(index)
+
             # If no two incoming node rules, look for rules with three incoming nodes
             elif max_incoming_nodes == 3 and num_incoming_nodes == 3:
                 append_best_rule(index)
         
         # logging.info(f'\t\t\tMost incoming node rules: {most_incoming_node_rules}')
+
+        # Prioritize the rules that follow the node's inversion rules
+        logging.info(f'\t\tNode inversion rules: {node.inversions}')
+        follows_inversion_rules = []
+        does_not_follow_inversion_rules = []
+
+        for rule in most_incoming_node_rules:
+            incoming_node_indices = rule[1]
+            logic = rule[2]
+            inversion_rules = node.inversions
+
+            # logging.info(f'\t\t\tIncoming node indices: {incoming_node_indices}')
+            logging.info(f'\t\t\tLogic rule: {logic}, {inversion_rules.values()}')
+            # logging.info(f'\t\t\tInversion Rules: {inversion_rules}')
+
+            if 'not A' in logic and inversion_rules[incoming_node_indices[0]] == False:
+                logging.info(f'\t\t\t\tLogic does not follow inversion')
+                does_not_follow_inversion_rules.append(rule)
+
+            if 'not B' in logic and inversion_rules[incoming_node_indices[0]] == False:
+                logging.info(f'\t\t\t\tLogic does not follow inversion')
+                does_not_follow_inversion_rules.append(rule)
+
+            if 'not C' in logic and inversion_rules[incoming_node_indices[0]] == False:
+                logging.info(f'\t\t\t\tLogic does not follow inversion')
+                does_not_follow_inversion_rules.append(rule)
+            
+            if rule not in does_not_follow_inversion_rules:
+                logging.info(f'\t\t\t\tLogic rule DOES follow inversion')
+                follows_inversion_rules.append(rule)
+            
+
+
+
 
         # Find the rules with the fewest 'and' statements
         min_rules = min([rule.count("and") for rule in most_incoming_node_rules])
@@ -192,10 +228,10 @@ def calculate_refined_errors(node, chunked_dataset):
             if rule.count("and") == min_rules:
                 best_rules.append((most_incoming_node_rules[i], best_rule_indices[i], best_rule_errors[i]))
         
-        # logging.info('\t\tbest rules:')
-        # for i in best_rules:
-        #     logging.info(f'\t\t\t{i[0]}')
-        #     logging.info(f'\t\t\tError = {i[2]}')
+        logging.info('\t\tbest rules:')
+        for i in best_rules:
+            logging.info(f'\t\t\t{i[0]}')
+            logging.info(f'\t\t\tError = {i[2]}')
 
     return best_rules
 
