@@ -14,6 +14,7 @@ import logging
 from alive_progress import alive_bar
 import os
 import random
+from rule_refinement import *
 
 # -------- Genetic Algorithm Code --------
 class CustomDeap:
@@ -53,7 +54,7 @@ class CustomDeap:
         _, num_columns = np.shape(self.binMat)
 
         # Chunk the data matrix to reduce noise and put into numpy array to speed up processing
-        self.num_chunks = 100
+        self.num_chunks = 1000
 
         # Chunk if there are more cells than columns, otherwise just use the columns
         if num_columns > self.num_chunks:
@@ -297,265 +298,59 @@ class CustomDeap:
         Gets around needing to use a lambda function in tools.Statistics so that the ruleset object can be pickled
         """
         return ind.fitness.values
-
+    
     def refine_rules(self, population, raw_fitnesses):
-
-        logging.info(f'\n-----REFINING RULESETS-----')
-        min_error_individuals = [ind for ind in population if ind.fitness.values == min(raw_fitnesses)]
-
-        # Set to keep track of unique value combinations
-        seen_values = set()
-
-        # List comprehension to filter out duplicates
-        unique_min_error_individuals = []
-        for ind in min_error_individuals:
-            # Convert the individual's values to a tuple (or another immutable type if necessary)
-            values_tuple = tuple(ind[1])
-
-            # Check if we've already seen these values
-            if values_tuple not in seen_values:
-                unique_min_error_individuals.append(ind)
-                seen_values.add(values_tuple)
-
-        # Now, unique_min_error_individuals contains only individuals with unique values
+        min_error_individuals = find_min_error_individuals(population, raw_fitnesses)
         all_best_rules = []
         ruleset_error = []
 
-
-        # Iterate through each ruleset with the minimum error
-        for i, individual_ruleset in enumerate(unique_min_error_individuals):
-            logging.info(f'Equivalent Ruleset {i+1} / {len(unique_min_error_individuals)}')
+        for i, individual_ruleset in enumerate(min_error_individuals):
+            logging.info(f'Equivalent Ruleset {i+1} / {len(min_error_individuals)}')
             total_rules = []
             rules_per_node = []
             best_rules = []
             max_iterations = 3
-            equivalent_ruleset = []
+            equivalent_ruleset = {}
 
-            # Used when sorting the rules by minimum error
-            # Gets around using lambda with sorted so that the ruleset object can be pickled
-            def get_third_element(item):
-                return item[2]
-            
-            # Loop through each node
-            with alive_bar(len(self.nodes), title='Refining Gene Rules') as bar:
-                for index, node in enumerate(self.nodes):
-                    continue_to_next_node = False
-                    iteration = 0
-                    passed_error_cutoff = True
-                    individual = individual_ruleset[1]
-                    equivalent_rules = []
+            for index, node in enumerate(self.nodes):
+                continue_to_next_node = False
+                iteration = 0
+                passed_error_cutoff = True
+                individual = individual_ruleset[1]
+                equivalent_rules = []
 
-                    # If the node has only an incoming connection from itself, skip the rule refinement
-                    if node.node_rules[0][1][0] == node.index:
-                        # Add in self signaling for the node
-                        logging.info(f'\tNode {node.name} signals only to itself')
-                        logging.info(f'\t[{node.name}, [{node.index}]')
-                        node.node_rules = [node.name, [node.index], 'A']
-                        node.predecessors[node.index] = node.name
-                        node.inversions[node.index] = False
-
-                        # Set the node's incoming node rules to itself
-                        rule = [node.name, [node.index], 'A']
-                        index = 0
-                        error = 0
-                        equivalent_rules.append(rule)
-                        best_rules.append((rule, index, error))
-
-                    # If the node has incoming connections from other nodes
-                    else:
-                        # Check to see if we should move to the next node
-                        while continue_to_next_node == False:
-                            node.reset_state() # Reset the state of the node predictions for this ruleset
-                            if iteration == 1:
-                                logging.info(f'\nRefining rules for node: {node.name} ({index+1} / {len(self.nodes)})')
-
-                            # If this is the first iteration through the refinement process for this node, use the ruleset as is
-                            else:
-                                logging.info(f'\tIteration {iteration}')
-                                individual = [1 for _ in individual_ruleset[1]]
-
-                            # Get the rules for each of the lowest error individuals
-                            if node.rule_start_index is not None: # Make sure this is not an empty node
-                                rule_length = node.rule_end_index - node.rule_start_index
-
-                                logging.info(f'\tRule length {rule_length} (rule start = {node.rule_start_index}, rule end = {node.rule_end_index})')
-
-                                # Make the predictions based on which rules are predicted by the ruleset
-                                logging.info(f'\tindividual bitstring: {individual[node.rule_start_index:node.rule_end_index]}')
-                                node.find_multiple_rule_predictions(individual)
-                                
-                                # Append the rules for the node to a list of the total rules and a list of the number of rules predicted for this node
-                                # logging.info(f'\tNode Rules: {node.node_rules}, Number of Rules: {len(node.node_rules)}')
-                                total_rules.append(node.node_rules)
-                                rules_per_node.append(len(node.node_rules))
-
-                                def invert_nodes(node):
-                                    logging.info(f'\tError is {error} (>= 0.8), flipping inversion rule for incoming nodes')
-                                    for key, value in node.inversions.items():
-                                        logging.info(f'\t\tInversion rule before: {node.inversions[key]}')
-                                        if value == True:
-                                            node.inversions[key] = False
-                                        elif value == False:
-                                            node.inversions[key] = True
-                                        logging.info(f'\t\tInversion rule after: {node.inversions[key]}')
-
-                                    # Re-make the rules for the node
-                                    node.find_multiple_rule_predictions(individual)
-
-                                    rules = self.calculate_refined_errors(node, passed_error_cutoff, self.coarse_chunked_dataset)
-                                    for rule, index, error in rules:
-                                        logging.info(f'\tAFTER INVERSION: rule {rule}, error = {error}')
-                                    
-                                    return rules
-
-                                # rules = (None, None)
-                                if passed_error_cutoff == True:
-                                    logging.info(f'\tPassed Error cutoff, calculating refined errors')
-                                    rules = self.calculate_refined_errors(node, passed_error_cutoff, self.chunked_data_numpy)
-                                    logging.info(f'\t\tRules: {rules}')
-                                    
-                                # If the node did not pass the error cutoff, look at every rule combination coarsely,
-                                # increasing for each iteration
-                                else:
-                                    rules = self.calculate_refined_errors(node, passed_error_cutoff, self.coarse_chunked_dataset)
-
-                                    # Find the minimum error rule
-                                    min_error_rules = sorted(rules, key=get_third_element)
-
-                                    for rule, index, error in min_error_rules:
-                                        # If the error is really high for the rule, try inverting the rules
-                                        if error >= 0.80:
-                                            rules = invert_nodes(node)
-
-                                            # If the minimum rule is less than 0.10
-                                            if rules[0][2] < 0.10:
-                                                # Keep track of all rules with the same minimum error
-                                                for rule in rules:
-                                                    if rule[0][2] == min_error_rule[0][2]:
-                                                        equivalent_rules.append(rule)
-                                                
-                                                # Append the first element of the sorted list
-                                                rule = rules[0][0]
-                                                index = rules[0][1]
-                                                error = rules[0][2]
-
-                                                logging.info(f'\tError is under 0.10: {error}')
-                                                logging.info(f'\trule: {rule}, index: {index}, error: {error}')
-                                                best_rules.append((rule, index, error))
-                                                passed_error_cutoff = True
-                                                continue_to_next_node = True
-                                                break
-                                        
-                                        # If the error is not super low, check it normally
-                                        elif error < 0.8:
-                                            logging.info(f'\tError is {error}, not flipping inversion rules')
-
-                                            if min_error_rule[0][2] < 0.10:
-                                                # Keep track of all rules with the same minimum error
-                                                for rule in min_error_rule:
-                                                    if rule[2] == min_error_rule[0][2]:
-                                                        equivalent_rules.append(rule)
-                                                
-                                                # Append the first element of the sorted list
-                                                rule = min_error_rule[0][0]
-                                                index = min_error_rule[0][1]
-                                                error = min_error_rule[0][2]
-
-                                                logging.info(f'\tError is under 0.10: {error}')
-                                                logging.info(f'\trule: {rule}, index: {index}, error: {error}')
-                                                best_rules.append((rule, index, error))
-                                                passed_error_cutoff = True
-                                                continue_to_next_node = True
-                                                break
-
-                                        else:
-                                            passed_error_cutoff = False
-                                            continue_to_next_node = False
-
-                                # If the error is too high, iterate again
-                                if not continue_to_next_node:
-                                    logging.info(f'\tDid not pass error cutoff, increasing iteration')
-
-                                    iteration += 1
-
-                                # Break if no best rule is found (changed to leave in high error node rules)
-                                if iteration >= max_iterations:
-                                    logging.info(f'\tMax iterations reached, seeing if there are rules with an error of 1 to invert')
-
-                                    for rule, index, error in rules:
-                                        logging.info(f'\tCOARSE SEARCH: rule {rule}, error = {error}')
-                                        if error >= 0.80:
-                                            logging.info(f'\tError is {error} (>= 0.8), flipping inversion rule for incoming nodes')
-                                            for key, value in node.inversions.items():
-                                                logging.info(f'\t\tInversion rule before: {node.inversions[key]}')
-                                                if value == True:
-                                                    node.inversions[key] = False
-                                                elif value == False:
-                                                    node.inversions[key] = True
-                                                logging.info(f'\t\tInversion rule after: {node.inversions[key]}')
-
-                                            # Re-make the rules for the node
-                                            node.find_multiple_rule_predictions(individual)
-
-                                            rules = self.calculate_refined_errors(node, passed_error_cutoff, self.coarse_chunked_dataset)
-                                            for rule, index, error in rules:
-                                                logging.info(f'\tAFTER INVERSION: rule {rule}, error = {error}')
-                                        else:
-                                            logging.info(f'\tError is {error}, not flipping inversion rules')
-
-                                    min_error_rule = sorted(rules, key=get_third_element)
-                                    logging.info(f'\t\tMin error rule: {min_error_rule}')
-                                    print(rules)
-
-                                    # Keep track of all rules with the same minimum error
-                                    for rule in min_error_rule:
-                                        if rule[2] == min_error_rule[0][2]:
-                                            equivalent_rules.append(rule)
-
-                                    best_rules.append(min_error_rule[0])
-                                    continue_to_next_node = True
-                            
-                            # If the node has no predictions, set the nodes expression to itself
-                            else:
-                                logging.info(f'\tException: {node.name} has no incoming nodes, signaling rule set to itself')
-                                if len(node.node_rules) == 0:
-                                    # Add in self signaling for the node
-                                    logging.info(f'\t[{node.name}, [{node.index}]')
-                                    node.node_rules = [node.name, [node.index], 'A']
-                                    node.predecessors[node.index] = node.name
-                                    node.inversions[node.index] = False
-
-                                    # Set the node's incoming node rules to itself
-                                    rule = [node.name, [node.index], 'A']
-                                    index = 0
-                                    error = 0
-
-                                    equivalent_rules.append((rule, index, error))
-                                    
-                                    best_rules.append((rule, index, error))
-                                    continue_to_next_node = True
-                                    # print(f'\tNo predictions\n')
-                        equivalent_ruleset.append(equivalent_rules)
-
-                    bar()
+                # If the node signals to itself, create that rule
+                if node.node_rules[0][1][0] == node.index:
+                    best_rule = handle_self_loop(node)
+                    equivalent_rules.append(best_rule) # Add the rule to the list of equivalent rules
+                    best_rules.append(best_rule) # Add the rule to the list of best rules
                 
+                # If there are no incoming nodes, set the node to signal to itself
+                elif len(node.node_rules) == 0:
+                    best_rule = handle_self_loop(node)
+                    equivalent_rules.append(best_rule) # Add the rule to the list of equivalent rules
+                    best_rules.append(best_rule) # Add the rule to the list of best rules
                 
-            logging.info(f'Equivalent Ruleset:')
-            for node in equivalent_ruleset:
-                print(node)
+                # If the rule has multiple incoming nodes, calculate the minimum error rule
+                else:
+                    equivalent_best_rules = calculate_refined_errors(node, self.coarse_chunked_dataset)
+                    equivalent_rules.append(equivalent_best_rules) # Add all equivalent rules to a list
+                    best_rules.append(equivalent_best_rules[0]) # Add the first equivalent rule to the best_rules
+                
+                # Add the equivalent rules to the node
+                equivalent_ruleset[node.name] = equivalent_rules
 
             all_best_rules.append(best_rules)
 
-            # print('FINAL BEST RULES:')
-            final_error = 0
-            for rule, index, error in best_rules:
-                logging.info(f'{rule}: Error = {error}')
-                final_error += error
-            ruleset_error.append(final_error / len(best_rules))
-        
+        # print('FINAL BEST RULES:')
+        final_error = 0
+        for rule, index, error in best_rules:
+            # logging.info(f'{rule}: Error = {error}')
+            final_error += error
+        ruleset_error.append(final_error / len(best_rules))
 
         return (all_best_rules, ruleset_error)
-
+ 
     def calculate_error(self, node, predicted_rule, dataset):
         # logging.info(f'CustomDeap calculate_error:')
         # Get the row in the dataset for the node being evaluated
@@ -612,147 +407,6 @@ class CustomDeap:
         count = len(predicted)
 
         return difference, count
-
-    def calculate_refined_errors(self, node, passed_error, chunked_dataset):
-        # Calculate the error for each prediction based on the entire dataset (not chunked)
-        logging.info(f'\tCalculate_refined_errors function:')
-        prediction_errors = []
-        most_incoming_node_rules = []
-        best_rule_errors = []
-        best_rule_indices = []
-        best_rules = []
-
-        logging.info(f'\t\tPredicted rule errors:')
-
-        # # Calculates the error for each possible rule for the node
-        logging.info(f'\t\t\tNode rules: {node.node_rules}')
-        if passed_error == False:
-            rules = node.find_all_rule_predictions()
-
-            def generate_combinations(rule):
-
-                variables = ['A', 'B', 'C']
-
-                # Generate all possible combinations of the variables and their negations
-                combinations = list(product(*[(var, f'not {var}') for var in variables]))
-                
-                results = []
-                for combo in combinations:
-                    # Create a temporary rule with the current combination
-                    temp_rule = rule
-                    for var, replacement in zip(variables, combo):
-                        # Replace variables with the current combination of variable or its negation
-                        temp_rule = temp_rule.replace(var, replacement)
-                    results.append(temp_rule)
-                
-                return results
-            
-            rules = [generate_combinations(rule) for rule in rules]
-
-            logging.info(f'\n\n\n RULES')
-            for rule in rules:
-                print(rule)
-
-            logging.info(f'\n\n\n')
-
-        elif passed_error == True:
-            rules = node.node_rules
-        else:
-            raise Exception('passed error != True or False')
-
-        for rule in rules:
-            logging.info(f'\t\t\tPredicted rule: {rule}')
-            difference, count = self.calculate_error(node, rule[2], chunked_dataset)
-            prediction_error = difference / count
-            logging.info(f'\t\t\t\tError: {prediction_error}')
-            prediction_errors.append(prediction_error)
-
-        # Finding indices of all occurrences of the minimum value
-        if prediction_errors: # Excludes nodes with no predictions
-            logging.info(f'\t\t\tPrediction errors: {prediction_errors}')
-            minimum_error = min(prediction_errors)
-            minimum_error_indices = [index for index, value in enumerate(prediction_errors) if
-                                     value == minimum_error]
-
-            # Calculate which rules have the lowest index, prioritize nodes with more incoming nodes
-            # (If three incoming nodes have the same error as two incoming nodes, the two incoming node rule is
-            # probably a subset of the three incoming node rule)
-
-            logging.info(f'\n\t\tMinimum error indices: {minimum_error_indices}, minimum error: {minimum_error}')
-            # Append the length of the rules and the index to a list of node lengths
-            
-            # Create a list of the number of incoming nodes for each of the minimum rules
-            num_incoming_nodes_list = []
-            for index in minimum_error_indices: 
-                num_incoming_nodes = 0
-                if 'A' in rules[index][2]:
-                    num_incoming_nodes += 1
-                if 'B' in rules[index][2]:
-                    num_incoming_nodes += 1
-                if 'C' in rules[index][2]:
-                    num_incoming_nodes += 1
-                num_incoming_nodes_list.append(num_incoming_nodes)
-
-            logging.info(f'\t\t\tNum incoming nodes list: {num_incoming_nodes_list}')
-            # Find the maximum number of incoming nodes
-            max_incoming_nodes = max(num_incoming_nodes_list)
-
-            for index in minimum_error_indices: 
-
-                num_incoming_nodes = 0
-                if 'A' in rules[index][2]:
-                    num_incoming_nodes += 1
-                if 'B' in rules[index][2]:
-                    num_incoming_nodes += 1
-                if 'C' in rules[index][2]:
-                    num_incoming_nodes += 1
-
-                logging.info(f'\n\t\t\tRule: {rules[index]}')
-                logging.info(f'\t\t\tminimum error index: {index}')
-                logging.info(f'\t\t\t\tmax_incoming_nodes = {max_incoming_nodes}')
-                logging.info(f'\t\t\t\tnum_incoming_nodes = {num_incoming_nodes}')
-
-                # One incoming node rules in the best ruleset
-                if max_incoming_nodes == 1:  # If there is one incoming node possibilities in the lowest error rules
-                    if num_incoming_nodes == 1:  # Only print the rules with one incoming nodes
-                        logging.info(f'\t\t\t\tbest_rule: {rules[index]}, Index: {index}, error: {prediction_errors[index]}')
-                        most_incoming_node_rules.append(rules[index])
-                        best_rule_indices.append(index)
-                        best_rule_errors.append(prediction_errors[index])
-
-                # If there are no minimum error rules with one incoming node, look for rules with two incoming nodes
-                elif max_incoming_nodes == 2:
-                    if num_incoming_nodes == 2:  # Only print the rules with two incoming nodes
-                        logging.info(f'\t\t\t\tbest_rule: {rules[index]}, Index: {index}, error: {prediction_errors[index]}')
-                        most_incoming_node_rules.append(rules[index])
-                        best_rule_indices.append(index)
-                        best_rule_errors.append(prediction_errors[index])
-
-                # If no three or two incoming node rules, print the rule and the number of incoming nodes
-                elif max_incoming_nodes == 3:
-                    if num_incoming_nodes == 3:
-                        logging.info(f'\t\t\t\tbest_rule: {rules[index]}, Index: {index}, error: {prediction_errors[index]}')
-                        most_incoming_node_rules.append(rules[index])
-                        best_rule_indices.append(index)
-                        best_rule_errors.append(prediction_errors[index])
-            
-            logging.info(f'\t\t\tMost incoming node rules: {most_incoming_node_rules}')
-
-            # Find the rules with the fewest 'and' statements
-            min_rules = min([rule.count("and") for rule in most_incoming_node_rules])
-
-            logging.info(f'\t\tmost_incoming_node_rules: {most_incoming_node_rules}')
-            for i, rule in enumerate(most_incoming_node_rules):
-                if rule.count("and") == min_rules:
-                    best_rules.append((most_incoming_node_rules[i], best_rule_indices[i], best_rule_errors[i]))
-            
-            logging.info('\t\tbest rules:')
-            for i in best_rules:
-                logging.info(f'\t\t\t{i[0]}')
-                logging.info(f'\t\t\tError = {i[2]}')
-
-
-        return best_rules
 
     def chunk_data(self, num_chunks):
         """
@@ -1123,7 +777,7 @@ class CustomDeap:
             complexity_penalty = sum(rules_per_node) * (current_gen / max_gen) * 0.002
 
             # Adjust the fitness by the complexity penalty
-            adjusted_fitness = fitness_score + complexity_penalty
+            adjusted_fitness = fitness_score
 
             fitnesses.append((adjusted_fitness,))
 
