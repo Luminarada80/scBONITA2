@@ -7,8 +7,8 @@
 # Which parts do you want to run? Set True to run or False to skip
     # Rule determination must be run prior to importance score, importance score must be run prior to relative abundance
 RUN_RULE_DETERMINATION=False
-RUN_IMPORTANCE_SCORE=True
-RUN_RELATIVE_ABUNDANCE=True
+RUN_IMPORTANCE_SCORE=False
+RUN_RELATIVE_ABUNDANCE=False
 RUN_ATTRACTOR_ANALYSIS=True
 RUN_CELL_MAPPING=False
 

@@ -6,13 +6,14 @@ from setup.user_input_prompts import *
 import logging
 from heatmap import create_heatmap
 import numexpr as ne
+import random
 
 def get_starting_state(file):
     starting_state = []
 
     with open(file, 'r') as network_attractor:
         for line in network_attractor:
-            node_starting_state = int(line)
+            node_starting_state = int([random.choice([0,1]) for i in line])
             starting_state.append(node_starting_state)
     
     return starting_state
@@ -37,51 +38,12 @@ def simulate_network(nodes, filename):
 
     return simulation_results
 
-# def vectorized_run_simulation(nodes, starting_state, steps):
-#     total_simulation_states = []
-
-#     # Run the simulation
-#     for step in range(steps):
-#         step_expression = []
-
-#         # Iterate through each node in the network
-#         for node in nodes:
-#             incoming_nodes = node.best_rule[1][:]
-#             logic_function = node.best_rule[2]
-#             inversion_rules = node.best_rule[3]
-
-#             # Get the indices for the incoming nodes
-#             incoming_node_indices = [index for index, name in node.predecessors.items() if name in incoming_nodes]
-
-#             # Get the rows in the dataset for the incoming nodes
-#             if step == 0:
-#                 incoming_node_data = [starting_state[i] for i in incoming_node_indices]
-#             else:
-#                 incoming_node_data = [total_simulation_states[step-1][i] for i in incoming_node_indices]
-
-#             # Find the logic function that should be used for this predicted rule
-#             calculation_function = node.find_calculation_function(logic_function)
-
-#             # Allow for whole rows of the dataset to be passed into the function rather than one at a time
-#             vectorized_calculation_function = np.vectorize(calculation_function)
-
-#             # Set up the argument to be passed into the logic funciton, allows for different number of input nodes
-#             function_argument = incoming_node_data + inversion_rules
-
-#             # Apply the logic function to the data from the incoming nodes to get the predicted output
-#             next_step_node_expression = vectorized_calculation_function(*function_argument)
-
-#             # Save the expression for the node for this step
-#             step_expression.append(next_step_node_expression)
-        
-#         # Save the expression 
-#         total_simulation_states.append(step_expression)
-    
-#     return total_simulation_states
-
 def evaluate_expression(data, expression):
     expression = expression.replace('and', '&').replace('or', '|').replace('not', '~')
-    local_vars = {key: np.array(value) for key, value in data.items()}
+    if any(op in expression for op in ['&', '|', '~']):
+        local_vars = {key: np.array(value).astype(bool) for key, value in data.items()}
+    else:
+        local_vars = {key: np.array(value) for key, value in data.items()}
     return ne.evaluate(expression, local_dict=local_vars)
 
 # logging.info(f'\tdata = {data}')
@@ -93,15 +55,18 @@ def vectorized_run_simulation(nodes, starting_state, steps):
     # Run the simulation
     for step in range(steps):
         step_expression = []
+        # print(f'Step {step}')
 
         # Iterate through each node in the network
         for node in nodes:
+            # print(f'\t{node.name} index {node.index}')
 
             # Initialize A, B, C to False by default (adjust according to what makes sense in context)
             A, B, C = (False,) * 3
             
             data = {}
             incoming_node_indices = [predecessor_index for predecessor_index in node.predecessors]
+            # print(f'\t\tIncoming nodes = {incoming_node_indices}')
 
             # Get the rows in the dataset for the incoming nodes
             if step == 0:
@@ -130,14 +95,18 @@ def vectorized_run_simulation(nodes, starting_state, steps):
             
             # Get the dataset row indices for the incoming nodes included in this rule
             # logging.info(f'\tPredicted rule: {predicted_rule}')
-
+            # print(f'\t\tNode calculation function: {node.calculation_function}')
+            # print(f'\t\tData: {data}')
             next_step_node_expression = evaluate_expression(data, node.calculation_function)
+            # print(f'\t\tNext step node expression: {next_step_node_expression}')
 
-        # Save the expression for the node for this step
-        step_expression.append(next_step_node_expression)
+            # Save the expression for the node for this step
+            step_expression.append(next_step_node_expression)
+            # print(f'\tStep expression: {step_expression}')
     
-    # Save the expression 
-    total_simulation_states.append(step_expression)
+        # Save the expression 
+        total_simulation_states.append(step_expression)
+        # print(f'total simulation states: {total_simulation_states}')
 
     return total_simulation_states
     
@@ -186,8 +155,11 @@ if __name__ == '__main__':
     logging.basicConfig(format='%(message)s', level=logging.INFO)
 
     # Add in arguments to find the attractor file
-    dataset_name = input("Enter dataset name: ")
-    network_name = input("Enter network name: ")
+    # dataset_name = input("Enter dataset name: ")
+    # network_name = input("Enter network name: ")
+
+    dataset_name = 'george_hiv'
+    network_name = 'hsa04670'
 
     # Specifies the path to the correct network pickle file
     network_pickle_file = f'/home/emoeller/github/scBONITA/scBONITA/pickle_files/{dataset_name}_pickle_files/network_pickle_files/{dataset_name}_{network_name}.network.pickle'
@@ -199,37 +171,40 @@ if __name__ == '__main__':
     dataset = network.dataset
     dense_dataset = np.array(dataset.todense())
 
-    # Select a random column from the network dataset
-    cell_index = input("Select a cell index or hit enter for random index: ")
-    if not cell_index:
+    num_simulations = 20
+    for i in range(num_simulations):
+        print(f'Simulation {num_simulations+1} / {num_simulations}')
+        # Select a random column from the network dataset
+        # cell_index = input("Select a cell index or hit enter for random index: ")
+        # if not cell_index:
         cell_index = np.random.choice(dense_dataset.shape[1])
 
-    # Reads in all of the rows for that columns
-    selected_column = dense_dataset[:, cell_index]
+        # Reads in all of the rows for that columns
+        selected_column = np.array([random.choice([0,1]) for _ in dense_dataset[:, cell_index]])
 
-    # Transposes the list of gene expression into a column
-    transposed_random_column = selected_column.reshape(-1,1)
+        # Transposes the list of gene expression into a column
+        transposed_random_column = selected_column.reshape(-1,1)
 
-    # Specify outfile path for the simulation results
-    outfile_folder = f'trajectories/{dataset_name}_{network_name}'
-    os.makedirs(outfile_folder, exist_ok=True)
-    file_path = f'{outfile_folder}/cell_{cell_index}_trajectory'
-    
-    # Simulate the network
-    simulated_attractor = simulate_network(network.nodes, transposed_random_column)
+        # Specify outfile path for the simulation results
+        outfile_folder = f'trajectories/{dataset_name}_{network_name}'
+        os.makedirs(outfile_folder, exist_ok=True)
+        file_path = f'{outfile_folder}/cell_{cell_index}_trajectory'
+        
+        # Simulate the network
+        simulated_attractor = simulate_network(network.nodes, transposed_random_column)
 
-    # Visualize the network simulation results
-    fig = visualize_simulation(network.network, simulated_attractor, network, "False")
+        # Visualize the network simulation results
+        fig = visualize_simulation(network.network, simulated_attractor, network, "False")
 
-    # Save the attractor states to a csv file
-    logging.info(f'Saved file to: "{file_path}"')
-    save_attractor_simulation(f'{outfile_folder}/cell_{cell_index}_trajectory.txt', network, simulated_attractor)
-    plt.close(fig)
+        # # Save the attractor states to a csv file
+        # logging.info(f'Saved file to: "{file_path}"')
+        save_attractor_simulation(f'{outfile_folder}/cell_{cell_index}_trajectory.txt', network, simulated_attractor)
+        plt.close(fig)
 
-    # Create a heatmap of the expression for easier attractor visualization
-    heatmap = create_heatmap(f'{outfile_folder}/cell_{cell_index}_trajectory.txt', f'Simulation for {dataset_name} {network_name} cell {cell_index} pathway ')
-    heatmap.show()
+        # Create a heatmap of the expression for easier attractor visualization
+        heatmap = create_heatmap(f'{outfile_folder}/cell_{cell_index}_trajectory.txt', f'Simulation for {dataset_name} {network_name} cell {cell_index} pathway ')
+        # heatmap.show()
 
-    # Saves a png of the results
-    heatmap.savefig(f'{outfile_folder}/cell_{cell_index}_trajectory.png', format='png')
-    plt.close(heatmap)
+        # Saves a png of the results
+        heatmap.savefig(f'{outfile_folder}/cell_{cell_index}_trajectory.png', format='png')
+        plt.close(heatmap)

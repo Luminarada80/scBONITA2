@@ -77,17 +77,16 @@ def extract_data(data_file, sep, sample_cells, node_indices, max_samples):
 def figure_graph(experimental_network, dataset_name, relative_abundances):
     G = experimental_network.network       
 
-    # Mapping scaled differences to colors from red to blue
-    # Positive = higher expression in experimental
-    # Negative = higher expression in control
-    node_colors = []
-
-    # Extracting importance scores
+    # Extracting importance scores and applying log transformation to relative abundances
     importance_scores = []
+    node_colors = []
 
     for node in experimental_network.nodes:
         node_colors.append(relative_abundances[node.name])
         importance_scores.append(node.importance_score)
+
+    # Apply log transformation to relative abundances to get log fold change
+    log_fold_changes = np.log2(np.array(node_colors) + 1e-9)  # Adding a small value to avoid log(0)
 
     # Define minimum and maximum node sizes
     min_node_size = 100  # Minimum node size
@@ -102,8 +101,8 @@ def figure_graph(experimental_network, dataset_name, relative_abundances):
     ]
 
     cmap = plt.cm.coolwarm
-    norm = TwoSlopeNorm(vmin=min(node_colors), vcenter=1, vmax=max(node_colors))
-    colors = [cmap(norm(value)) for value in node_colors]
+    norm = TwoSlopeNorm(vmin=min(log_fold_changes), vcenter=0, vmax=max(log_fold_changes))
+    colors = [cmap(norm(value)) for value in log_fold_changes]
 
     # Drawing the graph
     # Create custom legend
@@ -114,8 +113,8 @@ def figure_graph(experimental_network, dataset_name, relative_abundances):
     pos = nx.spring_layout(G, k=1, iterations=50)
     nx.draw(G, pos, with_labels=True, node_color=colors, cmap='coolwarm', node_size=scaled_importance_scores, font_size=10, ax=ax)
 
-    ax.set_title(f"Importance Score and Relative Abundance for network {experimental_network.name.split('_')[0]} for dataset {dataset_name}")
-    plt.legend(handles=[blue_patch, red_patch], title=f'Relative Expression of {experimental_group} compared to {control_group}')
+    ax.set_title(f"Importance Score and Log Fold Change for network {experimental_network.name.split('_')[0]} for dataset {dataset_name}")
+    plt.legend(handles=[blue_patch, red_patch], title=f'Log Fold Change of {experimental_group} compared to {control_group}')
 
     return fig
 
@@ -435,11 +434,11 @@ if __name__ == '__main__':
                 # Find intersection (common elements) between the two sets
                 common_genes_set = control_group_genes_set.intersection(experimental_group_genes_set)
 
-                logging.debug(f'Number of common genes: {len(common_genes_set)}')
+                # logging.info(f'Number of common genes: {len(common_genes_set)}')
 
                 # Convert the set back to a list if you need list operations later
                 gene_list = list(common_genes_set)
-                logging.debug(f'Gene list length: {len(gene_list)}')
+                # logging.info(f'Gene list length: {len(gene_list)}')
 
                 # Parse data for shared genes
                 # Initialize the MaxAbsScaler
@@ -471,20 +470,25 @@ if __name__ == '__main__':
                 # For the experimental group, only transform
                 experimental_group_data = parse_data_and_scale(experimental_group_network, gene_list, scaler=max_abs_scaler, fit_scaler=False)
 
-                logging.debug(f'\t{control_group} has {control_group_data.shape[0]} cells')
-                logging.debug(f'\t{experimental_group} has {experimental_group_data.shape[0]} cells')
+                # logging.info(f'\t{control_group} has {control_group_data.shape[0]} cells')
+                # logging.info(f'\t{experimental_group} has {experimental_group_data.shape[0]} cells')
 
                 min_num_cells = min(control_group_data.shape[0], experimental_group_data.shape[0])
 
                 # Calculate mean expression levels for each gene across all samples within each group
                 mean_expression_control = np.mean(control_group_data, axis=0)
+                # logging.info(f'\tMean expression control: {mean_expression_control}')
                 mean_expression_experimental = np.mean(experimental_group_data, axis=0)
+                # logging.info(f'\tMean expression experimental: {mean_expression_experimental}')
 
                 stdev_expression_control = np.std(control_group_data, axis=0)
+                # logging.info(f'\tstdev_expression_control = {stdev_expression_control}')
                 stdev_expression_experimental = np.std(experimental_group_data, axis=0)
+                # logging.info(f'\tstdev_expression_experimental = {stdev_expression_experimental}')
 
                 # Compute the difference in mean expression levels for the relative expression
-                fold_change = mean_expression_experimental / mean_expression_control
+                fold_change = mean_expression_experimental / (mean_expression_control + 1e-10)
+                # logging.info(f'\tFold change = {fold_change}')
 
                 relative_abundances = fold_change
 
