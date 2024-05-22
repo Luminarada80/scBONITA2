@@ -142,11 +142,11 @@ def prioritize_pkn_inversion_rules(node, rules, prediction_errors):
 
     # If the average error is less than 85% for the rules that follow the inversion rules, use those
     if average_error < 0.85:
-        logging.info(f'\t\t\t\tError is less than 85% for rules that follow the PKN inversion rules, only considering those {len(follows_inversion_rules)}')
+        # logging.info(f'\t\t\t\tError is less than 85% for rules that follow the PKN inversion rules, only considering those {len(follows_inversion_rules)}')
         rules = [i[0] for i in follows_inversion_rules]
         prediction_errors = [i[1] for i in follows_inversion_rules]
-    else:
-        logging.info(f'\t\t\t\tError is greater than 85% for rules that follow the PKN inversion rules, considering all rules {len(follows_inversion_rules) + len(does_not_follow_inversion_rules)}')
+    # else:
+        # logging.info(f'\t\t\t\tError is greater than 85% for rules that follow the PKN inversion rules, considering all rules {len(follows_inversion_rules) + len(does_not_follow_inversion_rules)}')
     
     return rules, prediction_errors
 
@@ -229,7 +229,7 @@ def calculate_refined_errors(node, chunked_dataset):
     return best_rules
     """
 
-    logging.info(f'\tCALCULATING REFINED ERROR FOR {node.name}')
+    # logging.info(f'\tCALCULATING REFINED ERROR FOR {node.name}')
 
     # Calculate the error for each prediction based on the entire dataset (not chunked)
     # logging.info(f'\tCalculate_refined_errors function:')
@@ -240,13 +240,13 @@ def calculate_refined_errors(node, chunked_dataset):
 
     # # Calculates the error for each possible rule for the node
     # logging.info(f'\t\t\tNode rules: {node.node_rules}')
-    logging.info(f'\t\tFinding all possible rules for {node.name} based on {len(node.predecessors)} incoming nodes')
+    # logging.info(f'\t\tFinding all possible rules for {node.name} based on {len(node.predecessors)} incoming nodes')
     rules = node.find_all_rule_predictions()
     
     # Generate all 'not' combinations for each rule
     not_combinations = [generate_not_combinations(rule[2]) for rule in rules]
 
-    logging.info(f'\t\t\tGenerated {len(not_combinations)} possible rules')
+    # logging.info(f'\t\t\tGenerated {len(not_combinations)} possible rules')
 
     # print('NOT COMBINATIONS')
     for combination in not_combinations:
@@ -261,7 +261,7 @@ def calculate_refined_errors(node, chunked_dataset):
     # for rule in rules:
     #     print(rule)
 
-    logging.info(f'\t\tCalculating the error for each rule')
+    # logging.info(f'\t\tCalculating the error for each rule')
     for rule in rules:
         # logging.info(f'\t\t\tPredicted rule: {rule}')
         difference, count = calculate_error(node, rule[2], chunked_dataset)
@@ -272,33 +272,33 @@ def calculate_refined_errors(node, chunked_dataset):
     # Find all of the rules that have the minimum error
     if len(prediction_errors) > 0: # Excludes nodes with no predictions
         
-        logging.info(f'\t\tPrioritizing using inversion rules from the PKN (unless average rule error > 85%)')
+        # logging.info(f'\t\tPrioritizing using inversion rules from the PKN (unless average rule error > 85%)')
         rules, prediction_errors = prioritize_pkn_inversion_rules(node, rules, prediction_errors)
-        logging.info(f'\t\t\tFound {len(rules)} rule(s)')
+        # logging.info(f'\t\t\tFound {len(rules)} rule(s)')
         
-        logging.info(f'\t\tFinding the indices for rules with the minimum error')
+        # logging.info(f'\t\tFinding the indices for rules with the minimum error')
         min_error_indices, min_error = find_min_error_indices(prediction_errors)
-        logging.info(f'\t\t\tFound {len(min_error_indices)} minimum error rule(s) (min error {min_error})')
+        # logging.info(f'\t\t\tFound {len(min_error_indices)} minimum error rule(s) (min error {min_error})')
 
         # logging.info(f'\n\t\t\tMinimum error indices: {min_error_indices}, minimum error: {min_error}\n')
 
         # Now that we have found the rules with the minimum error, we want to maximize the number of connections
-        logging.info(f'\t\tMaximizing the number of connections')
+        # logging.info(f'\t\tMaximizing the number of connections')
         max_incoming_node_rules, best_rule_indices, best_rule_errors = minimize_incoming_connections(min_error_indices, rules, prediction_errors)
-        logging.info(f'\t\t\tFound {len(max_incoming_node_rules)} rule(s)')
+        # logging.info(f'\t\t\tFound {len(max_incoming_node_rules)} rule(s)')
 
         # Find the rules with the fewest 'and' statements
-        logging.info(f'\t\tFinding the rules with the fewest "and" statements')
+        # logging.info(f'\t\tFinding the rules with the fewest "and" statements')
         min_rules = min([rule.count("and") for rule in max_incoming_node_rules])
         # logging.info(f'\t\tmax_incoming_node_rules: {max_incoming_node_rules}')
         for i, rule in enumerate(max_incoming_node_rules):
             if rule.count("and") == min_rules:
                 best_rules.append((max_incoming_node_rules[i], best_rule_indices[i], best_rule_errors[i]))
         
-        logging.info(f'\n\tBEST RULES FOR {node.name}:')
-        for i in best_rules:
-            logging.info(f'\t\tRule = {i[0][2]} | Error = {i[2]}')
-        logging.info(f'\n')
+        # logging.info(f'\n\tBEST RULES FOR {node.name}:')
+        # for i in best_rules:
+            # logging.info(f'\t\tRule = {i[0][2]} | Error = {i[2]}')
+        # logging.info(f'\n')
 
     return best_rules
 

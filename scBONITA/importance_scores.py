@@ -18,7 +18,7 @@ class CalculateImportanceScore():
         self.binarized_matrix = binarized_matrix
         self.nodes = nodes
         self.STEPS = 50
-        self.CELLS = 250
+        self.CELLS = 500
 
         # Ensure you do not sample more columns than exist in the matrix
         n_cols = min(self.CELLS, binarized_matrix.shape[1])
@@ -40,7 +40,11 @@ class CalculateImportanceScore():
     
     def evaluate_expression(self, data, expression):
         expression = expression.replace('and', '&').replace('or', '|').replace('not', '~')
-        local_vars = {key: np.array(value) for key, value in data.items()}
+        # Convert the arrays to boolean if the expression contains boolean operations
+        if any(op in expression for op in ['&', '|', '~']):
+            local_vars = {key: np.array(value).astype(bool) for key, value in data.items()}
+        else:
+            local_vars = {key: np.array(value) for key, value in data.items()}
         return ne.evaluate(expression, local_dict=local_vars)
 
     # logging.info(f'\tdata = {data}')

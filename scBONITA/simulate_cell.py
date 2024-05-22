@@ -155,11 +155,11 @@ if __name__ == '__main__':
     logging.basicConfig(format='%(message)s', level=logging.INFO)
 
     # Add in arguments to find the attractor file
-    # dataset_name = input("Enter dataset name: ")
-    # network_name = input("Enter network name: ")
+    dataset_name = input("Enter dataset name: ")
+    network_name = input("Enter network name: ")
 
-    dataset_name = 'george_hiv'
-    network_name = 'hsa04670'
+    # dataset_name = 'george_hiv'
+    # network_name = 'hsa04670'
 
     # Specifies the path to the correct network pickle file
     network_pickle_file = f'/home/emoeller/github/scBONITA/scBONITA/pickle_files/{dataset_name}_pickle_files/network_pickle_files/{dataset_name}_{network_name}.network.pickle'
@@ -173,7 +173,7 @@ if __name__ == '__main__':
 
     num_simulations = 20
     for i in range(num_simulations):
-        print(f'Simulation {num_simulations+1} / {num_simulations}')
+        print(f'Simulation {i+1} / {num_simulations}')
         # Select a random column from the network dataset
         # cell_index = input("Select a cell index or hit enter for random index: ")
         # if not cell_index:
