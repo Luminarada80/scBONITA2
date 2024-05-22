@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import csv
 from path_manager import PathManager
 from setup.user_input_prompts import *
+import numexpr as ne
 
 class CalculateImportanceScore():
     def __init__(self, nodes, binarized_matrix):
@@ -36,6 +37,14 @@ class CalculateImportanceScore():
         
         self.zeros_array = np.array([[0] * self.dataset.shape[1]], dtype=np.bool)
         self.ones_array = np.array([[1] * self.dataset.shape[1]], dtype=np.bool)
+    
+    def evaluate_expression(self, data, expression):
+        expression = expression.replace('and', '&').replace('or', '|').replace('not', '~')
+        local_vars = {key: np.array(value) for key, value in data.items()}
+        return ne.evaluate(expression, local_dict=local_vars)
+
+    # logging.info(f'\tdata = {data}')
+    
 
     def vectorized_run_simulation(self,knockout_node=None, knockin_node=None):
         total_simulation_states = []
@@ -55,21 +64,41 @@ class CalculateImportanceScore():
                     next_step_node_expression = self.ones_array
 
                 else: 
+                    # Initialize A, B, C to False by default (adjust according to what makes sense in context)
+                    A, B, C = (False,) * 3
+                    
+                    data = {}
+                    incoming_node_indices = [predecessor_index for predecessor_index in node.predecessors]
+
                     # Get the rows in the dataset for the incoming nodes
                     if step == 0:
-                        incoming_node_data = [self.dataset[i] for i in node.incoming_node_indices]
+                        if len(incoming_node_indices) > 0:
+                            data['A'] = self.dataset[incoming_node_indices[0]]
+                        if len(incoming_node_indices) > 1:
+                            data['B'] = self.dataset[incoming_node_indices[1]]
+                        if len(incoming_node_indices) > 2:
+                            data['C'] = self.dataset[incoming_node_indices[2]]
+                        if len(incoming_node_indices) > 3:
+                            data['D'] = self.dataset[incoming_node_indices[3]]
                     else:
-                        incoming_node_data = [total_simulation_states[step-1][i] for i in node.incoming_node_indices]
-
-                    # Allow for whole rows of the dataset to be passed into the function rather than one at a time
-                    vectorized_calculation_function = np.vectorize(node.calculation_function)
-
-                    # Set up the argument to be passed into the logic funciton, allows for different number of input nodes
-                    function_argument = incoming_node_data + node.inversion_rules
+                        if len(incoming_node_indices) > 0:
+                            data['A'] = total_simulation_states[step-1][incoming_node_indices[0]]
+                        if len(incoming_node_indices) > 1:
+                            data['B'] = total_simulation_states[step-1][incoming_node_indices[1]]
+                        if len(incoming_node_indices) > 2:
+                            data['C'] = total_simulation_states[step-1][incoming_node_indices[2]]
+                        if len(incoming_node_indices) > 3:
+                            data['D'] = total_simulation_states[step-1][incoming_node_indices[3]]
 
                     # Apply the logic function to the data from the incoming nodes to get the predicted output
 
-                    next_step_node_expression = vectorized_calculation_function(*function_argument)
+                    # Get the row in the dataset for the node being evaluated
+                    # logging.info(f'\tNode {node.name}, Dataset index {node.index}')
+                    
+                    # Get the dataset row indices for the incoming nodes included in this rule
+                    # logging.info(f'\tPredicted rule: {predicted_rule}')
+
+                    next_step_node_expression = self.evaluate_expression(data, node.calculation_function)
 
                 # Save the expression for the node for this step
                 step_expression.append(next_step_node_expression)
@@ -125,12 +154,9 @@ class CalculateImportanceScore():
 
         for node in self.nodes:
             incoming_nodes = node.best_rule[1][:]
-            logic_function = node.best_rule[2]
-            inversion_rules = node.best_rule[3]
             
-            node.calculation_function = node.find_calculation_function(logic_function)
+            node.calculation_function = node.find_calculation_function()
             node.incoming_node_indices = [index for index, name in node.predecessors.items() if name in incoming_nodes]
-            node.inversion_rules = inversion_rules
             
 
         # Calculate knockins and knockouts
