@@ -250,6 +250,9 @@ class Node:
         self.node_rules = []  # Clearing the list of rules
 
         # Any other attributes that need to be reset can be added here
+    
+    def find_calculation_function(self):
+        return self.best_rule[2]
 
 
 
