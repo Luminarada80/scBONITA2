@@ -24,10 +24,10 @@ class CustomDeap:
 
         # Genetic algorithm parameters
         self.mutate_percent_pop = 0.25
-        self.generations = 15
-        self.starting_population_size = 50
-        self.parent_population_size = 25
-        self.child_population_size = 25
+        self.generations = 5
+        self.starting_population_size = 10
+        self.parent_population_size = 5
+        self.child_population_size = 5
         self.crossover_probability = 0.1
         self.mutation_probability = 0.9
         self.bitFlipProb = 0.5
@@ -54,7 +54,7 @@ class CustomDeap:
         _, num_columns = np.shape(self.binMat)
 
         # Chunk the data matrix to reduce noise and put into numpy array to speed up processing
-        self.num_chunks = 100
+        self.num_chunks = 1000
 
         # Chunk if there are more cells than columns, otherwise just use the columns
         if num_columns > self.num_chunks:
@@ -153,7 +153,7 @@ class CustomDeap:
             total_fitnesses.append(raw_fitnesses)
 
             if gen == self.generations:
-                self.graph_genetic_algorithm_results(total_fitnesses)
+                # self.graph_genetic_algorithm_results(total_fitnesses)
                 with open("deap_results.txt", "w") as temp_file:
 
                     joined_generations = ",".join([str(i) for i in range(self.generations+1)])
@@ -203,7 +203,7 @@ class CustomDeap:
         for x, y in zip(x_values, y_values):
             plt.scatter([x] * len(y), y)
         plt.ylim([0, 0.5])
-        plt.show()
+        # plt.show()
 
 
     def find_best_individual(self, population, raw_fitnesses):
@@ -325,6 +325,8 @@ class CustomDeap:
 
         return (all_best_rules, ruleset_error)
         """
+
+        logging.info(f'\n-----RULE REFINEMENT-----')
         min_error_individuals = find_min_error_individuals(population, raw_fitnesses)
         all_best_rules = []
         ruleset_error = []
@@ -334,36 +336,37 @@ class CustomDeap:
             best_rules = []
             equivalent_ruleset = {}
 
-            for node in self.nodes:
-                equivalent_rules = []
+            with alive_bar(len(self.nodes)) as bar:
+                for node in self.nodes:
+                    equivalent_rules = []
 
-                # If the node signals to itself, create that rule
-                if node.node_rules[0][1][0] == node.index:
-                    best_rule = handle_self_loop(node)
-                    equivalent_rules.append(best_rule) # Add the rule to the list of equivalent rules
-                    best_rules.append(best_rule) # Add the rule to the list of best rules
-                
-                # If there are no incoming nodes, set the node to signal to itself
-                elif len(node.node_rules) == 0:
-                    best_rule = handle_self_loop(node)
-                    equivalent_rules.append(best_rule) # Add the rule to the list of equivalent rules
-                    best_rules.append(best_rule) # Add the rule to the list of best rules
-                
-                # If the rule has multiple incoming nodes, calculate the minimum error rule
-                else:
-                    equivalent_best_rules = calculate_refined_errors(node, self.coarse_chunked_dataset)
-                    equivalent_rules.append(equivalent_best_rules) # Add all equivalent rules to a list
-                    best_rules.append(equivalent_best_rules[0]) # Add the first equivalent rule to the best_rules
-                
-                # Add the equivalent rules to the node
-                equivalent_ruleset[node.name] = equivalent_rules
+                    # If the node signals to itself, create that rule
+                    if node.node_rules[0][1][0] == node.index:
+                        best_rule = handle_self_loop(node)
+                        equivalent_rules.append(best_rule) # Add the rule to the list of equivalent rules
+                        best_rules.append(best_rule) # Add the rule to the list of best rules
+                    
+                    # If there are no incoming nodes, set the node to signal to itself
+                    elif len(node.node_rules) == 0:
+                        best_rule = handle_self_loop(node)
+                        equivalent_rules.append(best_rule) # Add the rule to the list of equivalent rules
+                        best_rules.append(best_rule) # Add the rule to the list of best rules
+                    
+                    # If the rule has multiple incoming nodes, calculate the minimum error rule
+                    else:
+                        equivalent_best_rules = calculate_refined_errors(node, self.chunked_data_numpy)
+                        equivalent_rules.append(equivalent_best_rules) # Add all equivalent rules to a list
+                        best_rules.append(equivalent_best_rules[0]) # Add the first equivalent rule to the best_rules
+                    
+                    # Add the equivalent rules to the node
+                    equivalent_ruleset[node.name] = equivalent_rules
+                    bar()
 
             all_best_rules.append(best_rules)
 
             # Calculates summary stats for the rules
             errors = [error for _, _, error in best_rules]
-            print(errors)
-            average_error = sum(errors) / len(all_best_rules)
+            average_error = sum(errors) / len(errors)
             stdev_error = stdev(errors)
             max_error = max(errors)
             min_error = min(errors)

@@ -11,6 +11,7 @@ import logging
 import random
 import pandas
 from heatmap import create_heatmap
+import numexpr as ne
 
 def get_starting_state(file):
     starting_state = []
@@ -33,46 +34,76 @@ def simulate_network(nodes, filename):
 
     return simulation_results
 
+def evaluate_expression(data, expression):
+    expression = expression.replace('and', '&').replace('or', '|').replace('not', '~')
+    if any(op in expression for op in ['&', '|', '~']):
+        local_vars = {key: np.array(value).astype(bool) for key, value in data.items()}
+    else:
+        local_vars = {key: np.array(value) for key, value in data.items()}
+    return ne.evaluate(expression, local_dict=local_vars)
+
+# logging.info(f'\tdata = {data}')
+
+
 def vectorized_run_simulation(nodes, starting_state, steps):
     total_simulation_states = []
 
     # Run the simulation
     for step in range(steps):
         step_expression = []
+        # print(f'Step {step}')
 
         # Iterate through each node in the network
         for node in nodes:
-            incoming_nodes = node.best_rule[1][:]
-            logic_function = node.best_rule[2]
-            inversion_rules = node.best_rule[3]
+            # print(f'\t{node.name} index {node.index}')
 
-            # Get the indices for the incoming nodes
-            incoming_node_indices = [index for index, name in node.predecessors.items() if name in incoming_nodes]
+            # Initialize A, B, C to False by default (adjust according to what makes sense in context)
+            A, B, C = (False,) * 3
+            
+            data = {}
+            incoming_node_indices = [predecessor_index for predecessor_index in node.predecessors]
+            # print(f'\t\tIncoming nodes = {incoming_node_indices}')
 
             # Get the rows in the dataset for the incoming nodes
             if step == 0:
-                incoming_node_data = [starting_state[i] for i in incoming_node_indices]
+                if len(incoming_node_indices) > 0:
+                    data['A'] = starting_state[incoming_node_indices[0]]
+                if len(incoming_node_indices) > 1:
+                    data['B'] = starting_state[incoming_node_indices[1]]
+                if len(incoming_node_indices) > 2:
+                    data['C'] = starting_state[incoming_node_indices[2]]
+                if len(incoming_node_indices) > 3:
+                    data['D'] = starting_state[incoming_node_indices[3]]
             else:
-                incoming_node_data = [total_simulation_states[step-1][i] for i in incoming_node_indices]
-
-            # Find the logic function that should be used for this predicted rule
-            calculation_function = node.find_calculation_function(logic_function)
-
-            # Allow for whole rows of the dataset to be passed into the function rather than one at a time
-            vectorized_calculation_function = np.vectorize(calculation_function)
-
-            # Set up the argument to be passed into the logic funciton, allows for different number of input nodes
-            function_argument = incoming_node_data + inversion_rules
+                if len(incoming_node_indices) > 0:
+                    data['A'] = total_simulation_states[step-1][incoming_node_indices[0]]
+                if len(incoming_node_indices) > 1:
+                    data['B'] = total_simulation_states[step-1][incoming_node_indices[1]]
+                if len(incoming_node_indices) > 2:
+                    data['C'] = total_simulation_states[step-1][incoming_node_indices[2]]
+                if len(incoming_node_indices) > 3:
+                    data['D'] = total_simulation_states[step-1][incoming_node_indices[3]]
 
             # Apply the logic function to the data from the incoming nodes to get the predicted output
-            next_step_node_expression = vectorized_calculation_function(*function_argument)
+
+            # Get the row in the dataset for the node being evaluated
+            # logging.info(f'\tNode {node.name}, Dataset index {node.index}')
+            
+            # Get the dataset row indices for the incoming nodes included in this rule
+            # logging.info(f'\tPredicted rule: {predicted_rule}')
+            # print(f'\t\tNode calculation function: {node.calculation_function}')
+            # print(f'\t\tData: {data}')
+            next_step_node_expression = evaluate_expression(data, node.calculation_function)
+            # print(f'\t\tNext step node expression: {next_step_node_expression}')
 
             # Save the expression for the node for this step
             step_expression.append(next_step_node_expression)
-        
+            # print(f'\tStep expression: {step_expression}')
+    
         # Save the expression 
         total_simulation_states.append(step_expression)
-    
+        # print(f'total simulation states: {total_simulation_states}')
+
     return total_simulation_states
     
 
