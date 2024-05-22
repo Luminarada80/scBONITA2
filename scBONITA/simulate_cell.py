@@ -5,6 +5,7 @@ import pickle
 from setup.user_input_prompts import *
 import logging
 from heatmap import create_heatmap
+import random
 
 def get_starting_state(file):
     starting_state = []
@@ -25,12 +26,15 @@ def simulate_network(nodes, filename):
     steps = 100
 
     # starting_state = get_starting_state(filename)
-    starting_state = []
+    # starting_state = []
+    # for i in filename:
+    #     starting_state.append(i[0])
+    
+    random_starting_state = []
     for i in filename:
-        starting_state.append(i[0])
+        random_starting_state.append(random.choice([0,1]))
 
-
-    total_simulation_states = vectorized_run_simulation(nodes, starting_state, steps)
+    total_simulation_states = vectorized_run_simulation(nodes, random_starting_state, steps)
     
     simulation_results = [[int(item) for item in sublist] for sublist in total_simulation_states]
 
