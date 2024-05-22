@@ -290,8 +290,17 @@ class CustomDeap:
                 rule_file.write(line)
                 rule_file.write('\n')
 
-            logging.info(f'Refined Error: {error}\n')
-            rule_file.write(f'Refined_error:\t{error}')
+            avg_error = error[0]
+            stdev_error = error[1]
+            max_error = error[2]
+            min_error = error[3]
+
+            logging.info(f'Refined Error:\n')
+            logging.info(f'\tAverage = {avg_error}')
+            logging.info(f'\tStdev = {stdev_error}')
+            logging.info(f'\tMax = {max_error}')
+            logging.info(f'\tMin = {min_error}')
+            rule_file.write(f'Refined_error:\tavg={avg_error}|stdev={stdev_error}|max={max_error}|min={min_error}')
 
     def get_fitness_values(self, ind):
         """
@@ -300,23 +309,32 @@ class CustomDeap:
         return ind.fitness.values
     
     def refine_rules(self, population, raw_fitnesses):
+        """
+        Refines the rulesets from the population
+        1) Finds the individuals with the minimum error
+        2) Iterates through each node in the individuals
+            a) Handles nodes that have self-loops or no incoming nodes
+            b) Finds all possible rule combinations for the node
+            c) Calculates the error for each rule based on chunked_dataset
+            d) Finds the rules with the minimum error
+            e) Finds the simplest rules with the minimum error (fewest incoming nodes)
+            f) Finds the simplest rules with the greatest number of 'or' connections
+        3) Appends the minimum error rules to best_rules and stores equivalent rules
+        4) Stores summary statistics in `ruleset_error`
+            a) average error, stdev, max error, min error
+
+        return (all_best_rules, ruleset_error)
+        """
         min_error_individuals = find_min_error_individuals(population, raw_fitnesses)
         all_best_rules = []
         ruleset_error = []
 
-        for i, individual_ruleset in enumerate(min_error_individuals):
+        for i, _ in enumerate(min_error_individuals):
             logging.info(f'Equivalent Ruleset {i+1} / {len(min_error_individuals)}')
-            total_rules = []
-            rules_per_node = []
             best_rules = []
-            max_iterations = 3
             equivalent_ruleset = {}
 
-            for index, node in enumerate(self.nodes):
-                continue_to_next_node = False
-                iteration = 0
-                passed_error_cutoff = True
-                individual = individual_ruleset[1]
+            for node in self.nodes:
                 equivalent_rules = []
 
                 # If the node signals to itself, create that rule
@@ -342,12 +360,14 @@ class CustomDeap:
 
             all_best_rules.append(best_rules)
 
-        # print('FINAL BEST RULES:')
-        final_error = 0
-        for rule, index, error in best_rules:
-            # logging.info(f'{rule}: Error = {error}')
-            final_error += error
-        ruleset_error.append(final_error / len(best_rules))
+            # Calculates summary stats for the rules
+            errors = [error for _, _, error in best_rules]
+            print(errors)
+            average_error = sum(errors) / len(all_best_rules)
+            stdev_error = stdev(errors)
+            max_error = max(errors)
+            min_error = min(errors)
+            ruleset_error.append([average_error, stdev_error, max_error, min_error])
 
         return (all_best_rules, ruleset_error)
  
