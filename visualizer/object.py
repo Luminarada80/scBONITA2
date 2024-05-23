@@ -7,7 +7,7 @@ class Object(pygame.sprite.Sprite):
     def __init__(self, name, position, color):
         super().__init__()
 
-        self.size = 100
+        self.size = 75
         self.name = name
         self.position = position
         self.color = color
@@ -94,6 +94,7 @@ class Object(pygame.sprite.Sprite):
 
                 # Draw the arrowhead
                 pygame.draw.polygon(self.display_surface, self.line_color, [end_point, arrow_point_1, arrow_point_2])
+
         
     # Move the node by clicking and dragging with the mouse
     def move(self, events, rect, game):
@@ -187,12 +188,10 @@ class Object(pygame.sprite.Sprite):
             if self.is_drawing_line and keys[pygame.K_1] and object.rect.collidepoint(mouse_pos):
                 for event in events:
                     if event.type == pygame.MOUSEBUTTONDOWN:
-                        if object not in self.incoming_connections:
+                        if object not in self.outgoing_connections:
                             self.outgoing_connections.append(object)
-                            print(self.outgoing_connections)
                         if self not in object.incoming_connections:
                             object.incoming_connections.append(self)
-                            print(object.incoming_connections)
                         self.is_drawing_line = False
 
     
@@ -210,6 +209,16 @@ class Object(pygame.sprite.Sprite):
 
             if self.is_drawing_line and keys[pygame.K_t] and object.rect.collidepoint(mouse_pos):
                 self.remove_connection(object)
+    
+    def remove_all_connections(self, objects, just_killed):
+        mouse_pos = pygame.mouse.get_pos()
+
+        for object in objects:
+            keys = pygame.key.get_pressed()
+
+            if object.rect.collidepoint(mouse_pos) and keys[pygame.K_y] or just_killed:
+                self.remove_connection(object)
+
 
     # Remove a connection between two nodes
     def remove_connection(self, object):
@@ -286,7 +295,7 @@ class Object(pygame.sprite.Sprite):
                 self.update_num += 1
 
                 # Only the gates can update (allows for logic to update correctly if multiple gates are strung together)
-                if self in self.nodes_group:
+                if self.is_node == True:
                     self.can_update = False
         else:
             self.update_num = 0
@@ -390,8 +399,12 @@ class Object(pygame.sprite.Sprite):
     def request_uuid_objects(self, uuid_dict, object_uuids):
         """Requests the objects from main.py in a group"""
         objects = []
+
         for id in object_uuids:
-            objects.append(uuid_dict[id])
+            try:
+                objects.append(uuid_dict[id])
+            except:
+                KeyError
 
         return objects
             
@@ -406,6 +419,7 @@ class Object(pygame.sprite.Sprite):
         self.draw_edge(connections, rect)
         self.connect_to_object(events, objects)
         self.disconnect_objects(objects)
+        self.remove_all_connections(objects, False)
         self.run_simulation(draw_object_function)
         # self.move_if_colliding(objects)
         self.toggle_state(rect)

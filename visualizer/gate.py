@@ -37,8 +37,10 @@ class Gate(Object):
         self.rect = self.image.get_rect(center=self.position)
         self.original_image = self.image  # This will hold the currently displayed image
 
-        self.font_size = 16
+        self.font_size = 10
         self.font = pygame.freetype.Font('visualizer/arial.ttf', self.font_size)
+
+        self.is_node = False
 
         self.angle = 0
     
