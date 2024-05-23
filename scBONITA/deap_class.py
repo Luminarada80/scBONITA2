@@ -25,9 +25,9 @@ class CustomDeap:
         # Genetic algorithm parameters
         self.mutate_percent_pop = 0.25
         self.generations = 5
-        self.starting_population_size = 10
-        self.parent_population_size = 5
-        self.child_population_size = 5
+        self.starting_population_size = 20
+        self.parent_population_size = 10
+        self.child_population_size = 10
         self.crossover_probability = 0.1
         self.mutation_probability = 0.9
         self.bitFlipProb = 0.5
@@ -294,13 +294,19 @@ class CustomDeap:
             stdev_error = error[1]
             max_error = error[2]
             min_error = error[3]
+            num_self_loops = error[4]
+            percent_self_loops = round(num_self_loops/len(self.nodeList)*100,0)
 
             logging.info(f'Refined Error:\n')
             logging.info(f'\tAverage = {avg_error}')
             logging.info(f'\tStdev = {stdev_error}')
             logging.info(f'\tMax = {max_error}')
             logging.info(f'\tMin = {min_error}')
-            rule_file.write(f'Refined_error:\tavg={avg_error}|stdev={stdev_error}|max={max_error}|min={min_error}')
+            logging.info(f'\tPercent_self_loops = {percent_self_loops}%')
+            rule_file.write(f'Refined_error:\tavg={avg_error}|stdev={stdev_error}|max={max_error}|min={min_error}|%self_loops={percent_self_loops}')
+
+            if percent_self_loops > 20:
+                logging.warning(f'\n ----- WARNING: {percent_self_loops} of nodes are self-loops -----')
 
     def get_fitness_values(self, ind):
         """
@@ -335,6 +341,7 @@ class CustomDeap:
             logging.info(f'Equivalent Ruleset {i+1} / {len(min_error_individuals)}')
             best_rules = []
             equivalent_ruleset = {}
+            num_self_loops = 0
 
             with alive_bar(len(self.nodes)) as bar:
                 for node in self.nodes:
@@ -345,12 +352,14 @@ class CustomDeap:
                         best_rule = handle_self_loop(node)
                         equivalent_rules.append(best_rule) # Add the rule to the list of equivalent rules
                         best_rules.append(best_rule) # Add the rule to the list of best rules
+                        num_self_loops += 1
                     
                     # If there are no incoming nodes, set the node to signal to itself
                     elif len(node.node_rules) == 0:
                         best_rule = handle_self_loop(node)
                         equivalent_rules.append(best_rule) # Add the rule to the list of equivalent rules
                         best_rules.append(best_rule) # Add the rule to the list of best rules
+                        num_self_loops += 1
                     
                     # If the rule has multiple incoming nodes, calculate the minimum error rule
                     else:
@@ -370,7 +379,8 @@ class CustomDeap:
             stdev_error = stdev(errors)
             max_error = max(errors)
             min_error = min(errors)
-            ruleset_error.append([average_error, stdev_error, max_error, min_error])
+            ruleset_error.append([average_error, stdev_error, max_error, min_error, num_self_loops])
+            
 
         return (all_best_rules, ruleset_error)
  
@@ -816,8 +826,10 @@ class CustomDeap:
         )
         offspring = []
         for _ in range(self.child_population_size):
-            op_choice = random.random()
-            if op_choice < self.crossover_probability:  # Apply crossover
+            rand_percent = random.random()
+
+            # Apply crossover
+            if rand_percent < self.crossover_probability:  
                 inds = []
                 for samp in sample(population, 2):
                     ind = toolbox.clone(samp)
@@ -826,11 +838,14 @@ class CustomDeap:
                 ind1, ind2 = self.__cxTwoPointNode(ind1, ind2)
                 del ind1.fitness.values
                 offspring.append(ind1)
-            elif op_choice < self.crossover_probability + self.mutation_probability:  # Apply mutation
+            
+            # Apply mutation
+            elif rand_percent < self.crossover_probability + self.mutation_probability:  
                 ind = toolbox.clone(choice(population))
                 (ind,) = self.__mutFlipBitAdapt(ind, genfrac, mutModel)
                 del ind.fitness.values
                 offspring.append(ind)
+
             else:  # shouldn't happen... clone existing individual
                 offspring.append(choice(population))
         return offspring
@@ -846,16 +861,20 @@ class CustomDeap:
 
         Modified from deap to cross over between rules = needed to account for bistring only being one of two components of individual
         """
+
         size = len(ind1[0].nodeList)
         cxpointer1 = randint(1, size)
         cxpointer2 = randint(1, size - 1)
-        # make sure pointers are in right order
+
+        # make sure pointers are in right order, otherwise swap the two cx points
         if cxpointer2 >= cxpointer1:
             cxpointer2 += 1
-        else:  # Swap the two cx points
+        else:
             cxpointer1, cxpointer2 = cxpointer2, cxpointer1
+
         cxpoint1 = ind1[0].individualParse[cxpointer1]
         cxpoint2 = ind1[0].individualParse[cxpointer2]
+
         # cross over both bitlists and the total_combinationss (as well as total_inversionss)
         ind1[1][cxpoint1:cxpoint2], ind2[1][cxpoint1:cxpoint2] = (
             ind2[1][cxpoint1:cxpoint2],
@@ -875,105 +894,124 @@ class CustomDeap:
             ind2[0].total_inversions[cxpointer1:cxpointer2],
             ind1[0].total_inversions[cxpointer1:cxpointer2],
         )
-        # update the arrays seen by C code updateBool
-        # ind1[0]._ruleMaker__updateCpointers()
-        # ind2[0]._ruleMaker__updateCpointers()
+
         return ind1, ind2
 
     # 1.3.2 Mutation algorithm
     def __mutFlipBitAdapt(self, indyIn, genfrac, mutModel):
-        """mutation algorithm
-        :return: (indyIn,)
         """
-        errors = list(indyIn.fitness.values)  # get errors of the individual
-        individual = indyIn[1]  # Individual's data (bitstring)
-        model = indyIn[0]  # Information about the individual
-        # print(errors)
+        Perform adaptive bit flip mutation on an individual in a genetic algorithm.
 
-        # --- Get rid of errors in nodes that can't be changed ---
+        This mutation algorithm adapts the mutation focus based on the fitness errors
+        and the structure of the model. It aims to improve the individual's performance
+        by selectively flipping bits in the bitstring representing the individual's data.
+
+        Parameters:
+        indyIn : tuple
+            A tuple containing the model information and the individual's bitstring.
+            indyIn[0] : model information
+            indyIn[1] : bitstring representing the individual's data
+        genfrac : float
+            The fraction of the generation passed, used for adaptive mutation.
+        mutModel : float
+            Probability of mutating a node with high complexity.
+
+        Returns:
+        tuple
+            The mutated individual as a tuple containing the model and the updated bitstring.
+        """
+        
+        # Extract errors, individual data, and model information
+        errors = list(indyIn.fitness.values)  # Get errors of the individual
+        individual = indyIn[1]  # Individual's data (bitstring)
+        model = indyIn[0]  # Model information
+
+        # --- Filter out errors in nodes that cannot be changed ---
         errorNodes = 0
         for j in range(len(errors)):
             if model.node_combination_length[j] < 2:
                 errors[j] = 0
             else:
-                errorNodes = errorNodes + 1
+                errorNodes += 1
 
+        # Determine focus node based on error threshold
         if np.sum(errors) < 0.05 * errorNodes or errorNodes == 0:
-            # condition selection on number of incoming edges + downstream edges
+            # If errors are low, focus on nodes based on incoming and outgoing edges
+            pseudoerrors = []
             for i in range(len(model.nodeList)):
-                # If there are no successors, pseudoerrors = length of possibilities for the node
                 if model.successorNums[i] == 0:
-                    pseudoerrors = [len(model.total_combinations[i])]
-                # If there are successors, pseudoerrors = length of possibilities for the node * number of successors
+                    pseudoerrors.append(len(model.total_combinations[i]))
                 else:
-                    pseudoerrors = [len(model.total_combinations[i]) * model.successorNums[i]]
-            # zero out nodes that can't be changed
+                    pseudoerrors.append(len(model.total_combinations[i]) * model.successorNums[i])
+            
+            # Zero out nodes that cannot be changed
             for j in range(len(pseudoerrors)):
                 if model.node_combination_length[j] < 2:
                     pseudoerrors[j] = 0
             focusNode = self.__selectMutNode(pseudoerrors)
         else:
-            # if errors are relatively high, focus on nodes that fit the worst and have highest in-degree
-            # calculate probabilities for mutating each node
+            # If errors are high, focus on nodes with worst fit and highest in-degree
             for i in range(len(errors)):
                 temper = model.successorNums[i]
                 if temper == 0:
-                    errors[i] = errors[i] * len(model.total_combinations[i])
+                    errors[i] *= len(model.total_combinations[i])
                 else:
-                    errors[i] = errors[i] * len(model.total_combinations[i]) * temper
+                    errors[i] *= len(model.total_combinations[i]) * temper
             focusNode = self.__selectMutNode(errors)
+
         node = self.nodes[focusNode]
 
-        # Perform mutation for the current node
-        # Number of possible combinations for that node
+        # Perform mutation on the current focus node
         if model.node_combination_length[focusNode] >= 1:
-
-            # find ends of the node of interest in the individual
+            # Find the start and end indices of the node in the bitstring
             start = node.rule_start_index
             end = node.rule_end_index
 
-            # mutate the inputs some of the time
+            # Mutate the inputs some of the time based on complexity and probability
             if len(model.total_combinations[focusNode]) > 3 and random.random() < mutModel:
-                temppermup = []  # temporary upstream nodes
+                temp_incoming_nodes = []
                 upstreamAdders = list(model.total_combinations[focusNode])
                 rvals = list(node.rvalues)
-                while len(temppermup) < 3:
-                    randy = random.random()  # randomly select a node to mutate
-                    tempsum = sum(rvals)
-                    if tempsum == 0:
-                        addNoder = randint(
-                            0, len(rvals) - 1
-                        )  # int(math.floor(random.random()*len(upstreamAdders)))
-                        # print(addNoder)
+                while len(temp_incoming_nodes) < 3:
+                    rand_percent = random.random()
+                    sum_rvals = sum(rvals)
+                    if sum_rvals == 0:
+                        if len(rvals) > 0:
+                            add_node_rval = randint(0, len(rvals) - 1)
+                        else:
+                            break
                     else:
-                        recalc = np.cumsum([1.0 * rval / tempsum for rval in rvals])
-                        # print(recalc)
-                        addNoder = next(
-                            i for i in range(len(recalc)) if recalc[i] > randy
-                        )
-                        # print(addNoder)
-                    temppermup.append(upstreamAdders.pop(addNoder))
-                    # print(rvals)
-                    rvals.pop(addNoder)
-                # model._ruleMaker__update_upstream(focusNode, temppermup)
+                        recalc = np.cumsum([1.0 * rval / sum_rvals for rval in rvals])
+                        add_node_rval = next(i for i in range(len(recalc)) if recalc[i] > rand_percent)
+                    
+                    # Ensure upstreamAdders and rvals are not empty before popping
+                    if len(upstreamAdders) > 0 and len(rvals) > 0:
+                        temp_incoming_nodes.append(upstreamAdders.pop(add_node_rval))
+                        rvals.pop(add_node_rval)
+                    else:
+                        break
+
+            # Flip bits in the bitstring within the node's range
             for i in range(start, end):
-                # print("i: " + str(i))
                 if random.random() < 2 / (end - start + 1):
                     individual[i] = 1
                 else:
                     individual[i] = 0
-            # ensure that there is at least one shadow and node turned on
+            
+            # Ensure at least one bit is set to 1 within the node's range
             if np.sum(individual[start:end]) == 0:
                 individual[start] = 1
+
+            # Update the individual with the new bitstring
             indyIn[0] = model
             indyIn[1] = individual
 
         else:
-            next
-            # msg = f'Did not perform mutation, node combination length < 1 ({model.node_combination_length[focusNode]})'
-            # print(f'Node {[node.name for node in self.nodes if node.index == focusNode]} model.total_combinations:  {[model.total_combinations[focusNode]]}')
-            # raise Exception(msg)
+            # Skip mutation if the node combination length is less than 1
+            pass
+
         return (indyIn,)
+
 
     # 1.3.2.1 Selects a node to mutate randomly, but nodes with higher errors have a greater chance of being selected
     def __selectMutNode(self, errors):

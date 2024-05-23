@@ -7,17 +7,17 @@
 # Which parts do you want to run? Set True to run or False to skip
     # Rule determination must be run prior to importance score, importance score must be run prior to relative abundance
 RUN_RULE_DETERMINATION=True
-RUN_IMPORTANCE_SCORE=True
-RUN_RELATIVE_ABUNDANCE=True
-RUN_ATTRACTOR_ANALYSIS=True
-RUN_CELL_MAPPING=True
+RUN_IMPORTANCE_SCORE=False
+RUN_RELATIVE_ABUNDANCE=False
+RUN_ATTRACTOR_ANALYSIS=False
+RUN_CELL_MAPPING=False
 
 # General Arguments (Required for all steps)
 DATA_FILE="../../raven_data_covid/Club_Cells_data.csv"
 DATASET_NAME="raven_club"
 DATAFILE_SEP=","
 #  "04010" "04370" "04630" "04668" "04066" "04020" "04151" "04150" "00010" "00020" "04060" "04512" "04514" "04670" "04625" "04062"  "04810"
-KEGG_PATHWAYS=( "05171" "04623" "04061" "04630" "04621" "04622" "04668") # Enter KEGG pathway codes or leave blank to find all pathways with overlapping genes
+KEGG_PATHWAYS=("05171" "04623" "04061" "04630" "04621" "04622" "04668") # Enter KEGG pathway codes or leave blank to find all pathways with overlapping genes
 CUSTOM_PATHWAYS=() #("modified_network.graphml") #Put custom networks in the scBONITA folder
 BINARIZE_THRESHOLD=0.01 # Data points with values above this number will be set to 1, lower set to 0
 ORGANISM_CODE="hsa" # Organism code in front of KEGG pathway numbers
@@ -26,15 +26,18 @@ ORGANISM_CODE="hsa" # Organism code in front of KEGG pathway numbers
 METADATA_FILE="../../raven_data_covid/Club_Cells_meta.txt"
 METADATA_SEP=" "
 HEADER="y" # Does the metadata file contain a header before the entries start?
-OVERWRITE="y" # Do you want to overwrite the files generated for each of your different experimental groups?
+OVERWRITE="n" # Do you want to overwrite the files generated for each of your different experimental groups?
 CELL_NAME_COL=1 # What column contains the cell names (first column = 0)
 GROUP_INDICES=(2 3)
 
 # Specify the control groups and experimental groups that you want to compare
     # 1st entry in control is compared to 1st entry in experimental, 2nd entry compared to 2nd entry, etc.
+    # Separate multiple groups with "_" (e.g. if a cell has two groups CTRL and Adult, combine as CTRL_Adult)
+        #CONTROL_GROUPS=("CTRL_Pediatric" "CTRL_Adult")
+        #EXPERIMENTAL_GROUPS=("SARS-CoV-2_Pediatric" "SARS-CoV-2_Adult")
 
-CONTROL_GROUPS=("CTRL" "SARS-CoV-2")
-EXPERIMENTAL_GROUPS=("Pediatric" "Adult")
+CONTROL_GROUPS=("CTRL_Pediatric" "CTRL_Adult")
+EXPERIMENTAL_GROUPS=("SARS-CoV-2_Pediatric" "SARS-CoV-2_Adult")
 
 # -------------- End of user input --------------
 
