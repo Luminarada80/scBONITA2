@@ -4,6 +4,8 @@ from gate import Gate
 from display_box import DisplayBox
 import random
 import pickle
+import read_rule_file
+from datetime import datetime
 
 class SaveState():
     def __init__(self):
@@ -12,10 +14,13 @@ class SaveState():
         self.object_positions = []
         self.object_color = []
         self.object_ids = []
+        self.object_image = []
         self.outgoing_connections = []
         self.incoming_connections = []
-
-
+        self.nodes = []
+        self.gates = []
+        self.uuid_dict = {}  # Dictionary to map UUIDs to object instances
+        
     def save_objects(self, objects):
         # I want the name, position, size, outgoing_connections, and incoming_connections
         for object in objects:
@@ -38,42 +43,54 @@ class SaveState():
             self.incoming_connections.append(object_incoming_connections)
     
     def load_objects(self):
-        nodes = []
-        gates = []
-        uuid_dict = {}  # Dictionary to map UUIDs to object instances
-
         # Instantiate all objects and map them
         for i, object_type in enumerate(self.object_types):
             if object_type == "Node":
                 node = Node(self.object_names[i], self.object_positions[i], self.object_color[i])
                 node.id = self.object_ids[i]
+                node.rect = node.image.get_rect(center=node.position)
                 node.outgoing_connections = self.outgoing_connections[i]
                 node.incoming_connections = self.incoming_connections[i]
-                nodes.append(node)
-                uuid_dict[node.id] = node
+
+                if node not in self.nodes:
+                    self.nodes.append(node)
+                
+                if node.id not in self.uuid_dict:
+                    self.uuid_dict[node.id] = node
+
             elif object_type == "Gate":
                 gate = Gate(self.object_names[i], self.object_positions[i])
                 gate.id = self.object_ids[i]
+                gate.inactive_image, gate.active_image = gate.choose_gate_image()
+                gate.image = gate.inactive_image
+                gate.rect = gate.image.get_rect(center=gate.position)
                 gate.outgoing_connections = self.outgoing_connections[i]
                 gate.incoming_connections = self.incoming_connections[i]
-                gates.append(gate)
-                uuid_dict[gate.id] = gate
+
+                if gate not in self.gates:
+                    self.gates.append(gate)
+                
+                if gate.id not in self.uuid_dict:
+                    self.uuid_dict[gate.id] = gate
 
         # Restore connections using the UUID dictionary
-        for node in nodes:
-            node.outgoing_connections = [uuid_dict[uid] for uid in self.outgoing_connections[i]]
-            node.incoming_connections = [uuid_dict[uid] for uid in self.incoming_connections[i]]
-        for gate in gates:
-            gate.outgoing_connections = [uuid_dict[uid] for uid in self.outgoing_connections[i]]
-            gate.incoming_connections = [uuid_dict[uid] for uid in self.incoming_connections[i]]
-
+        for i, object_type in enumerate(self.object_types):
+            if object_type == "Node":
+                node = self.uuid_dict[self.object_ids[i]]
+                node.outgoing_connections = [self.uuid_dict[uid] for uid in self.outgoing_connections[i]]
+                node.incoming_connections = [self.uuid_dict[uid] for uid in self.incoming_connections[i]]
+            elif object_type == "Gate":
+                gate = self.uuid_dict[self.object_ids[i]]
+                gate.outgoing_connections = [self.uuid_dict[uid] for uid in self.outgoing_connections[i]]
+                gate.incoming_connections = [self.uuid_dict[uid] for uid in self.incoming_connections[i]]
 
         # Group the objects into sprite groups
-        nodes_group = pygame.sprite.Group(*nodes)
-        gates_group = pygame.sprite.Group(*gates)
+        nodes_group = pygame.sprite.Group(*self.nodes)
+        gates_group = pygame.sprite.Group(*self.gates)
         objects_group = pygame.sprite.Group([gates_group, nodes_group])
 
         return nodes_group, gates_group, objects_group
+
 
 def save_game_state(save_state, file_name):
     try:
@@ -106,158 +123,45 @@ class Game:
 
         self.uuids = {}
 
-        num_nodes = 10
-        num_and_gates = 10
-        num_or_gates = 10
-        num_not_gates = 4
+        # num_nodes = 10
+        # num_and_gates = 10
+        # num_or_gates = 10
+        # num_not_gates = 4
 
-        relative_abundance = False
+        # relative_abundance = False
 
         self.nodes = []
         self.gates = []
 
-        # counter = 1
-        # counter2 = 1
-        # with open('visualizer/connections.txt', 'r') as connection_file:
-        #     for line in connection_file:
-        #         line = line.strip()
-        #         target_name, connection_expr = line.split(' = ')
-        #         elements = connection_expr.split()
-
-        #         incoming_nodes = [ele for ele in elements if ele not in ("OR", "AND", "NOT")]
-        #         gates = [ele for ele in elements if ele in ("OR", "AND", "NOT")]
-
-        #         #print(f'Node: {target_name}')
-        #         #print(f'\tincoming gates: {gates}')
-        #         #print(f'\tincoming nodes: {incoming_nodes}')
-
-        #         target_node = Node(target_name, (self.WIDTH / 2 + 350 + (50*counter2), self.HEIGHT / 2 + (15 * counter)), "light blue")
-        #         self.nodes.append(target_node)
-
-        #         existing_nodes = {node.name: node for node in self.nodes}
-        #         gate_objects = []
-        #         last_output = None
-
-        #         def parse_not_gate(node_position):
-        #             # NOT gates should only have one input
-        #             node_name = incoming_nodes[node_position]
-        #             node = existing_nodes.get(node_name, Node(node_name, gate_position, "light blue"))
-        #             if node not in self.nodes:
-        #                 self.nodes.append(node)
-
-        #             not_gate = Gate('NOT', gate_position)
-        #             self.gates.append(not_gate)
-        #             not_gate.incoming_connections.append(node)
-        #             node.outgoing_connections.append(not_gate)
-
-        #             gate_objects.append(not_gate)
-                
-        #         count = 0
-        #         gates_no_not = [ele for ele in elements if ele not in ("OR", "AND")]
-        #         skip = False
-        #         for i, gate_type in enumerate(gates):
-                    
-        #             if skip == False:
-        #                 # Determine the correct position for visualization
-        #                 gate_position = (self.WIDTH / 2 + 200 + (50*counter2), self.HEIGHT / 2 - 150 + (15 * counter))
-                        
-        #                 if gate_type == 'NOT':
-        #                     parse_not_gate(node_position=0)
-
-        #                 else:
-        #                     # AND/OR gates
-        #                     gate = Gate(gate_type, gate_position)
-        #                     self.gates.append(gate)
-        #                     #print(f'\n\tGate type: {gate_type}')
-
-        #                     # Get the incoming node names
-        #                     node1_name = incoming_nodes[0+count]
-        #                     #print(f'\t\tnode1_name = {node1_name}')
-        #                     node1 = existing_nodes.get(node1_name, Node(node1_name, gate_position, "light blue"))
-        #                     # Append the node and it's connections
-        #                     self.nodes.append(node1)
-        #                     gate.incoming_connections.append(node1)
-        #                     node1.outgoing_connections.append(gate)
-        #                     count += 1
-                            
-                        
-        #                     # Check if the next node has a NOT gate
-        #                     if count < len(gates)-1:
-        #                         if gates[count] == 'NOT':
-        #                             parse_not_gate(count)
-        #                             skip = True
-
-        #                     if i == 0:
-        #                         # Get the second node for the gate
-        #                         # Get the incoming node names
-        #                         node2_name = incoming_nodes[count]
-        #                         #print(f'\t\tnode2_name = {node2_name}')
-        #                         node2 = existing_nodes.get(node2_name, Node(node2_name, gate_position, "light blue"))
-        #                         self.nodes.append(node2)
-        #                         # Append the node and it's connections
-        #                         gate.incoming_connections.append(node2)
-        #                         node2.outgoing_connections.append(gate)
-        #                         count += 1
-                                
-                            
-        #                     else:
-        #                         #print(f'\t\tincoming gate name = {gate_objects[-1].name}')
-        #                         gate.incoming_connections.append(gate_objects[-1])
-        #                         gate_objects[-1].outgoing_connections.append(gate)
-                                
-        #                     # #print(f'\tGate incoming connections:')
-        #                     # for node in gate.incoming_connections:
-        #                     #     #print(f'\t\t{node.name}')
-
-        #                     gate_objects.append(gate)
-
-        #             else:
-        #                 skip = True
-                
-        #         if len(gate_objects) > 0:
-        #             target_node.incoming_connections.append(gate_objects[-1])
-        #             gate_objects[-1].outgoing_connections.append(target_node)
-                    
-        #         if len(incoming_nodes) == 1:
-        #             node_name = incoming_nodes[0]
-        #             node = existing_nodes.get(node_name, Node(node_name, gate_position, "light blue"))
-        #             self.nodes.append(node)
-        #             target_node.incoming_connections.append(node)
-        #             node.outgoing_connections.append(target_node)
-
-                
-        #         if counter == 25:
-        #             counter = 0
-        #             counter2 += 1
-        #         counter += 1
+        read_rule_file.create_nodes_and_gates('visualizer/04670.txt', self)
 
         # Boolean Nodes
         # for i in range(1, num_nodes+1):
         #     self.nodes.append(Node('', (self.WIDTH/2+350,self.HEIGHT/2+(50*i)), "light blue"))
 
-        for i in range(1, num_nodes+1):
-            self.nodes.append(Node(f'Node {i}', (self.WIDTH/2+350,self.HEIGHT/2+(50*i)), "light blue"))
+        # for i in range(1, num_nodes+1):
+        #     self.nodes.append(Node(f'Node {i}', (self.WIDTH/2+350,self.HEIGHT/2+(50*i)), "light blue"))
 
         # Change the size and color of the nodes for relative abundance. Manual entry required
-        if relative_abundance:
-            colors = [(239, 224, 215), (255, 208, 198), (235, 103, 75), (206, 219, 255), (255, 98, 98), "blue", "red"]
-            sizes = [60, 35, 40, 35, 55, 65, 70]
-            for node_num, node in enumerate(self.nodes):
-                node.color = colors[node_num]
-                node.set_size(sizes[node_num])
-                node.font = pygame.font.Font('arial.ttf', int(round(node.size / 2, 1)))
+        # if relative_abundance:
+        #     colors = [(239, 224, 215), (255, 208, 198), (235, 103, 75), (206, 219, 255), (255, 98, 98), "blue", "red"]
+        #     sizes = [60, 35, 40, 35, 55, 65, 70]
+        #     for node_num, node in enumerate(self.nodes):
+        #         node.color = colors[node_num]
+        #         node.set_size(sizes[node_num])
+        #         node.font = pygame.font.Font('arial.ttf', int(round(node.size / 2, 1)))
 
-        # AND Gates
-        for i in range(num_and_gates):
-            self.gates.append(Gate('AND', (self.WIDTH/2+200, self.HEIGHT/2-150 - (15*i))))
+        # # AND Gates
+        # for i in range(num_and_gates):
+        #     self.gates.append(Gate('AND', (self.WIDTH/2+200, self.HEIGHT/2-150 - (15*i))))
 
-        # OR Gates
-        for i in range(num_or_gates):
-            self.gates.append(Gate('OR', (self.WIDTH/2+300, self.HEIGHT/2-150 - (15*i))))
+        # # OR Gates
+        # for i in range(num_or_gates):
+        #     self.gates.append(Gate('OR', (self.WIDTH/2+300, self.HEIGHT/2-150 - (15*i))))
 
-        # NOT Gates
-        for i in range(num_not_gates):
-            self.gates.append(Gate('NOT', (self.WIDTH/2+400, self.HEIGHT/2-150 - (15*i))))
+        # # NOT Gates
+        # for i in range(num_not_gates):
+        #     self.gates.append(Gate('NOT', (self.WIDTH/2+400, self.HEIGHT/2-150 - (15*i))))
 
         # Create a list of the unique IDs for the objects
         self.node_ids = [node.id for node in self.nodes]
@@ -267,7 +171,6 @@ class Game:
         self.gates_group = pygame.sprite.Group(*self.gates)
 
         self.objects_group = pygame.sprite.Group(*self.nodes, *self.gates)
-
 
         for object in self.objects_group:
             self.uuids[object.id] = object
@@ -284,6 +187,15 @@ class Game:
 
         self.node_being_moved = None  # No node is being moved initially
 
+        # self.save_interval = 180000  # Save every 3 minutes (180 seconds)
+        self.save_interval = 10000
+        self.last_save_time = pygame.time.get_ticks()
+    
+    def get_current_datetime(self):
+        now = datetime.now()
+        formatted_datetime = now.strftime("%m/%d/%Y %H:%M")
+        return formatted_datetime
+
     def run(self):
         while True:
             events = pygame.event.get()
@@ -292,15 +204,44 @@ class Game:
                     pygame.quit()
                     sys.exit()
 
+            # Press "S" to save the game
             keys = pygame.key.get_pressed()
             if keys[pygame.K_s]:
                 game_state = SaveState()
                 game_state.save_objects(self.objects_group)
                 save_game_state(game_state, 'save_game.pickle')
+                # self.last_save_time = current_time
+
+            # # Automatically saves the game every 2 minutes
+            # current_time = pygame.time.get_ticks()
+            # if current_time - self.last_save_time >= self.save_interval:
+            #     print(f'Autosaving: {self.get_current_datetime()}')
+            #     game_state = SaveState()
+            #     game_state.save_objects(self.objects_group)
+            #     save_game_state(game_state, 'save_game.pickle')
+            #     self.last_save_time = current_time  # Reset the last save time
+
 
             if keys[pygame.K_l]:
+                # Clear existing objects
+                self.objects_group.empty()
+                self.nodes_group.empty()
+                self.gates_group.empty()
+                
+                # Clear lists
+                self.objects_group = pygame.sprite.Group()
+                self.nodes_group = pygame.sprite.Group()
+                self.gates_group = pygame.sprite.Group()
+
+                # Clear nodes and gates
+                self.nodes = []
+                self.gates = []
+
                 game_state = load_game_state('save_game.pickle')
                 self.nodes_group, self.gates_group, self.objects_group = game_state.load_objects()
+                # Update UUIDs for event handling
+                self.uuids = {obj.id: obj for obj in self.objects_group}
+
 
             self.screen.fill("white")      
             for node in self.nodes_group:
@@ -316,15 +257,27 @@ class Game:
                     self.connections += 1
 
             # Reset the number of connections if the 1 key is not pressed
-            
-            if not keys[pygame.K_1]:
+            if self.connections != 0 and not keys[pygame.K_1]:
                 self.connections = 0
             self.nodes_group.draw(self.screen)
 
             for node in self.nodes_group:
                 node.draw_lock((node.position[0] - 37, node.position[1]))
 
-            keys = pygame.key.get_pressed()
+            mouse_pos = pygame.mouse.get_pos()
+
+            if keys[pygame.K_DELETE]:
+                for object in self.objects_group:
+                    if object.rect.collidepoint(mouse_pos):
+                        if object in self.uuids:
+                            del self.uuids[object.id]
+                        if object in self.gate_ids:
+                            del self.gate_ids[object.id]
+                        if object in self.node_ids:
+                            del self.gate_ids[object.id]
+                        object.kill()
+                        object.remove_all_connections(self.objects_group, just_killed=True)
+
             if keys[pygame.K_TAB]:
                 self.display_box.display_text('Node State', (self.WIDTH / 4 + 25, self.HEIGHT - 400))
                 self.display_box.display_text(f'Update {len(self.states)}', (self.WIDTH / 4 + 25, self.HEIGHT - 375))
