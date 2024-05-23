@@ -248,6 +248,8 @@ class Game:
 
             self.screen.fill("white")      
             for node in self.nodes_group:
+                if node not in self.nodes:
+                    self.nodes.append(node)
                 # node.draw_connections()
                 node.update_object(events, self.connections, self.gate_ids, self.node_ids, self.uuids, self)
                 if node.is_drawing_line == True:
