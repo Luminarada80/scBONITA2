@@ -99,6 +99,9 @@ class NetworkSetup:
                     if node in list(graph.successors(node)):
                         graph.remove_edge(node, node)
                         repeat = True
+                    if node in list(graph.predecessors(node)):
+                        graph.remove_edge(node, node)
+                        repeat = True
 
     # 1.2 Finds the predecessors of each node and stores the top 3
     def find_predecessors(self, ruleGraph, nodeList, graph, nodeDict, possibilityLister, node):
@@ -133,22 +136,22 @@ class NetworkSetup:
         return predecessors_final
 
     # 1.2.1 Finds the top 3 incoming nodes using Spearman correlation for the current node and stores that info
-    def parse_connections(self, node, nodeList, graph, nodeDict, possibilityLister):
+    def parse_connections(self, node_index, nodeList, graph, nodeDict, possibilityLister):
         """
         Find the top 3 incoming nodes for the node of interest and store the information (part of find_predecessors)
         """
         # Get NAMES of predecessors and successors of the node from original graph
         
-        predecessors_temp = list(graph.predecessors(nodeList[node]))
+        predecessors_temp = list(graph.predecessors(nodeList[node_index]))
         
-        successors_temp = list(graph.successors(nodeList[node]))
+        successors_temp = list(graph.successors(nodeList[node_index]))
         self.successorNums.append(len(successors_temp))
 
-        possibilitytemp = [nodeDict[predder] for predder in predecessors_temp]
+        possibilitytemp = [nodeDict[predder] for predder in predecessors_temp if nodeDict[predder] != node_index]
         possibilityLister.append(list(possibilitytemp))
 
         # Calculate the Spearman correlation for the incoming nodes
-        predCorr_temp = self.calculate_spearman_correlation(node, predecessors_temp)
+        predCorr_temp = self.calculate_spearman_correlation(node_index, predecessors_temp)
 
         # Select the top 3 predecessors of the node
         predecessors_final = sorted(

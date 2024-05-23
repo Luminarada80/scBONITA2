@@ -17,6 +17,7 @@ import scipy.sparse as sparse
 import csv
 import seaborn as sns
 import matplotlib.gridspec as gridspec
+from matplotlib.cm import ScalarMappable
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import requests
 
@@ -86,7 +87,7 @@ def figure_graph(experimental_network, dataset_name, relative_abundances):
         importance_scores.append(node.importance_score)
 
     # Apply log transformation to relative abundances to get log fold change
-    log_fold_changes = np.log2(np.array(node_colors) + 1e-9)  # Adding a small value to avoid log(0)
+    log_fold_changes = np.log2(np.array(node_colors))  # Adding a small value to avoid log(0)
 
     # Define minimum and maximum node sizes
     min_node_size = 100  # Minimum node size
@@ -101,7 +102,15 @@ def figure_graph(experimental_network, dataset_name, relative_abundances):
     ]
 
     cmap = plt.cm.coolwarm
-    norm = TwoSlopeNorm(vmin=min(log_fold_changes), vcenter=0, vmax=max(log_fold_changes))
+    norm = TwoSlopeNorm(vmin=-3, vcenter=0, vmax=3)
+
+    # Clamp the values between -5 and 5 to not drown out smaller changes with huge outliers
+    for value in log_fold_changes:
+        if value > 3:
+            value = 3
+        elif value < -3:
+            value = -3
+
     colors = [cmap(norm(value)) for value in log_fold_changes]
 
     # Drawing the graph
@@ -113,8 +122,14 @@ def figure_graph(experimental_network, dataset_name, relative_abundances):
     pos = nx.spring_layout(G, k=1, iterations=50)
     nx.draw(G, pos, with_labels=True, node_color=colors, cmap='coolwarm', node_size=scaled_importance_scores, font_size=10, ax=ax)
 
-    ax.set_title(f"Importance Score and Log Fold Change for network {experimental_network.name.split('_')[0]} for dataset {dataset_name}")
-    plt.legend(handles=[blue_patch, red_patch], title=f'Log Fold Change of {experimental_group} compared to {control_group}')
+    # Create a ScalarMappable and initialize a colorbar
+    sm = ScalarMappable(cmap=cmap, norm=norm)
+    sm.set_array([])
+    cbar = plt.colorbar(sm, ax=ax)
+    cbar.set_label('Fold Change')
+
+    ax.set_title(f"Importance Score and Log2 Fold Change for network {experimental_network.name.split('_')[0]} for dataset {dataset_name}")
+    plt.legend(handles=[blue_patch, red_patch], title=f'Log2 Fold Change of {experimental_group} compared to {control_group}')
 
     return fig
 
@@ -134,6 +149,9 @@ def relative_abundance_arguments(control_group, experimental_group):
     control_group = check_control_group(control_group)
     experimental_group = check_experimental_group(experimental_group)
     
+    logging.info(f'\t\tControl Group: {control_group}')
+    logging.info(f'\t\tExperimental Group: {experimental_group}')
+
     return control_group, experimental_group
 
 def plot_abundance_heatmap(gene_names, mean_expression_control, mean_expression_experimental, control_group_name, experimental_group_name, network_name):
@@ -157,7 +175,7 @@ def plot_abundance_heatmap(gene_names, mean_expression_control, mean_expression_
     ax.set_ylabel('Groups', fontsize=18)
     ax.set_xlabel('Genes', fontsize=18)
     ax.xaxis.tick_top()
-    ax.set_xticklabels(ax.get_xticklabels(), rotation=90, fontsize=16)
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=90, fontsize=10)
     ax.set_yticklabels(ax.get_yticklabels(), rotation=0, fontsize=16)
 
     # Manually adding a colorbar
@@ -206,7 +224,30 @@ def bubble_plot(network_names, p_values):
 
     return figure
 
+def parse_data_and_scale(network, gene_list, scaler=None, fit_scaler=False):
+    gene_data = {}
+    dataset = network.dataset.todense()
+    for node in network.nodes:
+        if node.name in gene_list:
+            gene_data[node.name] = [value for value in dataset[node.index]]
+
+    # Ensure gene data is ordered according to gene_list
+    ordered_gene_data = [gene_data[gene] for gene in gene_list if gene in gene_data]
+    ordered_gene_data = np.array(ordered_gene_data, dtype=float).T.squeeze()  # Transpose to match the original data structure
+
+    # Scale the data
+    if fit_scaler:
+        scaler.fit(ordered_gene_data)
+
+    scaled_data = scaler.transform(ordered_gene_data)
+
+
+    return scaled_data
+
 if __name__ == '__main__':
+    # Set a random seed for reproducibility
+    np.random.seed(42)
+
     # Set the logging level for output
     logging.basicConfig(format='%(message)s', level=logging.INFO)
     parser = argparse.ArgumentParser()
@@ -413,84 +454,37 @@ if __name__ == '__main__':
             break
         else:
             experimental_group = input(f'{experimental_group} network pickle files do not exist, check spelling and try again: ')
-
+    
+    max_abs_scaler = MaxAbsScaler()
     p_values = []
     network_names = [control_group_network.name.split('_')[0] for control_group_network in control_group_networks]
-    # Iterate through both networks and find the matching networks
+
     logging.info(f'\n----- Calculating Relative Abundance between groups {experimental_group} and {control_group} -----')
     for control_group_network in control_group_networks:
         for experimental_group_network in experimental_group_networks:
             if control_group_network.name.split('_')[0] == experimental_group_network.name.split('_')[0]:
-                
                 network_name = control_group_network.name.split("_")[0]
                 logging.info(f'\tNetwork: {network_name}')
                 control_group_nodes = [node.name for node in control_group_network.nodes]
                 experimental_group_nodes = [node.name for node in experimental_group_network.nodes]
 
-                # Convert gene lists to sets
                 control_group_genes_set = set(control_group_nodes)
                 experimental_group_genes_set = set(experimental_group_nodes)
-
-                # Find intersection (common elements) between the two sets
                 common_genes_set = control_group_genes_set.intersection(experimental_group_genes_set)
-
-                # logging.info(f'Number of common genes: {len(common_genes_set)}')
-
-                # Convert the set back to a list if you need list operations later
                 gene_list = list(common_genes_set)
-                # logging.info(f'Gene list length: {len(gene_list)}')
 
-                # Parse data for shared genes
-                # Initialize the MaxAbsScaler
-                max_abs_scaler = MaxAbsScaler()
-                
-                def parse_data_and_scale(network, gene_list, scaler=None, fit_scaler=False):
-                    gene_data = {}
-                    dataset = network.dataset.todense()
-                    for node in network.nodes:
-                        if node.name in gene_list:
-                            gene_data[node.name] = [value for value in dataset[node.index]]
-
-                    # Ensure gene data is ordered according to gene_list
-                    ordered_gene_data = [gene_data[gene] for gene in gene_list if gene in gene_data]
-                    ordered_gene_data = np.array(ordered_gene_data, dtype=float).T.squeeze()  # Transpose to match the original data structure
-
-                    # Scale the data
-                    if fit_scaler:
-                        scaler.fit(ordered_gene_data)
-
-                    scaled_data = scaler.transform(ordered_gene_data)
-
-
-                    return scaled_data
-                                
-                # For the control group, fit and transform
                 control_group_data = parse_data_and_scale(control_group_network, gene_list, scaler=max_abs_scaler, fit_scaler=True)
-
-                # For the experimental group, only transform
                 experimental_group_data = parse_data_and_scale(experimental_group_network, gene_list, scaler=max_abs_scaler, fit_scaler=False)
-
-                # logging.info(f'\t{control_group} has {control_group_data.shape[0]} cells')
-                # logging.info(f'\t{experimental_group} has {experimental_group_data.shape[0]} cells')
 
                 min_num_cells = min(control_group_data.shape[0], experimental_group_data.shape[0])
 
-                # Calculate mean expression levels for each gene across all samples within each group
                 mean_expression_control = np.mean(control_group_data, axis=0)
-                # logging.info(f'\tMean expression control: {mean_expression_control}')
                 mean_expression_experimental = np.mean(experimental_group_data, axis=0)
-                # logging.info(f'\tMean expression experimental: {mean_expression_experimental}')
 
                 stdev_expression_control = np.std(control_group_data, axis=0)
-                # logging.info(f'\tstdev_expression_control = {stdev_expression_control}')
                 stdev_expression_experimental = np.std(experimental_group_data, axis=0)
-                # logging.info(f'\tstdev_expression_experimental = {stdev_expression_experimental}')
 
-                # Compute the difference in mean expression levels for the relative expression
-                fold_change = mean_expression_experimental / (mean_expression_control + 1e-10)
-                # logging.info(f'\tFold change = {fold_change}')
-
-                relative_abundances = fold_change
+                relative_abundances = (np.round(mean_expression_experimental + 1e-3,3)) / (np.round(mean_expression_control+ 1e-3,3)) # pseudocount added to avoid large changes based on small numbers
 
                 file_path = f'relative_abundance_output/{dataset_name}/{experimental_group}_vs_{control_group}'
                 filename = f'{control_group_network.name.split("_")[0]}_{dataset_name}_{experimental_group}_vs_{control_group}_relative_abundance'
@@ -517,7 +511,7 @@ if __name__ == '__main__':
                 logging.info(f'\t\tPathway Modulation Score: {pathway_modulation}')
 
                 # Bootstrapping to find the P value
-                n_iterations = 100
+                n_iterations = 5000
                 bootstrap_scores = []
 
                 # Bootstrap process
@@ -531,13 +525,11 @@ if __name__ == '__main__':
                     # Resample RA values with replacement
                     resampled_RAs = np.random.choice(relative_abundances, size=len(relative_abundances), replace=True)
 
-                    # For each node, use the resampled RA value with the node's stdev and importance score
-                    for node_number, shared_node in enumerate(gene_list):
-                        for node in experimental_group_network.nodes:
-                            if shared_node == node.name:
-                                # Use resampled RA value
-                                node_score = resampled_RAs[node_number] * stdev_expression_experimental[node_number] * node.importance_score
-                                bootstrap_modulation += node_score
+                    # Calculate bootstrap modulation score
+                    bootstrap_modulation = np.sum(resampled_RAs *
+                                                    stdev_expression_experimental * 
+                                                    [node.importance_score for node in experimental_group_network.nodes if node.name in gene_list])
+                    
                     bootstrap_scores.append(bootstrap_modulation)
                 
                 # Step 1: Calculate the absolute difference of the original score from the bootstrap mean
@@ -580,17 +572,21 @@ if __name__ == '__main__':
                 # Write the relative abundance results as a text file
                 text_file_name = f'{filename}.txt'
                 with open(text_file_path + '/' + text_file_name, 'w') as abundance_file:
-                    abundance_file.write(f'node,importance_score,{experimental_group}_vs_{control_group}\n')
-
+                    abundance_file.write(f'node,importance_score,experimental_mean,control_mean,{experimental_group}_vs_{control_group},node_percent_pm_score\n')
                     for node_number, shared_node in enumerate(gene_list):
                         
                         # Set the relative abundance for group 1 vs group 2
                         for node in experimental_group_network.nodes:
                             if shared_node == node.name:
                                 # relative abundance negative to show how increased or decreased experimental is compared to control
-                                abundance_file.write(f'{node.name},{node.importance_score},{relative_abundances[node_number]}\n')
-                                node_abundances[node.name] = relative_abundances[node_number]
+                                rounded_mean_expr = round(mean_expression_experimental[node_number] + 0.001,3)
+                                rounded_mean_ctrl = round(mean_expression_control[node_number] + 0.001,3)
+                                node_score = relative_abundances[node_number] * stdev_expression_experimental[node_number] * node.importance_score
+                                node_impact = round(node_score / pathway_modulation,3)
 
+                                abundance_file.write(f'{node.name},{round(node.importance_score,2)},{rounded_mean_expr},{rounded_mean_ctrl},{round(relative_abundances[node_number],3)},{node_impact}\n')
+                                node_abundances[node.name] = relative_abundances[node_number]
+                
                 # Create the relative abundance figures in png and svg format
                 relative_abundance_graph = figure_graph(experimental_group_network, dataset_name, node_abundances)
                 bootstrap_fig = plot_bootstrap_histogram(bootstrap_scores, pathway_modulation)

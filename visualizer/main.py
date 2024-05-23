@@ -47,11 +47,15 @@ class SaveState():
             if object_type == "Node":
                 node = Node(self.object_names[i], self.object_positions[i], self.object_color[i])
                 node.id = self.object_ids[i]
+                node.outgoing_connections = self.outgoing_connections[i]
+                node.incoming_connections = self.incoming_connections[i]
                 nodes.append(node)
                 uuid_dict[node.id] = node
             elif object_type == "Gate":
                 gate = Gate(self.object_names[i], self.object_positions[i])
                 gate.id = self.object_ids[i]
+                gate.outgoing_connections = self.outgoing_connections[i]
+                gate.incoming_connections = self.incoming_connections[i]
                 gates.append(gate)
                 uuid_dict[gate.id] = gate
 
