@@ -2,6 +2,7 @@ import re
 from node import Node
 from gate import Gate
 import random
+import pygame
 
 def parse_equation(equation):
     """Parse the equation into LHS and RHS components."""
@@ -48,14 +49,13 @@ def create_nodes_and_gates(file_path, game):
         i = 0
         while i < len(rhs_terms):
             term = rhs_terms[i]
-            if term == "and" or term == "or" or term == "not":
+            if term in {"and", "or", "not"}:
+                gate_type = term.upper()
                 if gate is None:
-                    gate_type = term.upper()
                     gate = Gate(gate_type, (game.WIDTH / 2 + random.randint(-200, 200), game.HEIGHT / 2 + random.randint(-200, 200)))
                     game.gates.append(gate)
                     gate_list.append(gate)
                 else:
-                    gate_type = term.upper()
                     new_gate = Gate(gate_type, (game.WIDTH / 2 + random.randint(-200, 200), game.HEIGHT / 2 + random.randint(-200, 200)))
                     game.gates.append(new_gate)
                     gate_list.append(new_gate)
@@ -85,9 +85,16 @@ def create_nodes_and_gates(file_path, game):
                 node.outgoing_connections.append(node_dict[lhs])
                 node_dict[lhs].incoming_connections.append(node)
     
-    return node_dict, gate_list
+    # Update game attributes
+    game.node_ids = [node.id for node in game.nodes]
+    game.gate_ids = [gate.id for gate in game.gates]
+    game.nodes_group = pygame.sprite.Group(*game.nodes)
+    game.gates_group = pygame.sprite.Group(*game.gates)
+    game.objects_group = pygame.sprite.Group(*game.nodes, *game.gates)
+    
+    for obj in game.objects_group:
+        game.uuids[obj.id] = obj
+        obj.node_ids = game.node_ids
+        obj.gate_ids = game.gate_ids
 
-# Example usage:
-# game = Game()  # Ensure you have an instance of your Game class
-# create_nodes_and_gates('path_to_your_file.txt', game)
-# Now game.nodes and game.gates should be populated based on the file content
+    return node_dict, gate_list

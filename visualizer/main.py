@@ -133,7 +133,8 @@ class Game:
         self.nodes = []
         self.gates = []
 
-        read_rule_file.create_nodes_and_gates('visualizer/04670.txt', self)
+        # read_rule_file.create_nodes_and_gates('visualizer/04670.txt', self)
+        read_rule_file.create_nodes_and_gates('visualizer/05171.txt', self)
 
         # Boolean Nodes
         # for i in range(1, num_nodes+1):
@@ -187,8 +188,7 @@ class Game:
 
         self.node_being_moved = None  # No node is being moved initially
 
-        # self.save_interval = 180000  # Save every 3 minutes (180 seconds)
-        self.save_interval = 10000
+        self.save_interval = 180000  # Save every 3 minutes (180 seconds)
         self.last_save_time = pygame.time.get_ticks()
     
     def get_current_datetime(self):
@@ -204,22 +204,25 @@ class Game:
                     pygame.quit()
                     sys.exit()
 
+            save_file = 'hsa05171_save_game.pickle'
+
             # Press "S" to save the game
             keys = pygame.key.get_pressed()
             if keys[pygame.K_s]:
                 game_state = SaveState()
                 game_state.save_objects(self.objects_group)
-                save_game_state(game_state, 'save_game.pickle')
-                # self.last_save_time = current_time
+                print(f'Loaded {save_file}')
+                save_game_state(game_state, save_file)
+                self.last_save_time = current_time
 
-            # # Automatically saves the game every 2 minutes
-            # current_time = pygame.time.get_ticks()
-            # if current_time - self.last_save_time >= self.save_interval:
-            #     print(f'Autosaving: {self.get_current_datetime()}')
-            #     game_state = SaveState()
-            #     game_state.save_objects(self.objects_group)
-            #     save_game_state(game_state, 'save_game.pickle')
-            #     self.last_save_time = current_time  # Reset the last save time
+            # Automatically saves the game every 2 minutes
+            current_time = pygame.time.get_ticks()
+            if current_time - self.last_save_time >= self.save_interval:
+                print(f'Autosaving to {save_file}: {self.get_current_datetime()}')
+                game_state = SaveState()
+                game_state.save_objects(self.objects_group)
+                save_game_state(game_state, save_file)
+                self.last_save_time = current_time  # Reset the last save time
 
 
             if keys[pygame.K_l]:
@@ -237,7 +240,7 @@ class Game:
                 self.nodes = []
                 self.gates = []
 
-                game_state = load_game_state('save_game.pickle')
+                game_state = load_game_state(save_file)
                 self.nodes_group, self.gates_group, self.objects_group = game_state.load_objects()
                 # Update UUIDs for event handling
                 self.uuids = {obj.id: obj for obj in self.objects_group}
