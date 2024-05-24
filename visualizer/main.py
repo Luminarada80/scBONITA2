@@ -75,14 +75,10 @@ class SaveState():
 
         # Restore connections using the UUID dictionary
         for i, object_type in enumerate(self.object_types):
-            if object_type == "Node":
-                node = self.uuid_dict[self.object_ids[i]]
-                node.outgoing_connections = [self.uuid_dict[uid] for uid in self.outgoing_connections[i]]
-                node.incoming_connections = [self.uuid_dict[uid] for uid in self.incoming_connections[i]]
-            elif object_type == "Gate":
-                gate = self.uuid_dict[self.object_ids[i]]
-                gate.outgoing_connections = [self.uuid_dict[uid] for uid in self.outgoing_connections[i]]
-                gate.incoming_connections = [self.uuid_dict[uid] for uid in self.incoming_connections[i]]
+            object = self.uuid_dict[self.object_ids[i]]
+            object.outgoing_connections = [self.uuid_dict[uid] for uid in self.outgoing_connections[i]]
+            object.incoming_connections = [self.uuid_dict[uid] for uid in self.incoming_connections[i]]
+
 
         # Group the objects into sprite groups
         nodes_group = pygame.sprite.Group(*self.nodes)
@@ -244,6 +240,8 @@ class Game:
                 self.nodes_group, self.gates_group, self.objects_group = game_state.load_objects()
                 # Update UUIDs for event handling
                 self.uuids = {obj.id: obj for obj in self.objects_group}
+                self.node_ids = {obj.id: obj for obj in self.nodes_group}
+                self.gate_ids = {obj.id: obj for obj in self.gates_group}
 
 
             self.screen.fill("white")      
@@ -256,6 +254,8 @@ class Game:
                     self.connections += 1  
             
             for gate in self.gates_group:
+                if gate not in self.gates:
+                    self.gates.append(gate)
                 # gate.draw_connections()
                 gate.update_object(events, self.connections, self.gate_ids, self.node_ids, self.uuids, self)
                 if gate.is_drawing_line == True:

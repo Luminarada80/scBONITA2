@@ -115,6 +115,7 @@ class Object(pygame.sprite.Sprite):
                 if game.node_being_moved is None:
                     self.moving = True
                     game.node_being_moved = self  # Set this node as the one being moved
+                    print(f'{self.name} is being moved')
             elif event.type == pygame.MOUSEBUTTONUP:
                 if self.moving:
                     self.moving = False
@@ -162,6 +163,7 @@ class Object(pygame.sprite.Sprite):
         keys = pygame.key.get_pressed()
 
         if keys[pygame.K_1] and rect.collidepoint(mouse_pos) and connections < 2:
+
             self.is_drawing_line = True
         
         if self.is_drawing_line == True:
@@ -412,12 +414,12 @@ class Object(pygame.sprite.Sprite):
         gates = self.request_uuid_objects(uuid_dict, gate_ids)
         nodes = self.request_uuid_objects(uuid_dict, node_ids)
         objects = nodes + gates
+        self.connect_to_object(events, objects)
         self.draw_connections()
         self.lock_state(rect)
         self.move(events, rect, game)
         self.simulation_step_cooldown()
         self.draw_edge(connections, rect)
-        self.connect_to_object(events, objects)
         self.disconnect_objects(objects)
         self.remove_all_connections(objects, False)
         self.run_simulation(draw_object_function)
