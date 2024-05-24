@@ -110,8 +110,8 @@ class Game:
     def __init__(self):
 
         pygame.init()
-        self.WIDTH = 1920
-        self.HEIGHT = 1080
+        self.WIDTH = 3840
+        self.HEIGHT = 2160
 
         self.screen = pygame.display.set_mode((self.WIDTH,self.HEIGHT))
         pygame.display.set_caption('Graph visualizer')
@@ -173,6 +173,8 @@ class Game:
             self.uuids[object.id] = object
             object.node_ids = self.node_ids
             object.gate_ids = self.gate_ids
+
+            
 
         self.connections = 0        
 
