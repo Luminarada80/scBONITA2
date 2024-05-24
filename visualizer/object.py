@@ -115,7 +115,6 @@ class Object(pygame.sprite.Sprite):
                 if game.node_being_moved is None:
                     self.moving = True
                     game.node_being_moved = self  # Set this node as the one being moved
-                    print(f'{self.name} is being moved')
             elif event.type == pygame.MOUSEBUTTONUP:
                 if self.moving:
                     self.moving = False

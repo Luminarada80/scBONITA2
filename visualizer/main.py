@@ -200,7 +200,7 @@ class Game:
                     pygame.quit()
                     sys.exit()
 
-            save_file = 'hsa05171_save_game.pickle'
+            save_file = 'hsa05171_save_game_2.pickle'
 
             # Press "S" to save the game
             keys = pygame.key.get_pressed()
