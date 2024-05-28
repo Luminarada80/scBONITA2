@@ -9,8 +9,6 @@ class Node(Object):
 
         self.size = self.size
         
-        # Create a surface for drawing the node
-
         self.inactive_image = pygame.image.load('visualizer/images/node_inactive.png').convert_alpha()
         self.active_image = pygame.image.load('visualizer/images/node_active.png').convert_alpha()
 
@@ -42,7 +40,6 @@ class Node(Object):
         self.rect = self.image.get_rect(center=self.position)
         
         text_surface, text_rect = self.font.render(self.name, pygame.Color('black'))
-        # scaled_surface = pygame.transform.smoothscale(text_surface, (text_rect.width // 2, text_rect.height // 2))
         text_rect.center = (self.size/2, self.size/2)
         self.image.blit(text_surface, text_rect)
 
@@ -51,22 +48,9 @@ class Node(Object):
             activation_rect.center = (self.size/2, self.size/2)
             self.image.blit(activation_surface, activation_rect)
 
-        # self.original_image = self.image.copy()  # Update the original image
     
-    # def set_size(self, new_size):
-    #     self.size = new_size
-    #     self.image = pygame.Surface((self.size, self.size), pygame.SRCALPHA)
-    #     self.draw_circle()
-    #     self.rect = self.image.get_rect(center=self.position)
-    #     self.original_image = self.image.copy()
-
-    
-    def update_object(self, events, connections, gate_ids, node_ids, uuid_dict, game):
-        self.update(events, connections, gate_ids, node_ids, uuid_dict, self.rect, self.draw_circle, game)
+    def update_object(self, events, connections, gate_ids, node_ids, uuid_dict, game, keys, mouse_pos):
         self.update_activation_highlight(self.draw_circle)
-
-        # Display the updated image to the surface
-        # self.display_surface.blit(self.image, self.rect)
-        
+        self.update(events, connections, gate_ids, node_ids, uuid_dict, self.rect, self.draw_circle, game, keys, mouse_pos)     
 
 
