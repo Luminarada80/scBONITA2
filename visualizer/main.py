@@ -281,13 +281,6 @@ class Game:
 
 
             for object in self.objects_group:
-
-                if object in object.incoming_connections:
-                    object.incoming_connections.remove(object)
-                
-                if object in object.outgoing_connections:
-                    object.outgoing_connections.remove(object)
-
                 if object.is_node and object not in self.nodes:
                     self.nodes.append(object)
 
@@ -297,6 +290,10 @@ class Game:
                 object.update_object(events, self.connections, self.gate_ids, self.node_ids, self.uuids, self, self.keys, self.mouse_pos)
                 if object.is_drawing_line:
                     self.connections += 1
+
+            for node in self.nodes_group:
+                node.move_if_colliding(self.nodes_group)  # Move and resolve collisions
+
 
             # Reset the number of connections if the 1 key is not pressed
             if self.connections != 0 and not self.keys[pygame.K_1]:

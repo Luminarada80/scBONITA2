@@ -174,6 +174,14 @@ class Object(pygame.sprite.Sprite):
     def run_simulation(self, draw_object_function):
         if self.keys[pygame.K_TAB] and self.can_update:
             self.update_time = pygame.time.get_ticks()
+
+            if self in self.incoming_connections:
+                self.incoming_connections.remove(self)
+            if self in self.outgoing_connections:
+                self.outgoing_connections.remove(self)
+            if self in self.active_incoming_connections:
+                self.active_incoming_connections.remove(self)
+
             for obj in self.outgoing_connections:
                 if not obj.locked:
                     if self.state == 1:
@@ -196,7 +204,7 @@ class Object(pygame.sprite.Sprite):
             self.can_update = True
 
     def toggle_state(self, rect):
-        if self.keys[pygame.K_2] and rect.collidepoint(self.mouse_pos) and self.can_update:
+        if self.keys[pygame.K_2] and rect.collidepoint(self.mouse_pos) and self.can_update and type(self).__name__ == "Node":
             self.update_time = pygame.time.get_ticks()
             self.state = 1 - self.state
             self.can_update = False
@@ -213,29 +221,34 @@ class Object(pygame.sprite.Sprite):
         draw_object_function()
 
     def move_if_colliding(self, objects):
-        self.rect.x += self.velocity.x
-        self.rect.y += self.velocity.y
-
+        # Check for collisions with other objects
         for sprite in objects:
             if sprite != self and pygame.sprite.collide_rect(self, sprite):
                 self.resolve_collision(sprite)
 
     def resolve_collision(self, other_sprite):
-        direction_vector = pygame.math.Vector2(self.rect.centerx - other_sprite.rect.centerx,
-                                               self.rect.centery - other_sprite.rect.centery)
+        # Calculate the direction vector between the centers of the two sprites
+        direction_vector = pygame.math.Vector2(self.rect.centerx - other_sprite.rect.centerx + 0.001,
+                                            self.rect.centery - other_sprite.rect.centery + 0.001)
+        # Prevent division by zero
         distance = direction_vector.length() or 1
+        
+        # Calculate the overlap distance
         overlap = 0.5 * (distance - (self.rect.width / 2 + other_sprite.rect.width / 2 + 5))
 
+        # If there is an overlap, resolve the collision
         if overlap < 0:
+            adjustment_factor = 0.5
             move_vector = direction_vector.normalize() * (-overlap)
-            self.rect.x += move_vector.x
-            self.rect.y += move_vector.y
-            other_sprite.rect.x -= move_vector.x
-            other_sprite.rect.y -= move_vector.y
+            self.position += move_vector * adjustment_factor
+            other_sprite.position -= move_vector * adjustment_factor
 
-        self.velocity = -self.velocity
-        other_sprite.velocity = -other_sprite.velocity
-    
+        # Update the rect positions to match the new positions
+        self.rect.center = self.position
+        other_sprite.rect.center = other_sprite.position
+
+
+
     def request_uuid_objects(self, uuid_dict, object_uuids):
         return [uuid_dict.get(id) for id in object_uuids if id in uuid_dict]
             
