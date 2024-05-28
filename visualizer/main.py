@@ -15,8 +15,10 @@ class SaveState():
         self.object_color = []
         self.object_ids = []
         self.object_image = []
+        self.object_states = []
         self.outgoing_connections = []
         self.incoming_connections = []
+        self.active_connections = []
         self.nodes = []
         self.gates = []
         self.uuid_dict = {}  # Dictionary to map UUIDs to object instances
@@ -29,18 +31,24 @@ class SaveState():
             self.object_positions.append(object.position)
             self.object_color.append(object.color)
             self.object_ids.append(object.id)
+            self.object_states.append(object.state)
 
             object_outgoing_connections = []
             object_incoming_connections = []
+            object_active_connections = []
 
             for connected_object in object.outgoing_connections:
                 object_outgoing_connections.append(connected_object.id)
+            
+            for active_object in object.active_incoming_connections:
+                object_active_connections.append(active_object.id)
 
             for connected_object in object.incoming_connections:
                 object_incoming_connections.append(connected_object.id)
 
             self.outgoing_connections.append(object_outgoing_connections)
             self.incoming_connections.append(object_incoming_connections)
+            self.active_connections.append(object_active_connections)
     
     def load_objects(self):
         # Instantiate all objects and map them
@@ -51,6 +59,8 @@ class SaveState():
                 node.rect = node.image.get_rect(center=node.position)
                 node.outgoing_connections = self.outgoing_connections[i]
                 node.incoming_connections = self.incoming_connections[i]
+                node.active_incoming_connections = self.active_connections[i]
+                node.state = self.object_states[i]
 
                 if node not in self.nodes:
                     self.nodes.append(node)
@@ -66,6 +76,8 @@ class SaveState():
                 gate.rect = gate.image.get_rect(center=gate.position)
                 gate.outgoing_connections = self.outgoing_connections[i]
                 gate.incoming_connections = self.incoming_connections[i]
+                gate.active_incoming_connections = self.active_connections[i]
+                gate.state = self.object_states[i]
 
                 if gate not in self.gates:
                     self.gates.append(gate)
@@ -78,7 +90,7 @@ class SaveState():
             object = self.uuid_dict[self.object_ids[i]]
             object.outgoing_connections = [self.uuid_dict[uid] for uid in self.outgoing_connections[i]]
             object.incoming_connections = [self.uuid_dict[uid] for uid in self.incoming_connections[i]]
-
+            object.active_incoming_connections = [self.uuid_dict[uid] for uid in self.active_connections[i]]
 
         # Group the objects into sprite groups
         nodes_group = pygame.sprite.Group(*self.nodes)
@@ -88,34 +100,23 @@ class SaveState():
         return nodes_group, gates_group, objects_group
 
 
-def save_game_state(save_state, file_name):
-    try:
-        with open(file_name, 'wb') as file:
-            pickle.dump(save_state, file)
-            print("Game state saved successfully!")
-    except IOError:
-        print("Error: Unable to save game state.")
 
-def load_game_state(file_name):
-    try:
-        with open(file_name, 'rb') as file:
-            game_state = pickle.load(file)
-            print("Game state loaded successfully!")
-            return game_state
-    except (IOError, pickle.UnpicklingError):
-        print("Error: Unable to load game state.")
         
 
 class Game:
     def __init__(self):
 
         pygame.init()
-        self.WIDTH = 3840
-        self.HEIGHT = 2160
+        self.WIDTH = 1920
+        self.HEIGHT = 1080
 
         self.screen = pygame.display.set_mode((self.WIDTH,self.HEIGHT))
         pygame.display.set_caption('Graph visualizer')
         self.clock = pygame.time.Clock()
+
+        self.save_file = 'hsa05171_save_game_2.pickle'
+        self.mouse_pos = pygame.mouse.get_pos()
+        self.keys = pygame.key.get_pressed()
 
         self.uuids = {}
 
@@ -173,7 +174,6 @@ class Game:
             self.uuids[object.id] = object
             object.node_ids = self.node_ids
             object.gate_ids = self.gate_ids
-
             
 
         self.connections = 0        
@@ -193,6 +193,69 @@ class Game:
         now = datetime.now()
         formatted_datetime = now.strftime("%m/%d/%Y %H:%M")
         return formatted_datetime
+    
+    def save_game_state(self):
+        game_state = SaveState()
+        game_state.save_objects(self.objects_group)
+        try:
+            with open(self.save_file, 'wb') as file:
+                pickle.dump(game_state, file)
+                print("Game state saved successfully!")
+        except IOError:
+            print("Error: Unable to save game state.")
+        current_time = pygame.time.get_ticks()
+        self.last_save_time = current_time
+
+    def load_game_state(self):
+        # Clear existing objects
+        self.objects_group.empty()
+        self.nodes_group.empty()
+        self.gates_group.empty()
+        
+        # Clear lists
+        self.objects_group = pygame.sprite.Group()
+        self.nodes_group = pygame.sprite.Group()
+        self.gates_group = pygame.sprite.Group()
+
+        # Clear nodes and gates
+        self.nodes = []
+        self.gates = []
+
+        # Load the saved pickle file
+        try:
+            with open(self.save_file, 'rb') as file:
+                game_state = pickle.load(file)
+                print("Game state loaded successfully!")
+
+        except (IOError, pickle.UnpicklingError):
+            print("Error: Unable to load game state.")
+
+        # Load the objects
+        self.nodes_group, self.gates_group, self.objects_group = game_state.load_objects()
+
+        # Update UUIDs for event handling
+        self.uuids = {obj.id: obj for obj in self.objects_group}
+        self.node_ids = {obj.id: obj for obj in self.nodes_group}
+        self.gate_ids = {obj.id: obj for obj in self.gates_group}
+    
+    def autosave(self):
+        # Automatically saves the game every 2 minutes
+        current_time = pygame.time.get_ticks()
+        if current_time - self.last_save_time >= self.save_interval:
+            print(f'Autosaving to {self.save_file}: {self.get_current_datetime()}')
+            self.save_game_state(self.save_file)
+    
+    def delete_all_connections(self):
+        for object in self.objects_group:
+            if object.rect.collidepoint(self.mouse_pos):
+                if object in self.uuids:
+                    del self.uuids[object.id]
+                if object in self.gate_ids:
+                    del self.gate_ids[object.id]
+                if object in self.node_ids:
+                    del self.gate_ids[object.id]
+                object.kill()
+                object.remove_all_connections(self.objects_group, just_killed=True)
 
     def run(self):
         while True:
@@ -201,111 +264,70 @@ class Game:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-
-            save_file = 'hsa05171_save_game_2.pickle'
-
-            # Press "S" to save the game
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_s]:
-                game_state = SaveState()
-                game_state.save_objects(self.objects_group)
-                print(f'Loaded {save_file}')
-                save_game_state(game_state, save_file)
-                self.last_save_time = current_time
-
-            # Automatically saves the game every 2 minutes
-            current_time = pygame.time.get_ticks()
-            if current_time - self.last_save_time >= self.save_interval:
-                print(f'Autosaving to {save_file}: {self.get_current_datetime()}')
-                game_state = SaveState()
-                game_state.save_objects(self.objects_group)
-                save_game_state(game_state, save_file)
-                self.last_save_time = current_time  # Reset the last save time
-
-
-            if keys[pygame.K_l]:
-                # Clear existing objects
-                self.objects_group.empty()
-                self.nodes_group.empty()
-                self.gates_group.empty()
                 
-                # Clear lists
-                self.objects_group = pygame.sprite.Group()
-                self.nodes_group = pygame.sprite.Group()
-                self.gates_group = pygame.sprite.Group()
+            self.mouse_pos = pygame.mouse.get_pos()
+            self.keys = pygame.key.get_pressed()
 
-                # Clear nodes and gates
-                self.nodes = []
-                self.gates = []
+            if self.keys[pygame.K_s]:
+                self.save_game_state()
 
-                game_state = load_game_state(save_file)
-                self.nodes_group, self.gates_group, self.objects_group = game_state.load_objects()
-                # Update UUIDs for event handling
-                self.uuids = {obj.id: obj for obj in self.objects_group}
-                self.node_ids = {obj.id: obj for obj in self.nodes_group}
-                self.gate_ids = {obj.id: obj for obj in self.gates_group}
-
+            if self.keys[pygame.K_l]:
+                self.load_game_state()
+            
+            if self.keys[pygame.K_DELETE]:
+                self.delete_all_connections()
 
             self.screen.fill("white")      
-            for node in self.nodes_group:
-                if node not in self.nodes:
-                    self.nodes.append(node)
-                # node.draw_connections()
-                node.update_object(events, self.connections, self.gate_ids, self.node_ids, self.uuids, self)
-                if node.is_drawing_line == True:
-                    self.connections += 1  
-            
-            for gate in self.gates_group:
-                if gate not in self.gates:
-                    self.gates.append(gate)
-                # gate.draw_connections()
-                gate.update_object(events, self.connections, self.gate_ids, self.node_ids, self.uuids, self)
-                if gate.is_drawing_line == True:
+
+
+            for object in self.objects_group:
+
+                if object in object.incoming_connections:
+                    object.incoming_connections.remove(object)
+                
+                if object in object.outgoing_connections:
+                    object.outgoing_connections.remove(object)
+
+                if object.is_node and object not in self.nodes:
+                    self.nodes.append(object)
+
+                elif not object.is_node and object not in self.gates:
+                    self.gates.append(object)
+
+                object.update_object(events, self.connections, self.gate_ids, self.node_ids, self.uuids, self, self.keys, self.mouse_pos)
+                if object.is_drawing_line:
                     self.connections += 1
 
             # Reset the number of connections if the 1 key is not pressed
-            if self.connections != 0 and not keys[pygame.K_1]:
+            if self.connections != 0 and not self.keys[pygame.K_1]:
                 self.connections = 0
+
             self.nodes_group.draw(self.screen)
 
-            for node in self.nodes_group:
-                node.draw_lock((node.position[0] - 37, node.position[1]))
+            # Draw the lock for the object (after drawn to screen so lock is in front)
+            for object in self.nodes_group:
+                object.draw_lock()
 
-            mouse_pos = pygame.mouse.get_pos()
+            # if self.keys[pygame.K_TAB]:
+            #     self.display_box.display_text('Node State', (self.WIDTH / 4 + 25, self.HEIGHT - 400))
+            #     self.display_box.display_text(f'Update {len(self.states)}', (self.WIDTH / 4 + 25, self.HEIGHT - 375))
 
-            if keys[pygame.K_DELETE]:
-                for object in self.objects_group:
-                    if object.rect.collidepoint(mouse_pos):
-                        if object in self.uuids:
-                            del self.uuids[object.id]
-                        if object in self.gate_ids:
-                            del self.gate_ids[object.id]
-                        if object in self.node_ids:
-                            del self.gate_ids[object.id]
-                        object.kill()
-                        object.remove_all_connections(self.objects_group, just_killed=True)
+            #     if self.nodes[0].update_num <= 35:
+            #         self.states[self.nodes[0].update_num] = []
+            #         for node_num, node in enumerate(self.nodes_group):
+            #             position_adjustment = 15 * node_num
+            #             update_adjustment = 10 * self.nodes[0].update_num - 150
+            #             self.states[self.nodes[0].update_num].append((node.state, (self.WIDTH / 4 + update_adjustment, self.HEIGHT - 350 + position_adjustment)))
 
-            if keys[pygame.K_TAB]:
-                self.display_box.display_text('Node State', (self.WIDTH / 4 + 25, self.HEIGHT - 400))
-                self.display_box.display_text(f'Update {len(self.states)}', (self.WIDTH / 4 + 25, self.HEIGHT - 375))
+            #     # Displaying states
+            #     for update in self.states:
+            #         for node_num, node in enumerate(self.nodes_group):
+            #             position_adjustment = 25 * node_num
+            #             update_adjustment = 15 * len(self.states) - 100
+            #             self.display_box.display_text(f'{self.states[update][node_num][0]}', self.states[update][node_num][1])
 
-                if self.nodes[0].update_num <= 35:
-                    self.states[self.nodes[0].update_num] = []
-                    for node_num, node in enumerate(self.nodes_group):
-                        position_adjustment = 15 * node_num
-                        update_adjustment = 10 * self.nodes[0].update_num - 150
-                        self.states[self.nodes[0].update_num].append((node.state, (self.WIDTH / 4 + update_adjustment, self.HEIGHT - 350 + position_adjustment)))
-
-
-                # Displaying states
-                for update in self.states:
-                    for node_num, node in enumerate(self.nodes_group):
-                        position_adjustment = 25 * node_num
-                        update_adjustment = 15 * len(self.states) - 100
-                        self.display_box.display_text(f'{self.states[update][node_num][0]}', self.states[update][node_num][1])
-
-            else:
-                self.states = {}
+            # else:
+            #     self.states = {}
 
             pygame.display.update()
             self.clock.tick(60)

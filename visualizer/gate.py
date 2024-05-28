@@ -83,8 +83,6 @@ class Gate(Object):
             
         self.image.blit(text_surface, text_rect)
         
-
-
         self.rect = self.image.get_rect(center=self.position)
 
         # Blit the rotated image
@@ -141,8 +139,8 @@ class Gate(Object):
         elif len(self.active_incoming_connections) == 0:
             self.activation_threshold = 0
 
-    def update_object(self, events, connections, gate_ids, node_ids, uuid_dict, game):
-        self.update(events, connections, gate_ids, node_ids, uuid_dict, self.rect, self.draw_gate, game)
+    def update_object(self, events, connections, gate_ids, node_ids, uuid_dict, game, keys, mouse_pos):
+        self.update(events, connections, gate_ids, node_ids, uuid_dict, self.rect, self.draw_gate, game, keys, mouse_pos)
         # self.calculate_desired_orientation()
 
         if self.gate_type == 'AND':
