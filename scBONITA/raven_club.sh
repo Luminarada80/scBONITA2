@@ -13,17 +13,17 @@ RUN_ATTRACTOR_ANALYSIS=False
 RUN_CELL_MAPPING=False
 
 # General Arguments (Required for all steps)
-DATA_FILE="../../raven_data_covid/Club_Cells_data.csv"
+DATA_FILE="../../../raven_data_covid/Club_Cells_data.csv"
 DATASET_NAME="raven_club"
 DATAFILE_SEP=","
 #  "04010" "04370" "04630" "04668" "04066" "04020" "04151" "04150" "00010" "00020" "04060" "04512" "04514" "04670" "04625" "04062"  "04810"
-KEGG_PATHWAYS=("05171" "04623" "04061" "04630" "04621" "04622" "04668") # Enter KEGG pathway codes or leave blank to find all pathways with overlapping genes
+KEGG_PATHWAYS=("05171") # Enter KEGG pathway codes or leave blank to find all pathways with overlapping genes
 CUSTOM_PATHWAYS=() #("modified_network.graphml") #Put custom networks in the scBONITA folder
 BINARIZE_THRESHOLD=0.01 # Data points with values above this number will be set to 1, lower set to 0
 ORGANISM_CODE="hsa" # Organism code in front of KEGG pathway numbers
 
 # Relative Abundance arguments
-METADATA_FILE="../../raven_data_covid/Club_Cells_meta.txt"
+METADATA_FILE="../../../raven_data_covid/Club_Cells_meta.txt"
 METADATA_SEP=" "
 HEADER="y" # Does the metadata file contain a header before the entries start?
 OVERWRITE="n" # Do you want to overwrite the files generated for each of your different experimental groups?

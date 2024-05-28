@@ -1,5 +1,5 @@
 from network_setup import *
-from keggParser import *
+from kegg_parser import *
 import scipy.sparse as sparse
 import numpy as np
 from os import path
