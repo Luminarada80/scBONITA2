@@ -5,10 +5,10 @@ import re
 import string
 from bs4 import BeautifulSoup
 import itertools
-from rule_inference import *
+from singleCell import *
 
 
-def parse_kegg_dict():
+def parseKEGGdict():
     """makes a dictionary to convert ko numbers from KEGG into real gene names
     #this is all file formatting. it reads a line, parses the string into the gene name and ko # then adds to a dict that identifies the two."""
     converterDict = {}
@@ -24,78 +24,60 @@ def parse_kegg_dict():
     return converterDict
 
 
-def deconvolute_groups(node_id, groups):
+def expand_groups(node_id, groups):
     """
-    Creates a list with each group containing the node
-
     node_id: a node ID that may be a group
     groups: store group IDs and list of sub-ids
     return value: a list that contains all group IDs deconvoluted
     """
     node_list = []
     if node_id in groups.keys():
-        # Deconvolute each of the groups that the node is in
         for component_id in groups[node_id]:
-            node_list.extend(deconvolute_groups(component_id, groups))
+            node_list.extend(expand_groups(component_id, groups))
     else:
         node_list.extend([node_id])
     return node_list
 
-def read_kegg(lines, graph, KEGGdict, hsaDict):
+
+def readKEGG(lines, graph, KEGGdict, hsaDict):
     # read all lines into a bs4 object using libXML parser
     soup = BeautifulSoup("".join(lines), "xml")
     groups = {}  # store group IDs and list of sub-ids
     id_to_name = {}  # map id numbers to names
 
-    # Look at each entry in the kgml file. Info: (https://www.kegg.jp/kegg/xml/)
     for entry in soup.find_all("entry"):
-        print(f'entry: {entry}\n')
-
-        gene_names_in_entry = entry["name"]
-        print(f'\tgene_names_in_entry: {gene_names_in_entry}')
-
-        # Name of each gene in the entry
-        entry_split = gene_names_in_entry.split(":")
-        print(f'\tentry_split: {entry_split}')
-        print(f'\tlen(entry_split) : {len(entry_split)}')
-        # If the entry is part of a group (in the network coded by a group containing lots of related genes)
+        entry_split = entry["name"].split(":")
         if len(entry_split) > 2:
-
-            # Choose which dictionary to use based on whether the entries are hsa or kegg elements
             if entry_split[0] == "hsa" or entry_split[0] == "ko":
                 if entry_split[0] == "hsa":
-                    database = hsaDict
+                    useDict = hsaDict
                 else:
-                    database = KEGGdict
+                    useDict = KEGGdict
+                nameList = []
 
-                # Remove hsa or ko from the name of the genes in the group to isolate the gene ID
-                gene_number = entry_split.pop(0)
-                gene_number = gene_number.split()[0]
-                print(f'gene_number: {gene_number}')
-
-                # Format the entry name based on if the gene ID is in the database dictionary
                 entry_name = ""
-                if gene_number in database.keys():
-                    entry_name = entry_name + database[gene_number]
-                else:
-                    entry_name += gene_number
+                namer = entry_split.pop(0)
+                namer = entry_split.pop(0)
+                namer = namer.split()[0]
 
-                gene_number_list = []
-                for i, gene_number in enumerate(entry_split):
-                    gene_number_list.append(gene_number.split()[0])
-
-                for gene_number in gene_number_list:
+                entry_name = (
+                    entry_name + useDict[namer]
+                    if namer in useDict.keys()
+                    else entry_name + namer
+                )
+                for i in range(len(entry_split)):
+                    nameList.append(entry_split[i].split()[0])
+                for namer in nameList:
                     entry_name = (
-                        entry_name + "-" + database[gene_number]
-                        if gene_number in database.keys()
-                        else entry_name + "-" + gene_number
+                        entry_name + "-" + useDict[namer]
+                        if namer in useDict.keys()
+                        else entry_name + "-" + namer
                     )
                 entry_type = entry["type"]
             else:
                 entry_name = entry["name"]
                 entry_type = entry["type"]
         else:
-            # hsa:100132463
             if entry_split[0] == "hsa":
                 entry_name = entry_split[1]
                 entry_type = entry["type"]
@@ -142,9 +124,9 @@ def read_kegg(lines, graph, KEGGdict, hsaDict):
             subtypes.append(subtype["name"])
 
         if (
-                ("activation" in subtypes)
-                or ("expression" in subtypes)
-                or ("glycosylation" in subtypes)
+            ("activation" in subtypes)
+            or ("expression" in subtypes)
+            or ("glycosylation" in subtypes)
         ):
             color = "green"
             signal = "a"
@@ -174,8 +156,8 @@ def read_kegg(lines, graph, KEGGdict, hsaDict):
             print(subtypes)
             signal = "a"
 
-        entry1_list = deconvolute_groups(relation_entry1, groups)
-        entry2_list = deconvolute_groups(relation_entry2, groups)
+        entry1_list = expand_groups(relation_entry1, groups)
+        entry2_list = expand_groups(relation_entry2, groups)
 
         for (entry1, entry2) in itertools.product(entry1_list, entry2_list):
             node1 = id_to_name[entry1]
@@ -188,20 +170,24 @@ def read_kegg(lines, graph, KEGGdict, hsaDict):
                 type=relation_type,
                 signal=signal,
             )
-
+    """
+    for node in graph.nodes():
+        if graph.degree(node)==0:
+            graph.remove_node(node)
+    """
     return graph
 
 
-def find_kegg_pathways(
-    gene_list, preDefList=[], write_graphml=True, organism="hsa", minimumOverlap=1
+def find_pathways_kegg(
+    geneList, preDefList=[], writeGraphml=True, organism="hsa", minimumOverlap=1
 ):
 
     """
     geneList = the list of genes included in dataset
-    write_graphml = whether or not to write out a graphml (usually true)
+    writeGraphml = whether or not to write out a graphml (usually true)
     organism = organism code from kegg. Eg human = 'hsa', mouse = 'mus'
     """
-    koDict = parse_kegg_dict()  # parse the dictionary of ko codes
+    koDict = parseKEGGdict()  # parse the dictionary of ko codes
     try:  # try to retrieve and parse the dictionary containing organism gene names to codes conversion
         url = requests.get("http://rest.kegg.jp/list/" + organism, stream=True)
         # reads KEGG dictionary of identifiers between numbers and actual protein names and saves it to a python dictionary
@@ -237,7 +223,9 @@ def find_kegg_pathways(
         )  # eliminate org letters - retain only numbers from KEGG pathway codes
         origCode = code
         coder = str("ko" + code)  # add ko
+
         graph = nx.DiGraph()  # open a graph object
+        
         # get ko pathway
         for code in [coder]:
             print(code)
@@ -307,7 +295,7 @@ def find_kegg_pathways(
                 graph.remove_edge(edge[0], edge[1])
         # check to see if there is a connected component, simplify graph and print if so
         allNodes = set(graph.nodes())
-        test = len(allNodes.intersection(gene_list))
+        test = len(allNodes.intersection(geneList))
         print("Pathway: ", x, " Overlap: ", test, " Edges: ", len(graph.edges()))
         # nx.write_graphml(graph,coder+'.graphml')
         if (
@@ -324,3 +312,31 @@ def find_kegg_pathways(
             # print(graph.nodes())
             pathwayDict[code] = graph
     return pathwayDict
+
+
+"""
+##########TESTS##########
+find_pathways_kegg(geneList=["IL6", "IL6R", "STAT3","TLR4","RELA","IFNG","NFKB1","ERBB2"], preDefList = ["hsa04010"], writeGraphml=True,  organism="hsa")
+
+origGraph = nx.read_graphml("hsa04010_orig.graphml")
+print(len(origGraph.nodes()))
+print(len(origGraph.edges()))
+origNodes = list(origGraph.nodes())
+origNodes.sort()
+print(origNodes)
+print("*********")
+newGraph = nx.read_graphml("hsa04010_processed.graphml")
+print(len(newGraph.nodes()))
+print(len(newGraph.edges()))
+newNodes = list(newGraph.nodes())
+newNodes.sort()
+print(newNodes)
+print("*********")
+
+#print(set(list(origGraph.edges())).intersection(set(list(newGraph.edges()))))
+#print(set(origNodes).intersection(newNodes))
+print(len(set(origNodes).intersection(newNodes)))
+
+print(set(origNodes).difference(newNodes))
+print(len(set(origNodes).difference(newNodes)))
+"""

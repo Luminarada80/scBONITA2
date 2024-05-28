@@ -54,25 +54,42 @@ class Pathways:
 
     def parse_kegg_dict(self):
         """
-        Reads in the KEGG pathway and creates a dictionary with the kegg codes as keys and gene names as values
+        Makes a dictionary to convert ko numbers from KEGG into real gene names
         """
         logging.info(f'\t\tParsing KEGG dict...')
         gene_dict = {}
-        pathway_file = requests.get("http://rest.kegg.jp/get/br:ko00001", stream=True)
-        for line in pathway_file.iter_lines():
-            line = line.decode("utf-8")
-            if len(line) > 1 and line[0] == "D":  # lines which begin with D translate kegg codes to gene names
-                
-                # to split into kegg code, gene names
-                converter = re.split(r"\s+", re.split(r";", line)[0])
-                kegg_code = converter[1].upper()
-                gene_number = converter[2].upper()
-                gene_dict[kegg_code] = gene_number
-        pathway_file.close()
+
+        # If the dictionary file exists, use that (much faster than streaming)
+        if 'kegg_dict.csv' in os.listdir('pathway_xml_files'):
+            logging.info(f'\t\t\tReading in KEGG dictionary file...')
+            with open('pathway_xml_files/kegg_dict.csv', 'r') as kegg_dict_file:
+                for line in kegg_dict_file:
+                    line = line.strip().split('\t')
+                    kegg_code = line[0]
+                    gene_number = line[1]
+                    gene_dict[kegg_code] = gene_number
+
+        # If the dictionary file does not exist, write it and stream in the data for the dictionary
+        else:
+            logging.info(f'\t\t\tKEGG dictionary not found, downloading...')
+
+            pathway_file = requests.get("http://rest.kegg.jp/get/br:ko00001", stream=True)
+            with open('pathway_xml_files/kegg_dict.csv', 'w') as kegg_dict_file:
+                for line in pathway_file.iter_lines():
+                    line = line.decode("utf-8")
+                    if len(line) > 1 and line[0] == "D":  # lines which begin with D translate kegg codes to gene names
+                        
+                        # to split into kegg code, gene names
+                        converter = re.split(r"\s+", re.split(r";", line)[0])
+                        kegg_code = converter[1].upper()
+                        gene_number = converter[2].upper().replace(',', '')
+                        gene_dict[kegg_code] = gene_number
+                        kegg_dict_file.write(f'{kegg_code}\t{gene_number}\n')
+            pathway_file.close()
                 
         return gene_dict
 
-    def deconvolute_groups(self, node_id, groups):
+    def expand_groups(self, node_id, groups):
         """
         node_id: a node ID that may be a group
         groups: store group IDs and list of sub-ids
@@ -81,61 +98,56 @@ class Pathways:
         node_list = []
         if node_id in groups.keys():
             for component_id in groups[node_id]:
-                node_list.extend(self.deconvolute_groups(component_id, groups))
+                node_list.extend(self.expand_groups(component_id, groups))
         else:
             node_list.extend([node_id])
         return node_list
     
     def read_kegg(self, lines, graph, KEGGdict, hsaDict):
         # read all lines into a bs4 object using libXML parser
-        logging.debug(f'\t\tReading KEGG xml file')
+        logging.info(f'\t\tReading KEGG xml file')
         soup = BeautifulSoup("".join(lines), "xml")
         groups = {}  # store group IDs and list of sub-ids
         id_to_name = {}  # map id numbers to names
         
         # Look at each entry in the kgml file. Info: (https://www.kegg.jp/kegg/xml/)
         for entry in soup.find_all("entry"):
-            # logging.debug(f'entry: {entry}\n')
-
-            gene_names_in_entry = entry["name"]
-            # logging.debug(f'\tgene_names_in_entry: {gene_names_in_entry}')
+            # logging.info(f'\nEntry:')
+            # logging.info(f'\t{entry}')
 
             # Name of each gene in the entry
-            entry_split = gene_names_in_entry.split(":")
-            # logging.debug(f'\tentry_split: {entry_split}')
-            # logging.debug(f'\tlen(entry_split) : {len(entry_split)}')
+            entry_split = entry["name"].split(":")
+
+            # logging.info(f'\tentry_split: {entry_split}')
+            # logging.info(f'\tlen(entry_split) : {len(entry_split)}')
             # If the entry is part of a group (in the network coded by a group containing lots of related genes)
             if len(entry_split) > 2:
 
                 # Choose which dictionary to use based on whether the entries are hsa or kegg elements
                 if entry_split[0] == "hsa" or entry_split[0] == "ko":
                     if entry_split[0] == "hsa":
-                        database = hsaDict
+                        useDict = hsaDict
                     else:
-                        database = KEGGdict
-
-                    # Remove hsa or ko from the name of the genes in the group to isolate the gene ID
-                    gene_number = entry_split.pop(0) 
-                    gene_number = gene_number.split()[0]
-                    # logging.debug(f'gene_number: {gene_number}')
-
-                    # Format the entry name based on if the gene ID is in the database dictionary
+                        useDict = KEGGdict
+                    nameList = []
+                    
                     entry_name = ""
-                    if gene_number in database.keys():
-                        entry_name = entry_name + database[gene_number]
-                    else:
-                        entry_name += gene_number
+                    namer = entry_split.pop(0)
+                    namer = entry_split.pop(0)
+                    namer = namer.split()[0]
 
-
-                    gene_number_list = []
-                    for i, gene_number in enumerate(entry_split):
-                        gene_number_list.append(gene_number.split()[0])
-
-                    for gene_number in gene_number_list:
+                    entry_name = (
+                        entry_name + useDict[namer]
+                        if namer in useDict.keys()
+                        else entry_name + namer
+                    )
+                    for i in range(len(entry_split)):
+                        nameList.append(entry_split[i].split()[0])
+                    for namer in nameList:
                         entry_name = (
-                            entry_name + "-" + database[gene_number]
-                            if gene_number in database.keys()
-                            else entry_name + "-" + gene_number
+                            entry_name + "-" + useDict[namer]
+                            if namer in useDict.keys()
+                            else entry_name + "-" + namer
                         )
                     entry_type = entry["type"]
                 else:
@@ -163,10 +175,12 @@ class Pathways:
                 else:
                     entry_name = entry["name"]
                     entry_type = entry["type"]
-    
+            # logging.info(f'Gene name: {database[gene_number]}, Gene number: {gene_number}, Pathway: {pathway}')
+            
             entry_id = entry["id"]
             entry_name = re.sub(",", "", entry_name)
             id_to_name[entry_id] = entry_name
+            # logging.info(f'Entry name: {entry_name} ID: {entry_id}')
     
             if entry_type == "group":
                 group_ids = []
@@ -177,8 +191,10 @@ class Pathways:
                 graph.add_node(entry_name, name=entry_name, type=entry_type)
     
         for relation in soup.find_all("relation"):
+            # logging.info(f'Relation:')
+            # logging.info(f'\t{relation}')
             (color, signal) = ("black", "a")
-    
+
             relation_entry1 = relation["entry1"]
             relation_entry2 = relation["entry2"]
             relation_type = relation["type"]
@@ -221,12 +237,14 @@ class Pathways:
                 logging.debug(subtypes)
                 signal = "a"
     
-            entry1_list = self.deconvolute_groups(relation_entry1, groups)
-            entry2_list = self.deconvolute_groups(relation_entry2, groups)
+            entry1_list = self.expand_groups(relation_entry1, groups)
+            entry2_list = self.expand_groups(relation_entry2, groups)
     
             for (entry1, entry2) in itertools.product(entry1_list, entry2_list):
                 node1 = id_to_name[entry1]
                 node2 = id_to_name[entry2]
+                # if (node1.count('-') < 10 or node2.count('-') < 10):
+                #     logging.info(f'{node1} --- {signal} ---> {node2}\n\t{"/".join(subtypes)}')
                 graph.add_edge(
                     node1,
                     node2,
@@ -235,6 +253,7 @@ class Pathways:
                     type=relation_type,
                     signal=signal,
                 )
+                
 
         return graph
 
@@ -242,26 +261,26 @@ class Pathways:
         k = KEGG()  # read KEGG from bioservices
         k.organism = organism     
         pathway_list = list(k.pathwayIds)              
-        try:  # try to retrieve and parse the dictionary containing organism gene names to codes conversion
-            url = requests.get("http://rest.kegg.jp/list/" + organism, stream=True)
-            # reads KEGG dictionary of identifiers between numbers and actual protein names and saves it to a python dictionary
-            aliasDict = {}
-            orgDict = {}
-            for line in url.iter_lines():
-                line = line.decode("utf-8")
-                line_split = line.split("\t")
-                k = line_split[0].split(":")[1]
-                nameline = line_split[1].split(";")
-                name = nameline[0]
-                if "," in name:
-                    nameline = name.split(",")
-                    name = nameline[0]
-                    for entry in range(1, len(nameline)):
-                        aliasDict[nameline[entry].strip()] = name.upper()
-                orgDict[k] = name
-            url.close()
-        except:
-            logging.info("Could not get library: " + organism)
+        # try:  # try to retrieve and parse the dictionary containing organism gene names to codes conversion
+        #     url = requests.get("http://rest.kegg.jp/list/" + organism, stream=True)
+        #     # reads KEGG dictionary of identifiers between numbers and actual protein names and saves it to a python dictionary
+        #     aliasDict = {}
+        #     orgDict = {}
+        #     for line in url.iter_lines():
+        #         line = line.decode("utf-8")
+        #         line_split = line.split("\t")
+        #         k = line_split[0].split(":")[1]
+        #         nameline = line_split[1].split(";")
+        #         name = nameline[0]
+        #         if "," in name:
+        #             nameline = name.split(",")
+        #             name = nameline[0]
+        #             for entry in range(1, len(nameline)):
+        #                 aliasDict[nameline[entry].strip()] = name.upper()
+        #         orgDict[k] = name
+        #     url.close()
+        # except:
+        #     logging.info("Could not get library: " + organism)
         
         logging.info(f'\t\tDownloading any missing pathway xml files, this may take a while...')
         with alive_bar(len(pathway_list)) as bar:
@@ -317,6 +336,7 @@ class Pathways:
         origCode = code
 
         coder = str("ko" + code)  # add ko
+
         # remove complexes and rewire components
         removeNodeList = [gene for gene in graph.nodes() if "-" in gene]
         for rm in removeNodeList:
@@ -362,10 +382,20 @@ class Pathways:
 
         # nx.write_graphml(graph,coder+'.graphml')
 
+    
+        # logging.info(f'Nodes:')
+        # for node in graph.nodes():
+        #     logging.info(f'\t{node}')
+
+        # logging.info(f'Edges:')
+        # for edge in graph.edges():
+        #     logging.info(f'\t{edge}')
+
         if overlap > minimumOverlap and len(graph.edges()) > 0:  # if there are at least minimumOverlap genes shared between the network and the genes in the dataset
             # nx.write_graphml(graph,coder+'_processed.graphml') # write graph out
-            logging.debug(f'\t\t\tPathway ({pathway_num}/{num_pathways}): {pathway} Overlap: {overlap} Edges: {len(graph.edges())}')
+            logging.info(f'\t\t\tPathway ({pathway_num}/{num_pathways}): {pathway} Overlap: {overlap} Edges: {len(graph.edges())}')
             nx.write_graphml(graph, self.output_path + coder + ".graphml")
+
 
             
             # Add the pathway graph to the dictionary with the pathway code as the key
@@ -384,26 +414,44 @@ class Pathways:
         kegg_dict = self.parse_kegg_dict()  # parse the dictionary of ko codes
         logging.info("\t\t\tLoaded KEGG code dictionary")
         
-        try:  # try to retrieve and parse the dictionary containing organism gene names to codes conversion
-            url = requests.get("http://rest.kegg.jp/list/" + organism, stream=True)
-            # reads KEGG dictionary of identifiers between numbers and actual protein names and saves it to a python dictionary
-            aliasDict = {}
-            orgDict = {}
-            for line in url.iter_lines():
-                line = line.decode("utf-8")
-                line_split = line.split("\t")
-                k = line_split[0].split(":")[1]
-                nameline = line_split[1].split(";")
-                name = nameline[0]
-                if "," in name:
-                    nameline = name.split(",")
-                    name = nameline[0]
-                    for entry in range(1, len(nameline)):
-                        aliasDict[nameline[entry].strip()] = name.upper()
-                orgDict[k] = name
-            url.close()
-        except:
-            logging.info("Could not get library: " + organism)
+        pathway_dict_path = f'pathway_xml_files/{organism}_dict.csv'
+        aliasDict = {}
+        orgDict = {}
+
+        # If the dictionary file exists, use that (much faster than streaming)
+        if f'{organism}_dict.csv' in os.listdir('pathway_xml_files'):
+            logging.info(f'\t\t\tReading {organism} dictionary file...')
+            with open(pathway_dict_path, 'r') as kegg_dict_file:
+                for line in kegg_dict_file:
+                    line = line.strip().split('\t')
+                    k = line[0]
+                    name = line[1]
+                    orgDict[k] = name
+
+        # If the dictionary file does not exist, write it and stream in the data for the dictionary
+        else:
+            logging.info(f'\t\t\tOrganism dictionary not present for {organism}, downloading...')
+            try:  # try to retrieve and parse the dictionary containing organism gene names to codes conversion
+                url = requests.get("http://rest.kegg.jp/list/" + organism, stream=True)
+                # reads KEGG dictionary of identifiers between numbers and actual protein names and saves it to a python dictionary
+
+                with open(pathway_dict_path, 'w') as kegg_dict_file:
+                    for line in url.iter_lines():
+                        line = line.decode("utf-8")
+                        line_split = line.split("\t")
+                        k = line_split[0].split(":")[1]
+                        nameline = line_split[1].split(";")
+                        name = nameline[0]
+                        if "," in name:
+                            nameline = name.split(",")
+                            name = nameline[0]
+                            for entry in range(1, len(nameline)):
+                                aliasDict[nameline[entry].strip()] = name.upper()
+                        orgDict[k] = name
+                        kegg_dict_file.write(f'{k}\t{name}\n')
+                url.close()
+            except:
+                logging.info("Could not get library: " + organism)
 
         # Write all xml files from the kegg api rather than requesting each one individually. Finds any missing xml files
         self.write_all_organism_xml_files(organism)
@@ -411,6 +459,7 @@ class Pathways:
         if len(kegg_pathway_list) == 0:
             # Read in the pre-downloaded xml files and read them into a DiGraph object
             num_pathways = len(os.listdir(f'pathway_xml_files/{organism}'))
+            logging.info(f'\t\tNo KEGG pathways specified, searching all overlapping pathways')
             logging.info(f'\t\tFinding pathways with at least {minimumOverlap} genes that overlap with the dataset')
             with alive_bar(num_pathways) as bar:
                 for pathway_num, xml_file in enumerate(os.listdir(f'pathway_xml_files/{organism}')):
@@ -447,7 +496,7 @@ class Pathways:
                                 # Parse the kegg pathway and determine if there is sufficient overlap for processing with scBONITA
                                 self.parse_kegg_pathway(graph, minimumOverlap, pathway, pathway_num, num_pathways)
 
-                        if 'ko' + pathway == xml_pathway_name:
+                        elif 'ko' + pathway == xml_pathway_name:
                             with open(f'pathway_xml_files/{organism}/{xml_file}', 'r') as pathway_file:
                                 text = [line for line in pathway_file]
 

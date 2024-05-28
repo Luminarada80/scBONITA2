@@ -489,7 +489,6 @@
   <data key="d0">path:ko04613</data>
   <data key="d1">path</data>
 </node>
-<node id="ko"/>
 <node id="IL12A"/>
 <node id="IL12B"/>
 <node id="TLR7"/>
@@ -702,9 +701,6 @@
   <data key="d4">PPrel</data>
   <data key="d5">a</data>
 </edge>
-<edge source="STAT3" target="ko">
-  <data key="d5">a</data>
-</edge>
 <edge source="STAT3" target="NFKB1">
   <data key="d5">a</data>
 </edge>
@@ -745,9 +741,6 @@
   <data key="d2">red</data>
   <data key="d3">inhibition</data>
   <data key="d4">PPrel</data>
-  <data key="d5">i</data>
-</edge>
-<edge source="NSP1" target="ko">
   <data key="d5">i</data>
 </edge>
 <edge source="NSP1" target="RP">
@@ -1074,9 +1067,6 @@
   <data key="d4">PPrel</data>
   <data key="d5">a</data>
 </edge>
-<edge source="MYD88" target="ko">
-  <data key="d5">a</data>
-</edge>
 <edge source="MYD88" target="IRAK1">
   <data key="d5">a</data>
 </edge>
@@ -1155,9 +1145,6 @@
   <data key="d4">PPrel</data>
   <data key="d5">a</data>
 </edge>
-<edge source="MAP3K7" target="ko">
-  <data key="d5">a</data>
-</edge>
 <edge source="MAP3K7" target="IKBKA">
   <data key="d5">a</data>
 </edge>
@@ -1177,9 +1164,6 @@
   <data key="d2">green</data>
   <data key="d3">activation/phosphorylation</data>
   <data key="d4">PPrel</data>
-  <data key="d5">a</data>
-</edge>
-<edge source="JNK" target="ko">
   <data key="d5">a</data>
 </edge>
 <edge source="JNK" target="JUN">
@@ -1210,9 +1194,6 @@
   <data key="d2">purple</data>
   <data key="d3">binding/association</data>
   <data key="d4">PPrel</data>
-  <data key="d5">a</data>
-</edge>
-<edge source="cpd:C00046" target="ko">
   <data key="d5">a</data>
 </edge>
 <edge source="cpd:C00046" target="RP">
@@ -1461,9 +1442,6 @@
   <data key="d4">PPrel</data>
   <data key="d5">a</data>
 </edge>
-<edge source="TNFRSF1A" target="ko">
-  <data key="d5">a</data>
-</edge>
 <edge source="TNFRSF1A" target="NFKBIA">
   <data key="d5">a</data>
 </edge>
@@ -1494,16 +1472,10 @@
   <data key="d4">PPrel</data>
   <data key="d5">a</data>
 </edge>
-<edge source="FCGR2A" target="ko">
-  <data key="d5">a</data>
-</edge>
 <edge source="FCGR2A" target="ERK">
   <data key="d5">a</data>
 </edge>
 <edge source="FCGR2A" target="P38">
-  <data key="d5">a</data>
-</edge>
-<edge source="cpd:C00704 cpd:C00027" target="ko">
   <data key="d5">a</data>
 </edge>
 <edge source="cpd:C00704 cpd:C00027" target="NFKB1">
@@ -1524,9 +1496,6 @@
   <data key="d4">PPrel</data>
   <data key="d5">a</data>
 </edge>
-<edge source="IGH" target="ko">
-  <data key="d5">a</data>
-</edge>
 <edge source="IGH" target="C1QA">
   <data key="d5">a</data>
 </edge>
@@ -1540,9 +1509,6 @@
   <data key="d5">a</data>
 </edge>
 <edge source="IGH" target="C1S">
-  <data key="d5">a</data>
-</edge>
-<edge source="SYK" target="ko">
   <data key="d5">a</data>
 </edge>
 <edge source="SYK" target="PIK3CA_B_D">
@@ -1593,9 +1559,6 @@
   <data key="d4">PPrel</data>
   <data key="d5">a</data>
 </edge>
-<edge source="cpd:C00165" target="ko">
-  <data key="d5">a</data>
-</edge>
 <edge source="cpd:C00165" target="PRKCA">
   <data key="d5">a</data>
 </edge>
@@ -1603,9 +1566,6 @@
   <data key="d5">a</data>
 </edge>
 <edge source="cpd:C00165" target="PRKCG">
-  <data key="d5">a</data>
-</edge>
-<edge source="MBL" target="ko">
   <data key="d5">a</data>
 </edge>
 <edge source="MBL" target="MASP1">
@@ -1626,9 +1586,6 @@
   <data key="d4">PPrel</data>
   <data key="d5">a</data>
 </edge>
-<edge source="C5" target="ko">
-  <data key="d5">a</data>
-</edge>
 <edge source="C5" target="C6">
   <data key="d5">a</data>
 </edge>
@@ -1645,9 +1602,6 @@
   <data key="d5">a</data>
 </edge>
 <edge source="C5" target="C9">
-  <data key="d5">a</data>
-</edge>
-<edge source="F2" target="ko">
   <data key="d5">a</data>
 </edge>
 <edge source="F2" target="F13A1">
@@ -1677,112 +1631,10 @@
   <data key="d4">PPrel</data>
   <data key="d5">a</data>
 </edge>
-<edge source="ko" target="MYD88">
-  <data key="d5">a</data>
-</edge>
-<edge source="ko" target="IRAK1">
-  <data key="d5">a</data>
-</edge>
-<edge source="ko" target="IRAK4">
-  <data key="d5">a</data>
-</edge>
-<edge source="ko" target="TRAF6">
-  <data key="d5">a</data>
-</edge>
-<edge source="ko" target="TNF">
-  <data key="d5">a</data>
-</edge>
-<edge source="ko" target="IL6">
-  <data key="d5">a</data>
-</edge>
-<edge source="ko" target="IL1B">
-  <data key="d5">a</data>
-</edge>
-<edge source="ko" target="MMP3">
-  <data key="d5">a</data>
-</edge>
-<edge source="ko" target="MMP1">
-  <data key="d5">a</data>
-</edge>
-<edge source="ko" target="CCL2">
-  <data key="d5">a</data>
-</edge>
-<edge source="ko" target="IL8">
-  <data key="d5">a</data>
-</edge>
-<edge source="ko" target="NLRP3">
-  <data key="d5">a</data>
-</edge>
-<edge source="ko" target="IL12A">
-  <data key="d5">a</data>
-</edge>
-<edge source="ko" target="IL12B">
-  <data key="d5">a</data>
-</edge>
-<edge source="ko" target="JAK1">
-  <data key="d5">a</data>
-</edge>
-<edge source="ko" target="TYK2">
-  <data key="d5">a</data>
-</edge>
-<edge source="ko" target="STAT1">
-  <data key="d5">a</data>
-</edge>
-<edge source="ko" target="STAT2">
-  <data key="d5">a</data>
-</edge>
-<edge source="ko" target="NFKBIB">
-  <data key="d5">a</data>
-</edge>
-<edge source="ko" target="NFKBIA">
-  <data key="d5">a</data>
-</edge>
-<edge source="ko" target="cpd:C00165">
-  <data key="d5">a</data>
-</edge>
-<edge source="ko" target="MASP1">
-  <data key="d5">a</data>
-</edge>
-<edge source="ko" target="F2">
-  <data key="d5">a</data>
-</edge>
-<edge source="ko" target="C2">
-  <data key="d5">a</data>
-</edge>
-<edge source="ko" target="C4">
-  <data key="d5">a</data>
-</edge>
-<edge source="ko" target="C5">
-  <data key="d5">a</data>
-</edge>
-<edge source="ko" target="C6">
-  <data key="d5">a</data>
-</edge>
-<edge source="ko" target="C7">
-  <data key="d5">a</data>
-</edge>
-<edge source="ko" target="C8A">
-  <data key="d5">a</data>
-</edge>
-<edge source="ko" target="C8B">
-  <data key="d5">a</data>
-</edge>
-<edge source="ko" target="C8G">
-  <data key="d5">a</data>
-</edge>
-<edge source="ko" target="C9">
-  <data key="d5">a</data>
-</edge>
-<edge source="TLR7" target="ko">
-  <data key="d5">a</data>
-</edge>
 <edge source="TLR7" target="IRAK1">
   <data key="d5">a</data>
 </edge>
 <edge source="TLR7" target="IRAK4">
-  <data key="d5">a</data>
-</edge>
-<edge source="TLR8" target="ko">
   <data key="d5">a</data>
 </edge>
 <edge source="TLR8" target="IRAK1">
@@ -1827,9 +1679,6 @@
 <edge source="NFKB1" target="NLRP3">
   <data key="d5">a</data>
 </edge>
-<edge source="NFKB1" target="ko">
-  <data key="d5">a</data>
-</edge>
 <edge source="NFKB1" target="IL12A">
   <data key="d5">a</data>
 </edge>
@@ -1860,25 +1709,16 @@
 <edge source="RELA" target="NLRP3">
   <data key="d5">a</data>
 </edge>
-<edge source="RELA" target="ko">
-  <data key="d5">a</data>
-</edge>
 <edge source="RELA" target="IL12A">
   <data key="d5">a</data>
 </edge>
 <edge source="RELA" target="IL12B">
   <data key="d5">a</data>
 </edge>
-<edge source="IFNAR1" target="ko">
-  <data key="d5">a</data>
-</edge>
 <edge source="IFNAR1" target="JAK1">
   <data key="d5">a</data>
 </edge>
 <edge source="IFNAR1" target="TYK2">
-  <data key="d5">a</data>
-</edge>
-<edge source="IFNAR2" target="ko">
   <data key="d5">a</data>
 </edge>
 <edge source="IFNAR2" target="JAK1">
@@ -1893,25 +1733,16 @@
 <edge source="TYK2" target="STAT2">
   <data key="d5">a</data>
 </edge>
-<edge source="IKBKA" target="ko">
-  <data key="d5">a</data>
-</edge>
 <edge source="IKBKA" target="NFKBIB">
   <data key="d5">a</data>
 </edge>
 <edge source="IKBKA" target="NFKBIA">
   <data key="d5">a</data>
 </edge>
-<edge source="IKBKB" target="ko">
-  <data key="d5">a</data>
-</edge>
 <edge source="IKBKB" target="NFKBIB">
   <data key="d5">a</data>
 </edge>
 <edge source="IKBKB" target="NFKBIA">
-  <data key="d5">a</data>
-</edge>
-<edge source="IKBKG" target="ko">
   <data key="d5">a</data>
 </edge>
 <edge source="IKBKG" target="NFKBIB">
@@ -1962,9 +1793,6 @@
 <edge source="C1S" target="C4">
   <data key="d5">a</data>
 </edge>
-<edge source="C6" target="ko">
-  <data key="d5">a</data>
-</edge>
 <edge source="C6" target="C5">
   <data key="d5">a</data>
 </edge>
@@ -1981,9 +1809,6 @@
   <data key="d5">a</data>
 </edge>
 <edge source="C6" target="C9">
-  <data key="d5">a</data>
-</edge>
-<edge source="C7" target="ko">
   <data key="d5">a</data>
 </edge>
 <edge source="C7" target="C5">
@@ -2004,9 +1829,6 @@
 <edge source="C7" target="C9">
   <data key="d5">a</data>
 </edge>
-<edge source="C8A" target="ko">
-  <data key="d5">a</data>
-</edge>
 <edge source="C8A" target="C5">
   <data key="d5">a</data>
 </edge>
@@ -2023,9 +1845,6 @@
   <data key="d5">a</data>
 </edge>
 <edge source="C8A" target="C9">
-  <data key="d5">a</data>
-</edge>
-<edge source="C8B" target="ko">
   <data key="d5">a</data>
 </edge>
 <edge source="C8B" target="C5">
@@ -2046,9 +1865,6 @@
 <edge source="C8B" target="C9">
   <data key="d5">a</data>
 </edge>
-<edge source="C8G" target="ko">
-  <data key="d5">a</data>
-</edge>
 <edge source="C8G" target="C5">
   <data key="d5">a</data>
 </edge>
@@ -2065,9 +1881,6 @@
   <data key="d5">a</data>
 </edge>
 <edge source="C8G" target="C9">
-  <data key="d5">a</data>
-</edge>
-<edge source="C9" target="ko">
   <data key="d5">a</data>
 </edge>
 <edge source="C9" target="C5">

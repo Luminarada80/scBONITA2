@@ -1,7 +1,7 @@
 import os
 import logging
 from argparse import ArgumentParser
-from keggParser import *
+from kegg_parser import *
 import sys
 import glob
 

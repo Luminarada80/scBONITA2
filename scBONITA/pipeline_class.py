@@ -1,5 +1,5 @@
 from rule_inference import RuleInference
-from pathways import Pathways
+from kegg_parser import Pathways
 from network import Network
 from importance_scores import CalculateImportanceScore
 from cell_class import CellPopulation
