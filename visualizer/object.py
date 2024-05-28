@@ -85,10 +85,11 @@ class Object(pygame.sprite.Sprite):
 
     def move(self, events, rect, game):
         for event in events:
-            if event.type == pygame.MOUSEBUTTONDOWN and rect.collidepoint(self.mouse_pos) and game.node_being_moved is None:
+            if event.type == pygame.MOUSEBUTTONDOWN and rect.collidepoint(self.mouse_pos) and game.node_being_moved is None and event.button == 1:
                 self.moving = True
                 game.node_being_moved = self
-            elif event.type == pygame.MOUSEBUTTONUP and self.moving:
+
+            elif event.type == pygame.MOUSEBUTTONUP and self.moving and event.button == 1:
                 self.moving = False
                 game.node_being_moved = None
                 
