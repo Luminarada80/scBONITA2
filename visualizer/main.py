@@ -107,8 +107,8 @@ class Game:
     def __init__(self):
 
         pygame.init()
-        self.WIDTH = 1920
-        self.HEIGHT = 1080
+        self.WIDTH = 2560
+        self.HEIGHT = 1440
 
         self.screen = pygame.display.set_mode((self.WIDTH,self.HEIGHT))
         pygame.display.set_caption('Graph visualizer')
