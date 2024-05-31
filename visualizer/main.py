@@ -299,6 +299,7 @@ class Game:
         for obj in self.selected_objects:
             # Draw a golden circle around the object
             pygame.draw.circle(self.screen, (255, 215, 0), obj.rect.center, max(obj.rect.width, obj.rect.height) // 2 + 10, 3)
+    
     def run(self):
         while True:
             events = pygame.event.get()
