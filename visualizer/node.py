@@ -21,9 +21,9 @@ class Node(Object):
         self.rect = self.image.get_rect(center=self.position)
         self.original_image = self.image
 
-        self.font_size = 7
+        self.font_size = 4
         self.font = pygame.freetype.Font('visualizer/arial.ttf', self.font_size, resolution=200)
-        self.font.strength = 0.02778
+        self.font.strength = 0.01
 
         self.is_node = True
 

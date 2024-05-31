@@ -20,6 +20,7 @@ class Pathways:
         self.output_path = f'graphml_files/{dataset_name}/'
         self.gene_indices = []
         self.pathway_dict = {}
+        self.organism = organism
         
         if self.cv_threshold:
             self.filter_data()
@@ -109,6 +110,7 @@ class Pathways:
         soup = BeautifulSoup("".join(lines), "xml")
         groups = {}  # store group IDs and list of sub-ids
         id_to_name = {}  # map id numbers to names
+        subpaths = []
         
         # Look at each entry in the kgml file. Info: (https://www.kegg.jp/kegg/xml/)
         for entry in soup.find_all("entry"):
@@ -116,6 +118,7 @@ class Pathways:
             # logging.info(f'\t{entry}')
 
             # Name of each gene in the entry
+            # If there are multiple genes in the entry, store them all with the same id
             entry_split = entry["name"].split(":")
 
             # logging.info(f'\tentry_split: {entry_split}')
@@ -124,25 +127,32 @@ class Pathways:
             if len(entry_split) > 2:
 
                 # Choose which dictionary to use based on whether the entries are hsa or kegg elements
+                # Entries with hsa correspond to genes, entries with ko correspond to orthologs
                 if entry_split[0] == "hsa" or entry_split[0] == "ko":
                     if entry_split[0] == "hsa":
                         useDict = hsaDict
-                    else:
+                    elif entry_split[0] == "ko":
                         useDict = KEGGdict
                     nameList = []
                     
+                    # Split off the first name
                     entry_name = ""
                     namer = entry_split.pop(0)
                     namer = entry_split.pop(0)
                     namer = namer.split()[0]
 
+                    # Either use the dictionary name for the key or use the name directly if its not in the dictionary
                     entry_name = (
                         entry_name + useDict[namer]
                         if namer in useDict.keys()
                         else entry_name + namer
                     )
+
+                    # Append each gene name to the list ([gene1, gene2])
                     for i in range(len(entry_split)):
                         nameList.append(entry_split[i].split()[0])
+
+                    # For each of the gene names, separate them with a "-" (gene1-gene2)
                     for namer in nameList:
                         entry_name = (
                             entry_name + "-" + useDict[namer]
@@ -153,14 +163,17 @@ class Pathways:
                 else:
                     entry_name = entry["name"]
                     entry_type = entry["type"]
+            
+            # If there is only one name
             else:
-                # hsa:100132463
+                # If the name is hsa
                 if entry_split[0] == "hsa":
-                    entry_name = entry_split[1]
-                    entry_type = entry["type"]
-                    entry_name = (
+                    entry_name = entry_split[1] # Get the entry number
+                    entry_type = entry["type"] # Get the entry type
+                    entry_name = ( # Get the gene name from the entry number if its in the hsa gene name dict
                         hsaDict[entry_name] if entry_name in hsaDict.keys() else entry_name
                     )
+                # If the name is ko, do the same as above but use the KEGGdict instead of the hsa gene name dict
                 elif entry_split[0] == "ko":
                     entry_name = entry_split[1]
                     entry_type = entry["type"]
@@ -169,38 +182,55 @@ class Pathways:
                         if entry_name in KEGGdict.keys()
                         else entry_name
                     )
+                # If the entry is another KEGG pathway number, store the name of the signaling pathway
                 elif entry_split[0] == "path":
-                    entry_name = entry["name"]
+                    entry_name = entry_split[1]
                     entry_type = "path"
+                # If none of the above, just store the name and type
                 else:
                     entry_name = entry["name"]
                     entry_type = entry["type"]
-            # logging.info(f'Gene name: {database[gene_number]}, Gene number: {gene_number}, Pathway: {pathway}')
             
+            # Get the unique entry ID for this pathway
             entry_id = entry["id"]
+
+            # Some genes will have ',' at the end if there were more than one gene, remove that
             entry_name = re.sub(",", "", entry_name)
+
+            # Map the id of the entry to the entry name
             id_to_name[entry_id] = entry_name
             # logging.info(f'Entry name: {entry_name} ID: {entry_id}')
-    
+
+            # If the entry is a pathway, store the pathway name
+            if entry_type == "path":
+                if entry_name not in subpaths:
+                    subpaths.append(entry_name)
+                
+
+            # If the entry type is a gene group, find all component ids and add them to the id dictionary for the entry
             if entry_type == "group":
                 group_ids = []
                 for component in entry.find_all("component"):
                     group_ids.append(component["id"])
                 groups[entry_id] = group_ids
+            
+            # If the entry is not a group, add its attributes to the graph
             else:
                 graph.add_node(entry_name, name=entry_name, type=entry_type)
-    
+
+        # For each of the relationships
         for relation in soup.find_all("relation"):
             # logging.info(f'Relation:')
             # logging.info(f'\t{relation}')
             (color, signal) = ("black", "a")
 
-            relation_entry1 = relation["entry1"]
-            relation_entry2 = relation["entry2"]
-            relation_type = relation["type"]
+            relation_entry1 = relation["entry1"] # Upstream node
+            relation_entry2 = relation["entry2"] # Target node
+            relation_type = relation["type"] # Type of relationship (PPel, GEcrel, etc.)
     
             subtypes = []
-    
+
+            # Relationship subtypes tell you about whats going on
             for subtype in relation.find_all("subtype"):
                 subtypes.append(subtype["name"])
     
@@ -236,10 +266,12 @@ class Pathways:
                 logging.debug("color not detected. Signal assigned to activation arbitrarily")
                 logging.debug(subtypes)
                 signal = "a"
-    
+
+            # For entries that are a group of genes, get a list of all of the sub-id's in that group
             entry1_list = self.expand_groups(relation_entry1, groups)
             entry2_list = self.expand_groups(relation_entry2, groups)
-    
+
+            # Find all connections between objects in the groups and add them to the grapgh
             for (entry1, entry2) in itertools.product(entry1_list, entry2_list):
                 node1 = id_to_name[entry1]
                 node2 = id_to_name[entry2]
@@ -253,7 +285,200 @@ class Pathways:
                     type=relation_type,
                     signal=signal,
                 )
+        # logging.info(f'Subpaths:')
+        # for path_name in subpaths:
+        #     logging.info(f'\t{path_name}')
+
+        num_pathways = len(subpaths)
+
+        for pathway_num, pathway in enumerate(subpaths):
+            logging.info(f'Parsing {pathway}')
+            for xml_file in os.listdir(f'pathway_xml_files/{self.organism}'):
+                xml_pathway_name = xml_file.split('.')[0]
+                if pathway == xml_pathway_name:
+                    print(pathway)
+                    with open(f'pathway_xml_files/{self.organism}/{xml_file}', 'r') as pathway_file:
+                        text = [line for line in pathway_file]
+                    soup = BeautifulSoup("".join(text), "xml")
+                    for entry in soup.find_all("entry"):
+                        # logging.info(f'\nEntry:')
+                        # logging.info(f'\t{entry}')
+
+                        # Name of each gene in the entry
+                        # If there are multiple genes in the entry, store them all with the same id
+                        entry_split = entry["name"].split(":")
+
+                        # logging.info(f'\tentry_split: {entry_split}')
+                        # logging.info(f'\tlen(entry_split) : {len(entry_split)}')
+                        # If the entry is part of a group (in the network coded by a group containing lots of related genes)
+                        if len(entry_split) > 2:
+
+                            # Choose which dictionary to use based on whether the entries are hsa or kegg elements
+                            # Entries with hsa correspond to genes, entries with ko correspond to orthologs
+                            if entry_split[0] == "hsa" or entry_split[0] == "ko":
+                                if entry_split[0] == "hsa":
+                                    useDict = hsaDict
+                                elif entry_split[0] == "ko":
+                                    useDict = KEGGdict
+                                nameList = []
+                                
+                                # Split off the first name
+                                entry_name = ""
+                                namer = entry_split.pop(0)
+                                namer = entry_split.pop(0)
+                                namer = namer.split()[0]
+
+                                # Either use the dictionary name for the key or use the name directly if its not in the dictionary
+                                entry_name = (
+                                    entry_name + useDict[namer]
+                                    if namer in useDict.keys()
+                                    else entry_name + namer
+                                )
+
+                                # Append each gene name to the list ([gene1, gene2])
+                                for i in range(len(entry_split)):
+                                    nameList.append(entry_split[i].split()[0])
+
+                                # For each of the gene names, separate them with a "-" (gene1-gene2)
+                                for namer in nameList:
+                                    entry_name = (
+                                        entry_name + "-" + useDict[namer]
+                                        if namer in useDict.keys()
+                                        else entry_name + "-" + namer
+                                    )
+                                entry_type = entry["type"]
+                            else:
+                                entry_name = entry["name"]
+                                entry_type = entry["type"]
+                        
+                        # If there is only one name
+                        else:
+                            # If the name is hsa
+                            if entry_split[0] == "hsa":
+                                entry_name = entry_split[1] # Get the entry number
+                                entry_type = entry["type"] # Get the entry type
+                                entry_name = ( # Get the gene name from the entry number if its in the hsa gene name dict
+                                    hsaDict[entry_name] if entry_name in hsaDict.keys() else entry_name
+                                )
+                            # If the name is ko, do the same as above but use the KEGGdict instead of the hsa gene name dict
+                            elif entry_split[0] == "ko":
+                                entry_name = entry_split[1]
+                                entry_type = entry["type"]
+                                entry_name = (
+                                    KEGGdict[entry_name]
+                                    if entry_name in KEGGdict.keys()
+                                    else entry_name
+                                )
+                            # If the entry is another KEGG pathway number, store the name of the signaling pathway
+                            elif entry_split[0] == "path":
+                                entry_name = entry_split[1]
+                                entry_type = "path"
+                            # If none of the above, just store the name and type
+                            else:
+                                entry_name = entry["name"]
+                                entry_type = entry["type"]
+                        
+                        # Get the unique entry ID for this pathway
+                        entry_id = entry["id"]
+
+                        # Some genes will have ',' at the end if there were more than one gene, remove that
+                        entry_name = re.sub(",", "", entry_name)
+
+                        # Map the id of the entry to the entry name
+                        id_to_name[entry_id] = entry_name
+                        # logging.info(f'Entry name: {entry_name} ID: {entry_id}')
+
+                        # # If the entry is a pathway, store the pathway name
+                        # if entry_type == "path":
+                        #     if entry_name not in subpaths:
+                        #         subpaths.append(entry_name)
+                            
+
+                        # If the entry type is a gene group, find all component ids and add them to the id dictionary for the entry
+                        if entry_type == "group":
+                            group_ids = []
+                            for component in entry.find_all("component"):
+                                group_ids.append(component["id"])
+                            groups[entry_id] = group_ids
+                        
+                        # If the entry is not a group, add its attributes to the graph
+                        else:
+                            graph.add_node(entry_name, name=entry_name, type=entry_type)
+
+                    # For each of the relationships
+                    for relation in soup.find_all("relation"):
+                        # logging.info(f'Relation:')
+                        # logging.info(f'\t{relation}')
+                        (color, signal) = ("black", "a")
+
+                        relation_entry1 = relation["entry1"] # Upstream node
+                        relation_entry2 = relation["entry2"] # Target node
+                        relation_type = relation["type"] # Type of relationship (PPel, GEcrel, etc.)
                 
+                        subtypes = []
+
+                        # Relationship subtypes tell you about whats going on
+                        for subtype in relation.find_all("subtype"):
+                            subtypes.append(subtype["name"])
+                
+                        if (
+                            ("activation" in subtypes)
+                            or ("expression" in subtypes)
+                            or ("glycosylation" in subtypes)
+                        ):
+                            color = "green"
+                            signal = "a"
+                        elif ("inhibition" in subtypes) or ("repression" in subtypes):
+                            color = "red"
+                            signal = "i"
+                        elif ("binding/association" in subtypes) or ("compound" in subtypes):
+                            color = "purple"
+                            signal = "a"
+                        elif "phosphorylation" in subtypes:
+                            color = "orange"
+                            signal = "a"
+                        elif "dephosphorylation" in subtypes:
+                            color = "pink"
+                            signal = "i"
+                        elif "indirect effect" in subtypes:
+                            color = "cyan"
+                            signal = "a"
+                        elif "dissociation" in subtypes:
+                            color = "yellow"
+                            signal = "i"
+                        elif "ubiquitination" in subtypes:
+                            color = "cyan"
+                            signal = "i"
+                        else:
+                            logging.debug("color not detected. Signal assigned to activation arbitrarily")
+                            logging.debug(subtypes)
+                            signal = "a"
+
+                        # For entries that are a group of genes, get a list of all of the sub-id's in that group
+                        entry1_list = self.expand_groups(relation_entry1, groups)
+                        entry2_list = self.expand_groups(relation_entry2, groups)
+
+                        # Find all connections between objects in the groups and add them to the grapgh
+                        for (entry1, entry2) in itertools.product(entry1_list, entry2_list):
+                            node1 = id_to_name[entry1]
+                            node2 = id_to_name[entry2]
+                            # if (node1.count('-') < 10 or node2.count('-') < 10):
+                            # logging.info(f'{node1} --- {signal} ---> {node2}\n\t{"/".join(subtypes)}')
+                            graph.add_edge(
+                                node1,
+                                node2,
+                                color=color,
+                                subtype="/".join(subtypes),
+                                type=relation_type,
+                                signal=signal,
+                            )
+
+
+        print(subpaths)
+
+        # self.add_pathways(subpath_graphs, minOverlap=25, organism=self.organism)
+
+
 
         return graph
 
@@ -440,7 +665,7 @@ class Pathways:
                         line = line.decode("utf-8")
                         line_split = line.split("\t")
                         k = line_split[0].split(":")[1]
-                        nameline = line_split[1].split(";")
+                        nameline = line_split[3].split(";")
                         name = nameline[0]
                         if "," in name:
                             nameline = name.split(",")
