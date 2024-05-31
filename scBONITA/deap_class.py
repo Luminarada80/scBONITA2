@@ -54,7 +54,7 @@ class CustomDeap:
         _, num_columns = np.shape(self.binMat)
 
         # Chunk the data matrix to reduce noise and put into numpy array to speed up processing
-        self.num_chunks = 1000
+        self.num_chunks = 100
 
         # Chunk if there are more cells than columns, otherwise just use the columns
         if num_columns > self.num_chunks:

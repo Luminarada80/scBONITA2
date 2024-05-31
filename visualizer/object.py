@@ -7,7 +7,7 @@ class Object(pygame.sprite.Sprite):
     def __init__(self, name, position, color):
         super().__init__()
 
-        self.size = 75
+        self.size = 50
         self.name = name
         self.position = position
         self.color = color
@@ -68,9 +68,9 @@ class Object(pygame.sprite.Sprite):
                 start_point = (self.position[0] + unit_direction[0] * self.size / 2, self.position[1] + unit_direction[1] * self.size / 2)
                 end_point = (obj.position[0] - unit_direction[0] * obj.size / 2, obj.position[1] - unit_direction[1] * obj.size / 2)
 
-                pygame.draw.line(self.display_surface, self.line_color, start_point, end_point, 4)
+                pygame.draw.line(self.display_surface, self.line_color, start_point, end_point, 3)
                 
-                arrow_length = 12
+                arrow_length = 6
                 arrow_degrees = math.radians(30)
 
                 arrow_body_end = (end_point[0] - unit_direction[0] * arrow_length, end_point[1] - unit_direction[1] * arrow_length)
@@ -85,10 +85,11 @@ class Object(pygame.sprite.Sprite):
 
     def move(self, events, rect, game):
         for event in events:
-            if event.type == pygame.MOUSEBUTTONDOWN and rect.collidepoint(self.mouse_pos) and game.node_being_moved is None:
+            if event.type == pygame.MOUSEBUTTONDOWN and rect.collidepoint(self.mouse_pos) and game.node_being_moved is None and event.button == 1:
                 self.moving = True
                 game.node_being_moved = self
-            elif event.type == pygame.MOUSEBUTTONUP and self.moving:
+
+            elif event.type == pygame.MOUSEBUTTONUP and self.moving and event.button == 1:
                 self.moving = False
                 game.node_being_moved = None
                 
@@ -106,7 +107,7 @@ class Object(pygame.sprite.Sprite):
 
         pygame.draw.line(self.display_surface, self.line_color, node_edge, mouse, 2)
 
-        arrow_length = 10
+        arrow_length = 7
         arrow_degrees = math.radians(30)
 
         angle = math.atan2(direction[1], direction[0])

@@ -114,11 +114,22 @@ class Game:
         pygame.display.set_caption('Graph visualizer')
         self.clock = pygame.time.Clock()
 
+        self.selection_box_start = None
+        self.selection_box_end = None
+        self.selected_objects = pygame.sprite.Group()
+        self.dragging_selection = False
+        self.moving_objects = False
+
         self.save_file = 'hsa05171_save_game_2.pickle'
         self.mouse_pos = pygame.mouse.get_pos()
         self.keys = pygame.key.get_pressed()
 
         self.uuids = {}
+        self.last_mouse_pos = None
+
+        self.is_panning = False  # Flag to track panning state
+        self.pan_start_pos = (0, 0)  # Store the initial position when panning starts
+        self.offset = [0, 0]  # Offset for panning
 
         # num_nodes = 10
         # num_and_gates = 10
@@ -257,6 +268,37 @@ class Game:
                 object.kill()
                 object.remove_all_connections(self.objects_group, just_killed=True)
 
+    def draw_selection_box(self):
+        if self.selection_box_start and self.selection_box_end:
+            x1, y1 = self.selection_box_start
+            x2, y2 = self.selection_box_end
+            rect = pygame.Rect(min(x1, x2), min(y1, y2), abs(x2 - x1), abs(y2 - y1))
+            pygame.draw.rect(self.screen, (0, 255, 0), rect, 2)
+
+    def update_selected_objects(self):
+        self.selected_objects.empty()
+        if self.selection_box_start and self.selection_box_end:
+            x1, y1 = self.selection_box_start
+            x2, y2 = self.selection_box_end
+            selection_rect = pygame.Rect(min(x1, x2), min(y1, y2), abs(x2 - x1), abs(y2 - y1))
+            for obj in self.objects_group:
+                if selection_rect.colliderect(obj.rect):
+                    self.selected_objects.add(obj)
+
+    def check_selected_objects(self, mouse_pos):
+        mouse_pos_difference = pygame.Vector2(mouse_pos) - pygame.Vector2(self.last_mouse_pos)
+        for obj in self.selected_objects:
+            if obj.rect.collidepoint(mouse_pos):
+                # obj.moving = True
+                # self.node_being_moved = obj
+                # obj.drag_offset = obj.position - pygame.Vector2(mouse_pos)
+                obj.position = obj.position - mouse_pos_difference
+                break
+
+    def highlight_selected_objects(self):
+        for obj in self.selected_objects:
+            # Draw a golden circle around the object
+            pygame.draw.circle(self.screen, (255, 215, 0), obj.rect.center, max(obj.rect.width, obj.rect.height) // 2 + 10, 3)
     def run(self):
         while True:
             events = pygame.event.get()
@@ -264,6 +306,50 @@ class Game:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.button == 3:  # Right mouse button for selection box
+                        self.selection_box_start = pygame.Vector2(event.pos)
+                        self.selection_box_end = pygame.Vector2(event.pos)
+                        self.dragging_selection = True
+                    elif event.button == 1:  # Left mouse button for moving
+                        self.check_selected_objects(event.pos)
+
+                    elif event.button == 2:  # Middle mouse button
+                        self.is_panning = True
+                        self.pan_start_pos = pygame.mouse.get_pos()
+
+                elif event.type == pygame.MOUSEBUTTONUP:
+                    if event.button == 3 and self.dragging_selection:
+                        self.dragging_selection = False
+                        self.update_selected_objects()
+                        self.selection_box_start = None  # Reset the selection box start
+                        self.selection_box_end = None    # Reset the selection box end
+
+                    elif event.button == 1:
+                        for obj in self.selected_objects:
+                            obj.moving = False
+                        self.node_being_moved = None
+
+                    elif event.button == 2:  # Middle mouse button
+                        self.is_panning = False
+
+                elif event.type == pygame.MOUSEMOTION:
+                    if self.dragging_selection:
+                        self.selection_box_end = pygame.Vector2(event.pos)
+
+                    elif self.node_being_moved:
+                        mouse_pos_difference = pygame.Vector2(pygame.mouse.get_pos()) - pygame.Vector2(self.last_mouse_pos)
+                        for obj in self.selected_objects:
+                            obj.position = obj.position + mouse_pos_difference
+                            object.rect.center = obj.position
+                        self.last_mouse_pos = pygame.mouse.get_pos()  # Update the last mouse position
+
+                    elif self.is_panning:
+                        mouse_pos_difference = pygame.Vector2(pygame.mouse.get_pos()) - pygame.Vector2(self.last_mouse_pos)
+                        for object in self.objects_group:
+                            object.position = object.position + mouse_pos_difference
+                            object.rect.center = object.position
+                        self.last_mouse_pos = pygame.mouse.get_pos()  # Update the last mouse position
                 
             self.mouse_pos = pygame.mouse.get_pos()
             self.keys = pygame.key.get_pressed()
@@ -279,8 +365,10 @@ class Game:
 
             self.screen.fill("white")      
 
+            
 
             for object in self.objects_group:
+
                 if object.is_node and object not in self.nodes:
                     self.nodes.append(object)
 
@@ -290,9 +378,13 @@ class Game:
                 object.update_object(events, self.connections, self.gate_ids, self.node_ids, self.uuids, self, self.keys, self.mouse_pos)
                 if object.is_drawing_line:
                     self.connections += 1
-
+                
+                # object.position = (object.position[0] + self.offset[0], object.position[1] + self.offset[1])
+            
             for node in self.nodes_group:
                 node.move_if_colliding(self.nodes_group)  # Move and resolve collisions
+
+            
 
 
             # Reset the number of connections if the 1 key is not pressed
@@ -326,6 +418,11 @@ class Game:
             # else:
             #     self.states = {}
 
+            self.draw_selection_box()  # Draw the selection box
+            self.highlight_selected_objects()  # Highlight selected objects
+
+            # Update the last mouse pos
+            self.last_mouse_pos = self.mouse_pos
             pygame.display.update()
             self.clock.tick(60)
 
