@@ -107,8 +107,8 @@ class Game:
     def __init__(self):
 
         pygame.init()
-        self.WIDTH = 1920
-        self.HEIGHT = 1080
+        self.WIDTH = 2560
+        self.HEIGHT = 1440
 
         self.screen = pygame.display.set_mode((self.WIDTH,self.HEIGHT))
         pygame.display.set_caption('Graph visualizer')
@@ -126,10 +126,13 @@ class Game:
 
         self.uuids = {}
         self.last_mouse_pos = None
+<<<<<<< HEAD
 
         self.is_panning = False  # Flag to track panning state
         self.pan_start_pos = (0, 0)  # Store the initial position when panning starts
         self.offset = [0, 0]  # Offset for panning
+=======
+>>>>>>> origin/working
 
         # num_nodes = 10
         # num_and_gates = 10
@@ -299,6 +302,11 @@ class Game:
         for obj in self.selected_objects:
             # Draw a golden circle around the object
             pygame.draw.circle(self.screen, (255, 215, 0), obj.rect.center, max(obj.rect.width, obj.rect.height) // 2 + 10, 3)
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> origin/working
     def run(self):
         while True:
             events = pygame.event.get()
@@ -314,22 +322,29 @@ class Game:
                     elif event.button == 1:  # Left mouse button for moving
                         self.check_selected_objects(event.pos)
 
+<<<<<<< HEAD
                     elif event.button == 2:  # Middle mouse button
                         self.is_panning = True
                         self.pan_start_pos = pygame.mouse.get_pos()
 
+=======
+>>>>>>> origin/working
                 elif event.type == pygame.MOUSEBUTTONUP:
                     if event.button == 3 and self.dragging_selection:
                         self.dragging_selection = False
                         self.update_selected_objects()
                         self.selection_box_start = None  # Reset the selection box start
                         self.selection_box_end = None    # Reset the selection box end
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/working
                     elif event.button == 1:
                         for obj in self.selected_objects:
                             obj.moving = False
                         self.node_being_moved = None
 
+<<<<<<< HEAD
                     elif event.button == 2:  # Middle mouse button
                         self.is_panning = False
 
@@ -337,6 +352,11 @@ class Game:
                     if self.dragging_selection:
                         self.selection_box_end = pygame.Vector2(event.pos)
 
+=======
+                elif event.type == pygame.MOUSEMOTION:
+                    if self.dragging_selection:
+                        self.selection_box_end = pygame.Vector2(event.pos)
+>>>>>>> origin/working
                     elif self.node_being_moved:
                         mouse_pos_difference = pygame.Vector2(pygame.mouse.get_pos()) - pygame.Vector2(self.last_mouse_pos)
                         for obj in self.selected_objects:
@@ -344,12 +364,15 @@ class Game:
                             object.rect.center = obj.position
                         self.last_mouse_pos = pygame.mouse.get_pos()  # Update the last mouse position
 
+<<<<<<< HEAD
                     elif self.is_panning:
                         mouse_pos_difference = pygame.Vector2(pygame.mouse.get_pos()) - pygame.Vector2(self.last_mouse_pos)
                         for object in self.objects_group:
                             object.position = object.position + mouse_pos_difference
                             object.rect.center = object.position
                         self.last_mouse_pos = pygame.mouse.get_pos()  # Update the last mouse position
+=======
+>>>>>>> origin/working
                 
             self.mouse_pos = pygame.mouse.get_pos()
             self.keys = pygame.key.get_pressed()
