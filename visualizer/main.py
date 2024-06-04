@@ -121,7 +121,7 @@ class Game:
         self.dragging_selection = False
         self.moving_objects = False
 
-        self.save_file = 'hsa05171_save_game_2.pickle'
+        self.save_file = 'hsa04621_save_game.pickle'
         self.mouse_pos = pygame.mouse.get_pos()
         self.keys = pygame.key.get_pressed()
 
@@ -149,7 +149,7 @@ class Game:
         self.gates = []
 
         # read_rule_file.create_nodes_and_gates('visualizer/04670.txt', self)
-        read_rule_file.create_nodes_and_gates('visualizer/05171.txt', self)
+        read_rule_file.create_nodes_and_gates('visualizer/04621.txt', self)
 
         # Boolean Nodes
         # for i in range(1, num_nodes+1):
@@ -308,9 +308,9 @@ class Game:
             pygame.draw.circle(self.screen, (255, 215, 0), obj.rect.center, max(obj.rect.width, obj.rect.height) // 2 + 10, 3)
     
     def auto_organize_nodes(self):
-        gravity = 0.01
-        repulsive_force_modifier = 50
-        attractive_force_modifier = 0.01
+        gravity = 0.02
+        repulsive_force_modifier = 25
+        attractive_force_modifier = 0.2
 
         # There should be a repulsive force away from 
         # Pull objects toward the center of the screen
@@ -326,15 +326,17 @@ class Game:
             if distance_to_center != 0:
                 dir_to_center.normalize_ip()
 
-            attraction = gravity * ((math.sqrt(distance_to_center)**1.5))
-            repulsion = -30/math.sqrt(distance_to_center)
+            attraction = gravity * ((math.sqrt(distance_to_center)**1.6))
+            repulsion = -50/math.sqrt(distance_to_center)
 
             # Move the object towards the center
             obj.position += dir_to_center * (attraction + repulsion)
             obj.rect.center = obj.position      
 
-            repulsive_force = 1 + len(obj.incoming_connections) * repulsive_force_modifier
-            attractive_force = 1 + len(obj.outgoing_connections) * attractive_force_modifier
+            repulsive_force = (0.4 * len(obj.outgoing_connections)) * repulsive_force_modifier
+            attractive_force = (0.3 * len(obj.outgoing_connections)) * attractive_force_modifier
+            # repulsive_force = 1 + repulsive_force_modifier
+            # attractive_force = 1 + attractive_force_modifier
 
             # Push incoming connections away from the node
             for conn_obj in obj.incoming_connections + obj.outgoing_connections:
@@ -344,18 +346,22 @@ class Game:
 
                 # Find the distance between the objects
                 distance = direction_vector.length()
-                # Calculate the overlap distance
-                overlap = distance - (obj.rect.width / 2 + conn_obj.rect.width / 2 + 5)
-
-                # Make sure that nodes don't collide a ton
-                if not pygame.sprite.collide_rect(obj, conn_obj) and distance > 20:
                     
-                    conn_repulsion = -repulsive_force/(math.sqrt(distance))
-                    conn_attraction = attractive_force * (math.sqrt(distance)**1.1)
-                    move_vector = direction_vector.normalize() * (conn_attraction + conn_repulsion)
-                    # Move the object by the move_vector
-                    conn_obj.position += move_vector
-                    conn_obj.rect.center = conn_obj.position
+                conn_repulsion = -repulsive_force/(math.sqrt(distance)) # Make the repulsion more as distance decreases
+                conn_attraction = attractive_force * (math.sqrt(distance)**1.5) # Make the attraction more as distance increases
+                move_vector = direction_vector.normalize() * (conn_attraction + conn_repulsion)
+                
+                # Move the object by the move_vector
+                if conn_obj in obj.outgoing_connections:
+                    move_left = 0.5 / len(obj.outgoing_connections) # Scale the movement for nodes with lots of connections
+                    move_vector = move_vector + pygame.math.Vector2(move_left, 0) # move outgoing connections slightly to the right
+                
+                if conn_obj in obj.incoming_connections:
+                    move_right = -0.5 / len(obj.incoming_connections) # Scale the movement for nodes with lots of connections
+                    move_vector = move_vector + pygame.math.Vector2(move_right, 0) # move incoming connections slightly to the left
+                
+                conn_obj.position += move_vector
+                conn_obj.rect.center = conn_obj.position
 
     def simulation_step_cooldown(self):
         if not self.can_update and pygame.time.get_ticks() - self.update_time >= self.cooldown:
@@ -458,9 +464,9 @@ class Game:
                 
                 # object.position = (object.position[0] + self.offset[0], object.position[1] + self.offset[1])
             
-            # if not self.keys[pygame.K_SPACE]:
-            for node in self.nodes_group:
-                node.move_if_colliding(self.nodes_group)  # Move and resolve collisions
+            if not self.keys[pygame.K_SPACE]:
+                for node in self.nodes_group:
+                    node.move_if_colliding(self.nodes_group)  # Move and resolve collisions
 
 
             # Reset the number of connections if the 1 key is not pressed
