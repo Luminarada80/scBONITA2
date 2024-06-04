@@ -121,7 +121,7 @@ class Game:
         self.dragging_selection = False
         self.moving_objects = False
 
-        self.save_file = 'hsa05171_save_game_huge.pickle'
+        self.save_file = 'hsa05171_save_game_2.pickle'
         self.mouse_pos = pygame.mouse.get_pos()
         self.keys = pygame.key.get_pressed()
 
@@ -131,6 +131,12 @@ class Game:
         self.is_panning = False  # Flag to track panning state
         self.pan_start_pos = (0, 0)  # Store the initial position when panning starts
         self.offset = [0, 0]  # Offset for panning
+
+        self.clustering_running = False
+
+        self.cooldown = 200
+        self.update_time = None
+        self.can_update = True
 
         # num_nodes = 10
         # num_and_gates = 10
@@ -143,7 +149,7 @@ class Game:
         self.gates = []
 
         # read_rule_file.create_nodes_and_gates('visualizer/04670.txt', self)
-        read_rule_file.create_nodes_and_gates('visualizer/05171_huge.txt', self)
+        read_rule_file.create_nodes_and_gates('visualizer/05171.txt', self)
 
         # Boolean Nodes
         # for i in range(1, num_nodes+1):
@@ -351,6 +357,10 @@ class Game:
                     conn_obj.position += move_vector
                     conn_obj.rect.center = conn_obj.position
 
+    def simulation_step_cooldown(self):
+        if not self.can_update and pygame.time.get_ticks() - self.update_time >= self.cooldown:
+            self.can_update = True
+
     def run(self):
         while True:
             events = pygame.event.get()
@@ -401,7 +411,9 @@ class Game:
                             object.position = object.position + mouse_pos_difference
                             object.rect.center = object.position
                         self.last_mouse_pos = pygame.mouse.get_pos()  # Update the last mouse position
-                
+            
+            self.simulation_step_cooldown()
+
             self.mouse_pos = pygame.mouse.get_pos()
             self.keys = pygame.key.get_pressed()
 
@@ -413,6 +425,17 @@ class Game:
             
             if self.keys[pygame.K_DELETE]:
                 self.delete_all_connections()
+            
+            # if self.keys[pygame.K_SPACE] and self.can_update:
+            #     self.update_time = pygame.time.get_ticks()
+
+            #     if self.clustering_running == False:
+            #         self.clustering_running = True
+            #         self.can_update = False
+                    
+            #     elif self.clustering_running == True:
+            #         self.clustering_running = False
+            #         self.can_update = False
             
             if self.keys[pygame.K_SPACE]:
                 self.auto_organize_nodes()
@@ -436,8 +459,8 @@ class Game:
                 # object.position = (object.position[0] + self.offset[0], object.position[1] + self.offset[1])
             
             # if not self.keys[pygame.K_SPACE]:
-            # for node in self.nodes_group:
-            #     node.move_if_colliding(self.nodes_group)  # Move and resolve collisions
+            for node in self.nodes_group:
+                node.move_if_colliding(self.nodes_group)  # Move and resolve collisions
 
 
             # Reset the number of connections if the 1 key is not pressed
