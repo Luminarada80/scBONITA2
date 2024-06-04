@@ -121,7 +121,7 @@ class Game:
         self.dragging_selection = False
         self.moving_objects = False
 
-        self.save_file = 'hsa05171_save_game_2.pickle'
+        self.save_file = 'hsa05171_save_game_huge.pickle'
         self.mouse_pos = pygame.mouse.get_pos()
         self.keys = pygame.key.get_pressed()
 
@@ -143,7 +143,7 @@ class Game:
         self.gates = []
 
         # read_rule_file.create_nodes_and_gates('visualizer/04670.txt', self)
-        read_rule_file.create_nodes_and_gates('visualizer/05171.txt', self)
+        read_rule_file.create_nodes_and_gates('visualizer/05171_huge.txt', self)
 
         # Boolean Nodes
         # for i in range(1, num_nodes+1):
@@ -351,43 +351,6 @@ class Game:
                     conn_obj.position += move_vector
                     conn_obj.rect.center = conn_obj.position
 
-
-            # # Push incoming connections away from the node
-            # for inc_obj in obj.incoming_connections:
-            #     # Calculate the direction vector between the centers of the two sprites
-            #     direction_vector = pygame.math.Vector2(obj.rect.centerx - inc_obj.rect.centerx + 0.001,
-            #                                             obj.rect.centery - inc_obj.rect.centery + 0.001)
-
-            #     # Find the distance between the objects
-            #     distance = direction_vector.length()
-            #     # Calculate the overlap distance
-            #     overlap = distance - (obj.rect.width / 2 + inc_obj.rect.width / 2 + 5)
-
-            #     # Make sure that nodes don't collide a ton
-            #     if not pygame.sprite.collide_rect(obj, inc_obj) and overlap > 20:
-
-            #         move_vector = direction_vector.normalize() * repulsive_force / math.sqrt(distance)
-            #         # Move the object by the move_vector
-            #         inc_obj.position -= move_vector
-            #         inc_obj.rect.center = inc_obj.position
-
-            # for out_obj in obj.outgoing_connections:
-            #     # Calculate the direction vector between the centers of the two sprites
-            #     direction_vector = pygame.math.Vector2(obj.rect.centerx - out_obj.rect.centerx + 0.001,
-            #                                             obj.rect.centery - out_obj.rect.centery + 0.001)
-
-            #     # Find the distance between the objects
-            #     distance = direction_vector.length()
-            #     # Calculate the overlap distance
-            #     overlap = distance - (obj.rect.width / 2 + out_obj.rect.width / 2 + 5)
-
-            #     # Make sure that nodes don't collide a ton
-            #     if not pygame.sprite.collide_rect(obj, out_obj) and overlap > 20:
-            #         move_vector = direction_vector.normalize() * attractive_force * math.sqrt(distance)
-            #         # Move the object by the move_vector
-            #         out_obj.position += move_vector
-            #         out_obj.rect.center = out_obj.position
-
     def run(self):
         while True:
             events = pygame.event.get()
@@ -473,10 +436,8 @@ class Game:
                 # object.position = (object.position[0] + self.offset[0], object.position[1] + self.offset[1])
             
             # if not self.keys[pygame.K_SPACE]:
-            for node in self.nodes_group:
-                node.move_if_colliding(self.nodes_group)  # Move and resolve collisions
-
-            
+            # for node in self.nodes_group:
+            #     node.move_if_colliding(self.nodes_group)  # Move and resolve collisions
 
 
             # Reset the number of connections if the 1 key is not pressed

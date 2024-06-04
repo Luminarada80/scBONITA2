@@ -200,40 +200,6 @@ class Object(pygame.sprite.Sprite):
         else:
             self.update_num = 0
     
-    # def auto_organize_nodes(self):
-    #     if self.keys[pygame.K_SPACE]:
-
-    #         # There should be a repulsive force away from 
-
-    #         # Calculate the gravity
-    #         # The gravity pulling toward the node will be equal to the number of connections the node has
-    #         # Pull connected objects toward this object
-    #         if len(self.incoming_connections) + len(self.outgoing_connections) > 0:
-    #             gravity = len(self.incoming_connections) + len(self.outgoing_connections)
-    #             for obj in self.incoming_connections + self.outgoing_connections:
-    #                 if obj.is_node:
-
-    #                     # Calculate the direction vector between the centers of the two sprites
-    #                     direction_vector = pygame.math.Vector2(self.rect.centerx - obj.rect.centerx + 0.001,
-    #                                                         self.rect.centery - obj.rect.centery + 0.001)
-
-    #                     # Find the distance between the objects
-    #                     distance = direction_vector.length()
-    #                     # Calculate the overlap distance
-    #                     overlap = distance - (self.rect.width / 2 + obj.rect.width / 2 + 5)
-                        
-    #                     # Make sure that nodes dont collide a ton
-    #                     if not pygame.sprite.collide_rect(self, obj) and overlap > 1:
-    #                         move_vector = (direction_vector.normalize() * gravity) * math.sqrt(distance)
-    #                         # Move the object by the move_vector
-    #                         obj.position += move_vector
-    #                         obj.rect.center = obj.position
-                    
-                    
-
-            
-
-
     def simulation_step_cooldown(self):
         if not self.can_update and pygame.time.get_ticks() - self.update_time >= self.cooldown:
             self.can_update = True
@@ -282,8 +248,6 @@ class Object(pygame.sprite.Sprite):
         self.rect.center = self.position
         other_sprite.rect.center = other_sprite.position
 
-
-
     def request_uuid_objects(self, uuid_dict, object_uuids):
         return [uuid_dict.get(id) for id in object_uuids if id in uuid_dict]
             
@@ -293,7 +257,6 @@ class Object(pygame.sprite.Sprite):
         gates = self.request_uuid_objects(uuid_dict, gate_ids)
         nodes = self.request_uuid_objects(uuid_dict, node_ids)
         objects = nodes + gates
-        # self.auto_organize_nodes()
         self.move(events, rect, game)
         self.connect_to_object(events, objects)
         self.draw_connections()
