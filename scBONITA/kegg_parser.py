@@ -859,7 +859,8 @@ class Pathways:
                     # To do: remove complexes, remove dependences of a node on complexes that include that node (which is a form of self-loop)
                     self.pathway_graphs[pathway] = G
                     logging.info(f'\t\t\t\tEdges after processing: {len(G.edges())} Overlap: {len(set(G.nodes()).intersection(pathwayGenes))}')
-                    
+                    filtered_overlap = len(set(G.nodes()).intersection(pathwayGenes))
+
                     if write_graphml and filtered_overlap > minOverlap:
                         nx.write_graphml(
                             G, self.output_path + organism + pathway + "_processed.graphml", infer_numeric_types=True
@@ -899,7 +900,7 @@ class Pathways:
                         # To do: remove complexes, remove dependences of a node on complexes that include that node (which is a form of self-loop)
                         self.pathway_graphs[pathway] = G
                         filtered_overlap = len(set(G.nodes()).intersection(pathwayGenes))
-                        logging.info(f'\t\t\t\tEdges after processing: {len(G.edges())} Overlap: {filtered_overlap}')
+                        logging.info(f'\t\t\tEdges after processing: {len(G.edges())} Overlap: {filtered_overlap}')
 
 
                         if write_graphml and filtered_overlap > minOverlap:

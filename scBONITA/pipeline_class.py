@@ -128,6 +128,9 @@ class Pipeline():
                 processed_graphml_path = f'graphml_files/{self.dataset_name}/{self.organism}{pathway}_processed.graphml'
 
                 self.infer_rules(pathway, processed_graphml_path, ruleset)
+            
+            else:
+                logging.info(f'\t\t\tNot enough overlapping nodes for {pathway} (min 25, overlap {len(graph.nodes())})')
     
     def generate_ruleset(self, network, node_indices, gene_list):
         # Create RuleInference object
