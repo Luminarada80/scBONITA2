@@ -56,8 +56,8 @@ class GenerateDataset:
     def combine_not(self, operators):
         i = 0
         while i < len(operators):
-            if operators[i] == 'NOT' and i + 1 < len(operators):
-                operators[i] = 'NOT ' + operators[i + 1]
+            if operators[i] == 'not' and i + 1 < len(operators):
+                operators[i] = 'not ' + operators[i + 1]
                 del operators[i + 1]
             else:
                 i += 1

@@ -1,147 +1,91 @@
-import numpy as np
+import re
+import statistics
 import random
+import matplotlib.pyplot as plt
 
-def check_rules(dataset, rules, raw_rule_text):
-    """
-    Check if the dataset follows the given rules.
-
-    Args:
-    dataset (numpy array): The dataset containing the states of the genes.
-    rules (list of lists): The rules for each gene.
-
-    Returns:
-    bool: True if the dataset follows the rules, False otherwise.
-    """
-    num_cells = dataset.shape[1]
-    num_genes = dataset.shape[0]
-    total = 0
-    mismatch_count = 0
-
-    rule_error_dict = {}
+def evaluate_expression(expression, state):
+    # Replace indices with their boolean values from the state
+    def replace_indices(match):
+        index = int(match.group(0).replace('Gene', ''))
+        return str(bool(state[index]))
     
-
-    for cell in range(num_cells):
-        for gene_index, rule in enumerate(rules):
-            if raw_rule_text[gene_index] not in rule_error_dict:
-                rule_error_dict[str(raw_rule_text[gene_index])] = 0
-
-            result = check_logic(rule, dataset[:, cell])
-
-            if result != dataset[gene_index, cell]:
-                mismatch_count += 1
-                rule_error_dict[str(raw_rule_text[gene_index])] += 1
-        
-            total += 1
+    # Use regex to find all indices in the expression and replace them
+    parsed_expression = re.sub(r'\bGene\d+\b', replace_indices, expression)
     
-    print(f'\nRules with mismatches:')
-    for rule, mismatches in rule_error_dict.items():
-        line_new = '{:>12}  {:>12}'.format(rule, mismatches)
-        if mismatches != 0:
-            print(f'\tMismatches: {mismatches}\tRule: {rule}')
+    # Evaluate the parsed expression safely
+    try:
+        result = eval(parsed_expression)
+    except Exception as e:
+        raise ValueError(f"Error evaluating expression: {expression}") from e
     
-    if mismatch_count == 0:
-        print(f'\tNo mismatches')
+    return result
+
+def evaluate_ruleset(ruleset, state):
+    results = []
+    for rule in ruleset:
+        result = evaluate_expression(rule, state)
+        results.append(result)
+    return results
+
+def compare_rulesets(ruleset1, ruleset2, state):
+    results1 = evaluate_ruleset(ruleset1, state)
+    results2 = evaluate_ruleset(ruleset2, state)
     
-    error =  mismatch_count / total * 100
+    match_count = sum(1 for r1, r2 in zip(results1, results2) if r1 == r2)
+    match_percentage = (match_count / len(ruleset1)) * 100
+    
+    return match_percentage, results1, results2
 
-    # print(f'\nMismatches = {mismatch_count} (total = {total})')
-    # print(f'Error = {error}\n')
+def parse_ruleset(rule_file_path):
+    ruleset = []
+    with open(rule_file_path, 'r') as rule_file:
+        for line in rule_file:
+            if ' = ' in line:
+                rule = line.strip().split(' = ')[1]
+                ruleset.append(rule)
+    return ruleset
 
-    return mismatch_count, total, error
+true_ruleset_path = f'network_simulation/data/network_rules.txt'
+test_ruleset_path = f'scBONITA/rules_output/test_data_rules/test_network.graphml_test_data_ind_1_rules.txt'
 
-def check_logic(rule, state):
-    result = None
-    operator = None
-    print(f"Evaluating Rule: {rule} with State: {state}")  # Debugging output
-    for item in rule:
-        if item in ['and', 'or', 'not']:
-            operator = item
-        else:
-            value = state[int(item)]
-            if operator == 'not':
-                value = not value
-                operator = None  # Reset operator after use
+true_ruleset = parse_ruleset(true_ruleset_path)
+test_ruleset = parse_ruleset(test_ruleset_path)
 
-            print(f"Item: {item}, Operator: {operator}, Value: {value}")  # Debugging output
+num_trials = 1000
+num_genes = len(true_ruleset)
 
-            if result is None:
-                result = value
-            else:
-                if operator == 'and':
-                    result = result and value
-                elif operator == 'or':
-                    result = result or value
+# Compare rulesets
+percent_matches = []
+for i in range(num_trials):
+    state = [random.choice([0,1]) for i in true_ruleset]
+    match_percentage, results1, results2 = compare_rulesets(true_ruleset, test_ruleset, state)
+    percent_matches.append(match_percentage)
 
-            print(f"Intermediate Result: {result}")  # Debugging output
+avg = statistics.mean(percent_matches)
+stdev = statistics.stdev(percent_matches)
+minimum = min(percent_matches)
+maximum = max(percent_matches)
 
-    final_result = 1 if result else 0
-    print(f"Final Result: {final_result}")  # Debugging output
-    return final_result
+print(f"Average Percent Match: {avg}%")
+print(f'Stdev = {round(stdev,2)}%')
+print(f'Min = {minimum}%')
+print(f'Max = {maximum}%')
 
-def get_rules(path):
-    raw_ruletext = []
-    with open(path, 'r') as rules_file:
-        ruleset = []
-        for line in rules_file:
+plt.figure(figsize=(12, 6))
+plt.boxplot(percent_matches, vert=True, patch_artist=True)
+plt.title(f'Percent of scBONITA rules matching True rules over {num_trials} trials for a pathway with {num_genes} genes')
+plt.ylabel('Percentage')
+plt.xticks([])  # Remove the x-axis tick (1)
 
-            # Get the gene names
-            gene_name = line.split(' = ')[0]
-            gene_name = gene_name.strip('Gene')
+# Adding legend with statistics
+legend_text = (
+    f"Avg = {avg:.2f}%\n"
+    f"Stdev = {stdev:.1f}%\n"
+    f"Min = {minimum}%\n"
+    f"Max = {maximum}%"
+)
+plt.figtext(0.85, 0.5, legend_text, verticalalignment='center', fontsize=10, bbox={'facecolor': 'white', 'alpha': 0.5, 'pad': 10})
 
-            # Get and format the rules
-            try:
-                gene_rules = line.split(' = ')[1] # Specify the rules as being the right side of the '=' sign
-                # print(gene_rules)
-                gene_rules = gene_rules.split(' ') # Split elements based on spaces
-                gene_rules = [i.strip('Gene') for i in gene_rules] # Strip 'Gene' from each element to get gene numbers
-                gene_rules = [i.strip() for i in gene_rules] # Get rid of newline characters
-                gene_rules = [i.lower() for i in gene_rules] # Set rules to lowercase
-                raw_ruletext.append(line.strip())
-            except IndexError:
-                continue
-
-            ruleset.append(gene_rules) # Append the ruleset for the file
-    return ruleset, raw_ruletext
-
-def get_matrix(path):
-    with open(path, 'r') as data_file:
-        matrix = []
-        file_lines = []
-        for line in data_file:
-            line = line.strip()
-            line = line.split(',')
-            file_lines.append(line)
-        for entry in file_lines[1:]:
-            integer_data = [int(i) for i in entry[1:]]
-            matrix.append(integer_data)
-    return matrix
-
-def evaluate_scbonita_output():
-    scbonita_rules_file_path = '/home/emoeller/github/scBONITA/scBONITA/rules_output/test_data_rules/test_network.graphml_test_data_ind_1_rules.txt'
-    simulated_rules_file_path = './data/network_rules.txt'
-    data_file_path = './data/test_data_file.csv'
-
-    scbonita_ruleset, scbonita_rules = get_rules(scbonita_rules_file_path)
-    simulated_ruleset, simulated_rules = get_rules(simulated_rules_file_path)
-
-    data = get_matrix(data_file_path)
-
-    matrix = np.array(data)
-
-    print('scBONITA')
-    scbonita_mismatch_count, scbonita_total, scbonita_error = check_rules(matrix, scbonita_ruleset, scbonita_rules)
-
-    print('Simulated Rules')
-    simulated_mismatch_count, simulated_total, simulated_error = check_rules(matrix, simulated_ruleset, simulated_rules)
-
-    print(f'\nscBONITA Rules')
-    print(f'Mismatches = {scbonita_mismatch_count} (total = {scbonita_total})')
-    print(f'Error = {round(scbonita_error, 2)}%')
-
-    print(f'\nSimulated Rules')
-    print(f'Mismatches = {simulated_mismatch_count} (total = {simulated_total})')
-    print(f'Error = {simulated_error}%')
-
-
-if __name__ == '__main__':
-    evaluate_scbonita_output()
+plt.grid(True)
+plt.subplots_adjust(right=0.8)
+plt.show()

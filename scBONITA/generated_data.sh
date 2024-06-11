@@ -12,8 +12,11 @@ RUN_RELATIVE_ABUNDANCE=False
 RUN_ATTRACTOR_ANALYSIS=False
 RUN_CELL_MAPPING=False
 
+# Set the directory path for where the main scBONITA files are found
+HOME=/home/emoeller/github/scBONITA2/scBONITA
+
 # General Arguments (Required for all steps)
-DATA_FILE="../../network_simulation/data/test_data_file.csv"
+DATA_FILE="../network_simulation/data/test_data_file.csv"
 DATASET_NAME="test_data"
 DATAFILE_SEP=","
 #  "04010" "04370" "04630" "04668" "04066" "04020" "04151" "04150" "00010" "00020" "04060" "04512" "04514" "04670" "04625" "04062"  "04810"
@@ -36,8 +39,6 @@ GROUP_INDICES=(2)
 
 CONTROL_GROUPS=("Healthy")
 EXPERIMENTAL_GROUPS=("HIV")
-
-HOME=/home/emoeller/github/scBONITA/scBONITA
 
 # -------------- End of user input --------------
 

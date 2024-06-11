@@ -81,7 +81,11 @@ class RuleInference(NetworkSetup):
             cell.name = cell_name
             for row_num, row in enumerate(full_matrix):
                 row_array = np.array(row).flatten()
-                cell.expression[self.gene_names[row_num]] = row_array[cell_index]
+                # print(f'Cell {cell_index}, Row {row_num}')
+                try:
+                    cell.expression[self.gene_names[row_num]] = row_array[cell_index]
+                except IndexError as e:
+                    logging.info(f'Encountered error {e} at row {row_num}, col {cell_index}. If at the last gene position, ignore')
 
             self.cells.append(cell)
 

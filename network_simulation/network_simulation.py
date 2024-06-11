@@ -1,47 +1,43 @@
 from create_test_network import CreateTestNetwork
 import random
 import numpy as np
+import re
 
 def generate_random_state(length):
     return [random.randint(0, 1) for _ in range(length)]
 
+def evaluate_expression(expression, state):
+    # Replace indices with their boolean values from the state
+    def replace_indices(match):
+        index = int(match.group(0))
+        return str(bool(state[index]))
+    
+    # Use regex to find all indices in the expression and replace them
+    parsed_expression = re.sub(r'\b\d+\b', replace_indices, expression)
+    
+    # Evaluate the parsed expression safely
+    try:
+        result = eval(parsed_expression)
+    except Exception as e:
+        raise ValueError(f"Error evaluating expression: {expression}") from e
+    
+    return int(result)
+
 def evaluate_rule(rules, state):
     """
-    Evaluate a single rule based on the current state.
+    Evaluate a list of rules based on the current state.
 
     Args:
-    rule (list): The rule to be evaluated.
+    rules (list): The list of rules to be evaluated.
     state (list): The current state of the values.
 
     Returns:
-    int: The result of the rule evaluation.
+    list: The results of the rule evaluations.
     """
-
     ruleset = []
     for rule in rules:
-        result = None
-        operator = None
-        for item in rule:
-            if item == 'and':
-                operator = 'and'
-            elif item == 'or':
-                operator = 'or'
-            elif item == 'not':
-                operator = 'not'
-            else:
-                value = state[int(item)]
-                if operator == 'not':
-                    value = not value
-                    operator = None
-
-                if result is None:
-                    result = value
-                else:
-                    if operator == 'and':
-                        result = result and value
-                    elif operator == 'or':
-                        result = result or value
-        ruleset.append(1 if result else 0)
+        result = evaluate_expression(rule, state)
+        ruleset.append(result)
     return ruleset
 
 def generate_states(rules, num_cells, num_genes):
@@ -87,45 +83,10 @@ def check_rules(dataset, rules):
 
     for cell in range(num_cells):
         for gene_index, rule in enumerate(rules):
-            result = evaluate_generated_dataset(rule, dataset[:, cell])
+            result = evaluate_expression(rule, dataset[:, cell])
             if result != dataset[gene_index, cell]:
                 mismatches.append((gene_index, cell, result, dataset[gene_index, cell]))
     return mismatches
-
-def evaluate_generated_dataset(rule, state):
-    """
-    Evaluate a single rule based on the current state.
-
-    Args:
-    rule (list): The rule to be evaluated.
-    state (list): The current state of the values.
-
-    Returns:
-    int: The result of the rule evaluation.
-    """
-    result = None
-    operator = None
-    for item in rule:
-        if item == 'and':
-            operator = 'and'
-        elif item == 'or':
-            operator = 'or'
-        elif item == 'not':
-            operator = 'not'
-        else:
-            value = state[int(item)]
-            if operator == 'not':
-                value = not value
-                operator = None
-
-            if result is None:
-                result = value
-            else:
-                if operator == 'and':
-                    result = result and value
-                elif operator == 'or':
-                    result = result or value
-    return 1 if result else 0
 
 def parse_rules(rules_filename):
     # Read the rules for the test network and create a dataset
@@ -139,14 +100,13 @@ def parse_rules(rules_filename):
 
             # Get and format the rules
             gene_rules = line.split(' = ')[1] # Specify the rules as being the right side of the '=' sign
-            # print(gene_rules)
             gene_rules = gene_rules.split(' ') # Split elements based on spaces
-            gene_rules = [i.strip('Gene') for i in gene_rules] # Strip 'Gene' from each element to get gene numbers
+            gene_rules = [i.replace('Gene', '') for i in gene_rules] # Strip 'Gene' from each element to get gene numbers
             gene_rules = [i.strip() for i in gene_rules] # Get rid of newline characters
             gene_rules = [i.lower() for i in gene_rules] # Set rules to lowercase
-
+            gene_rules = ' '.join([i for i in gene_rules])
+            # print(gene_rules)
             ruleset.append(gene_rules) # Append the ruleset for the file
-
         return ruleset
 
 def create_network(num_genes, network_filename, rules_filename):
@@ -172,8 +132,10 @@ def generate_dataset(chunks, ruleset, num_cells, num_genes):
 
     num_tries = 0
     
-    for _ in range(chunks):
+    for i in range(chunks):
+        print(f'Chunk {i}/{chunks}')
         while True:
+            print(f'Try {num_tries}')
             # Generate Cells
             cells = generate_states(ruleset, num_cells, num_genes)
 
@@ -190,7 +152,7 @@ def generate_dataset(chunks, ruleset, num_cells, num_genes):
                 
             else:
                 num_tries += 1
-                if num_tries == 100:
+                if num_tries == 5:
                     return False
 
         matrix_chunks.append(matrix_chunk)
@@ -203,10 +165,10 @@ def simulate_network():
     # banner = 
 
     # Generate a dataset based on the rules
-    num_genes = 25 # Find the number of genes in the network
-    num_cells = 25
+    num_genes = 50 # Find the number of genes in the network
+    num_cells = 250
 
-    chunks = 100
+    chunks = 10
 
     # Specify file names
     rules_filename = "./data/network_rules.txt"
