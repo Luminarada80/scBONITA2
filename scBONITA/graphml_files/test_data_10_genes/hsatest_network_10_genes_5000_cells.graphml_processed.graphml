@@ -1,0 +1,103 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d1" for="edge" attr.name="interaction" attr.type="string"/>
+<key id="d0" for="node" attr.name="name" attr.type="string"/>
+<graph edgedefault="directed"><node id="Gene0">
+  <data key="d0">Gene0</data>
+</node>
+<node id="Gene1">
+  <data key="d0">Gene1</data>
+</node>
+<node id="Gene2">
+  <data key="d0">Gene2</data>
+</node>
+<node id="Gene3">
+  <data key="d0">Gene3</data>
+</node>
+<node id="Gene4">
+  <data key="d0">Gene4</data>
+</node>
+<node id="Gene5">
+  <data key="d0">Gene5</data>
+</node>
+<node id="Gene6">
+  <data key="d0">Gene6</data>
+</node>
+<node id="Gene7">
+  <data key="d0">Gene7</data>
+</node>
+<node id="Gene8">
+  <data key="d0">Gene8</data>
+</node>
+<node id="Gene9">
+  <data key="d0">Gene9</data>
+</node>
+<edge source="Gene0" target="Gene9">
+  <data key="d1">a</data>
+</edge>
+<edge source="Gene0" target="Gene1">
+  <data key="d1">a</data>
+</edge>
+<edge source="Gene1" target="Gene3">
+  <data key="d1">i</data>
+</edge>
+<edge source="Gene1" target="Gene8">
+  <data key="d1">a</data>
+</edge>
+<edge source="Gene2" target="Gene9">
+  <data key="d1">a</data>
+</edge>
+<edge source="Gene3" target="Gene6">
+  <data key="d1">a</data>
+</edge>
+<edge source="Gene3" target="Gene5">
+  <data key="d1">a</data>
+</edge>
+<edge source="Gene3" target="Gene0">
+  <data key="d1">a</data>
+</edge>
+<edge source="Gene4" target="Gene3">
+  <data key="d1">a</data>
+</edge>
+<edge source="Gene4" target="Gene1">
+  <data key="d1">a</data>
+</edge>
+<edge source="Gene4" target="Gene0">
+  <data key="d1">a</data>
+</edge>
+<edge source="Gene5" target="Gene6">
+  <data key="d1">i</data>
+</edge>
+<edge source="Gene5" target="Gene3">
+  <data key="d1">a</data>
+</edge>
+<edge source="Gene5" target="Gene7">
+  <data key="d1">i</data>
+</edge>
+<edge source="Gene6" target="Gene5">
+  <data key="d1">i</data>
+</edge>
+<edge source="Gene6" target="Gene2">
+  <data key="d1">a</data>
+</edge>
+<edge source="Gene6" target="Gene4">
+  <data key="d1">a</data>
+</edge>
+<edge source="Gene7" target="Gene6">
+  <data key="d1">a</data>
+</edge>
+<edge source="Gene7" target="Gene9">
+  <data key="d1">a</data>
+</edge>
+<edge source="Gene8" target="Gene4">
+  <data key="d1">a</data>
+</edge>
+<edge source="Gene9" target="Gene4">
+  <data key="d1">a</data>
+</edge>
+<edge source="Gene9" target="Gene0">
+  <data key="d1">a</data>
+</edge>
+<edge source="Gene9" target="Gene8">
+  <data key="d1">a</data>
+</edge>
+</graph></graphml>

@@ -2,6 +2,7 @@ import re
 import statistics
 import random
 import matplotlib.pyplot as plt
+from alive_progress import alive_bar
 
 def evaluate_expression(expression, state):
     # Replace indices with their boolean values from the state
@@ -45,22 +46,36 @@ def parse_ruleset(rule_file_path):
                 ruleset.append(rule)
     return ruleset
 
-true_ruleset_path = f'network_simulation/data/network_rules.txt'
-test_ruleset_path = f'scBONITA/rules_output/test_data_rules/test_network.graphml_test_data_ind_1_rules.txt'
+num_genes = 100
+num_cells = 5000
+
+true_ruleset_path = f'/home/emoeller/github/scBONITA/scBONITA/network_rules_{num_genes}_genes_{num_cells}_cells.txt'
+test_ruleset_path = f'/home/emoeller/github/scBONITA/scBONITA/rules_output/test_data_{num_genes}_genes_rules/test_network_{num_genes}_genes_{num_cells}_cells.graphml_test_data_{num_genes}_genes_ind_1_rules.txt'
 
 true_ruleset = parse_ruleset(true_ruleset_path)
 test_ruleset = parse_ruleset(test_ruleset_path)
 
 num_trials = 1000
+sim_steps = 100
 num_genes = len(true_ruleset)
 
 # Compare rulesets
 percent_matches = []
-for i in range(num_trials):
-    state = [random.choice([0,1]) for i in true_ruleset]
-    match_percentage, results1, results2 = compare_rulesets(true_ruleset, test_ruleset, state)
-    percent_matches.append(match_percentage)
 
+with alive_bar(num_trials) as bar:
+    for i in range(num_trials):
+        state = [random.choice([0,1]) for i in true_ruleset]
+        # print(f'State {state}')
+        state_matches = []
+        for j in range(sim_steps):
+            # print(f'\tSimulation step {j}')
+            match_percentage, results1, results2 = compare_rulesets(true_ruleset, test_ruleset, state)
+            state_matches.append(match_percentage)
+            state = results1
+            # print(f'\tPercent Match = {match_percentage}')
+        percent_matches.append(statistics.mean(state_matches))
+        bar()
+        
 avg = statistics.mean(percent_matches)
 stdev = statistics.stdev(percent_matches)
 minimum = min(percent_matches)
@@ -87,5 +102,6 @@ legend_text = (
 plt.figtext(0.85, 0.5, legend_text, verticalalignment='center', fontsize=10, bbox={'facecolor': 'white', 'alpha': 0.5, 'pad': 10})
 
 plt.grid(True)
+plt.ylim((0,100))
 plt.subplots_adjust(right=0.8)
 plt.show()

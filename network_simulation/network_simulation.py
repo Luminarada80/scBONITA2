@@ -1,224 +1,176 @@
-from create_test_network import CreateTestNetwork
 import random
 import numpy as np
 import re
+from create_test_network import CreateTestNetwork
+import networkx as nx
+import time
+from datetime import timedelta
+from alive_progress import alive_bar
 
 def generate_random_state(length):
-    return [random.randint(0, 1) for _ in range(length)]
+    return np.random.randint(2, size=length)
 
 def evaluate_expression(expression, state):
-    # Replace indices with their boolean values from the state
-    def replace_indices(match):
-        index = int(match.group(0))
-        return str(bool(state[index]))
-    
-    # Use regex to find all indices in the expression and replace them
-    parsed_expression = re.sub(r'\b\d+\b', replace_indices, expression)
-    
-    # Evaluate the parsed expression safely
+    parsed_expression = re.sub(r'\b\d+\b', lambda match: f'{state[int(match.group(0))]}', expression)
     try:
-        result = eval(parsed_expression)
+        return int(eval(parsed_expression))
     except Exception as e:
         raise ValueError(f"Error evaluating expression: {expression}") from e
-    
-    return int(result)
 
 def evaluate_rule(rules, state):
-    """
-    Evaluate a list of rules based on the current state.
-
-    Args:
-    rules (list): The list of rules to be evaluated.
-    state (list): The current state of the values.
-
-    Returns:
-    list: The results of the rule evaluations.
-    """
-    ruleset = []
-    for rule in rules:
-        result = evaluate_expression(rule, state)
-        ruleset.append(result)
-    return ruleset
+    return [evaluate_expression(rule, state) for rule in rules]
 
 def generate_states(rules, num_cells, num_genes):
     cells = []
-    for cell in range(num_cells):
+    max_iterations = 5
+    max_initial_states_tried = 5
+    
+    for _ in range(num_cells):
         initial_state = generate_random_state(num_genes)
-        # print(f'cell{cell} initial_state: \t{initial_state}')
-
         iterations = 0
         initial_states_tried = 0
 
-        while True:
-            # print(f'Cell {cell} Iteration: {iterations} Initial State: {initial_states_tried}')
+        while iterations <= max_iterations:
             new_genes = evaluate_rule(rules, initial_state)
-            # print(f'\tstate: \t\t{new_genes}')
-            if iterations > 10:
+            if np.array_equal(new_genes, initial_state) or initial_states_tried > max_initial_states_tried:
+                break
+            if iterations >= max_iterations:
                 initial_state = generate_random_state(num_genes)
                 iterations = 0
                 initial_states_tried += 1
-            if new_genes == initial_state or initial_states_tried > 5:
-                break
-            initial_state = new_genes
+            else:
+                initial_state = new_genes
+                iterations += 1
 
-            iterations += 1
-        # print(f'\tcell{cell} = \t{initial_state}\n')
         cells.append(initial_state)
-    return cells
+    
+    return np.array(cells)
 
-def check_rules(dataset, rules):
-    """
-    Check if the dataset follows the given rules.
+def preprocess_rules(rules):
+    return [re.sub(r'\b\d+\b', lambda match: f'state[{int(match.group(0))}]', rule) for rule in rules]
 
-    Args:
-    dataset (numpy array): The dataset containing the states of the genes.
-    rules (list of lists): The rules for each gene.
-
-    Returns:
-    bool: True if the dataset follows the rules, False otherwise.
-    """
+def evaluate_preprocessed_expression(parsed_expression, state):
+    try:
+        return int(eval(parsed_expression))
+    except Exception as e:
+        raise ValueError(f"Error evaluating expression: {parsed_expression}") from e
+    
+def vectorized_evaluate_rules(rules, dataset):
+    preprocessed_rules = preprocess_rules(rules)
     num_cells = dataset.shape[1]
     num_genes = dataset.shape[0]
-    mismatches = []
 
-    for cell in range(num_cells):
-        for gene_index, rule in enumerate(rules):
-            result = evaluate_expression(rule, dataset[:, cell])
-            if result != dataset[gene_index, cell]:
-                mismatches.append((gene_index, cell, result, dataset[gene_index, cell]))
+    # Initialize a matrix to store the results of rule evaluations
+    results = np.zeros((num_genes, num_cells), dtype=int)
+
+    # Evaluate rules for each cell
+    for gene_index, parsed_rule in enumerate(preprocessed_rules):
+        for cell in range(num_cells):
+            state = dataset[:, cell]
+            results[gene_index, cell] = evaluate_preprocessed_expression(parsed_rule, state)
+
+    return results
+
+def check_rules(dataset, rules):
+    results = vectorized_evaluate_rules(rules, dataset)
+    mismatches = np.sum(results != dataset)
     return mismatches
 
-def parse_rules(rules_filename):
-    # Read the rules for the test network and create a dataset
-    with open(rules_filename, 'r') as datafile:
-        ruleset = []
-        for line in datafile:
-
-            # Get the gene names
-            gene_name = line.split(' = ')[0]
-            gene_name = gene_name.strip('Gene')
-
-            # Get and format the rules
-            gene_rules = line.split(' = ')[1] # Specify the rules as being the right side of the '=' sign
-            gene_rules = gene_rules.split(' ') # Split elements based on spaces
-            gene_rules = [i.replace('Gene', '') for i in gene_rules] # Strip 'Gene' from each element to get gene numbers
-            gene_rules = [i.strip() for i in gene_rules] # Get rid of newline characters
-            gene_rules = [i.lower() for i in gene_rules] # Set rules to lowercase
-            gene_rules = ' '.join([i for i in gene_rules])
-            # print(gene_rules)
-            ruleset.append(gene_rules) # Append the ruleset for the file
-        return ruleset
-
-def create_network(num_genes, network_filename, rules_filename):
-    #Instantiate the network class
+def create_network(num_genes):
     test_network = CreateTestNetwork(num_genes=num_genes)
-    
-    # Export the graphml file for the network
-    test_network.export_network_graphml(network_filename)
-    
-    # Export the network rules to a text file
-    test_network.export_network_rules(filename=rules_filename)
+    network = test_network.graph
+    rule_dict = test_network.generate_network_rules()
 
-    # Visualize the network
-    # test_network.visualize_network()
-
-    # Extract the rules from the rules file
-    ruleset = parse_rules(rules_filename)
-
-    return ruleset
+    return rule_dict, network
 
 def generate_dataset(chunks, ruleset, num_cells, num_genes):
     matrix_chunks = []
-
     num_tries = 0
     
     for i in range(chunks):
-        print(f'Chunk {i}/{chunks}')
         while True:
-            print(f'Try {num_tries}')
-            # Generate Cells
             cells = generate_states(ruleset, num_cells, num_genes)
-
-            # Put the simulated data into a matrix
-            matrix_chunk = np.array(cells).T
-
-            # Check if the dataset follows the rules
+            matrix_chunk = cells.T
             mismatches = check_rules(matrix_chunk, ruleset)
-
-            # Break if there are no mismatches, else try another set of data
-            if not mismatches:
+            if mismatches == 0:
                 num_tries = 0
                 break
+
+            # Only try this network and ruleset a few times if its the first chunk
+            elif i == 0:
+                num_tries += 1
+                if num_tries == 4:
+                    return False
                 
+            # Try more times if a chunk has already been created
             else:
                 num_tries += 1
-                if num_tries == 5:
+                if num_tries == 10:
                     return False
-
         matrix_chunks.append(matrix_chunk)
             
-    matrix = np.concatenate(matrix_chunks, axis = 1)
+    return np.hstack(matrix_chunks)
 
-    return matrix
-                
 def simulate_network():
-    # banner = 
+    num_genes = 100
+    num_cells = 1
+    chunks = 5000
 
-    # Generate a dataset based on the rules
-    num_genes = 50 # Find the number of genes in the network
-    num_cells = 250
+    rules_filename = f"network_rules_{num_genes}_genes_{num_cells*chunks}_cells.txt"
+    network_filename = f"test_network_{num_genes}_genes_{num_cells*chunks}_cells.graphml"
+    data_filename = f"test_data_file_{num_genes}_genes_{num_cells*chunks}_cells.csv"
 
-    chunks = 10
-
-    # Specify file names
-    rules_filename = "./data/network_rules.txt"
-    network_filename = "./data/test_network.graphml"
-    data_filename = "./data/test_data_file.csv"
-
-    mutation_chance = 0.00
-
-    # Main loop
-    print(f'Generating simulated data...')
-    while True:
-        # Create the network and the rules
-        ruleset = create_network(num_genes, network_filename, rules_filename)
-
-        # Generate the data
-        matrix = generate_dataset(chunks, ruleset, num_cells, num_genes)
-
-        if isinstance(matrix, np.ndarray):
-            break
+    print('Generating simulated data...')
+    attempt_num = 1
+    print(f'\tCreating network')
+    print(f'\tAttempting to generate dataset')
     
-    # Randomly choose indices to mutate
+    with alive_bar(0, bar='classic2', spinner='dots_waves') as bar:
+        while True:
+            attempt_num += 1
+            rule_dict, network = create_network(num_genes)
+            ruleset = [rule.replace('Gene', '') for _, rule in rule_dict.items()]
+            matrix = generate_dataset(chunks, ruleset, num_cells, num_genes)
+            if isinstance(matrix, np.ndarray):
+                # print(f'\t\tAttempt {attempt_num} successful')
+                break
+            # else:
+                # print(f'\t\tAttempt {attempt_num} failed, generating new network and rules')
+            bar()
+            # time.sleep(0.1)  # O
+
+    nx.write_graphml(network, network_filename)
+
+    with open(rules_filename, 'w') as ruleset_file:
+        for target, rule in rule_dict.items():
+            line = f'{target} = {rule}\n'
+            ruleset_file.write(line)
+    
     mutation_rate = 0.1 
     num_mutations = int(num_genes * num_cells * mutation_rate)
     rows_to_mutate = np.random.choice(num_genes, num_mutations, replace=True)
-    cols_to_mutate = np.random.choice(num_cells, num_mutations, replace=True)
+    cols_to_mutate = np.random.choice(num_cells * chunks, num_mutations, replace=True)
+    matrix[rows_to_mutate, cols_to_mutate] = 1 - matrix[rows_to_mutate, cols_to_mutate]
 
-    # Perform the mutations
-    for row, col in zip(rows_to_mutate, cols_to_mutate):
-        matrix[row, col] = 1 - matrix[row, col]  # Flip the bit
-
-    # Add the column and row labels
-    row_labels = ["Gene" + str(i) for i in range(matrix.shape[0])]
+    row_labels = ["Gene" + str(i) for i in range(num_genes)]
     labeled_matrix = np.column_stack((row_labels, matrix))
-    column_labels = [""] + ["Cell" + str(i + 1) for i in range(matrix.shape[1])]
+    column_labels = [""] + ["Cell" + str(i + 1) for i in range(num_cells * chunks)]
     labeled_matrix_with_columns = np.vstack([column_labels, labeled_matrix])
-    # print(labeled_matrix_with_columns)
 
-    # Save the numpy array to a CSV file without joining rows
     np.savetxt(data_filename, labeled_matrix_with_columns, delimiter=',', fmt='%s')
 
     print(f'Number of cells: {num_cells * chunks}')
-    print(f'Number of genes: {num_genes}\n')
-
-    print(f'Matrix shape = ({labeled_matrix_with_columns.shape[0]},{labeled_matrix_with_columns.shape[1]})')
-    print(f'\tCSV dataset file "{data_filename}" created')
-    print(f'\tNetwork graphml file "{network_filename}" created')
-    print(f'\tRules text file {rules_filename} created')
+    print(f'Number of genes: {num_genes}')
+    print(f'Matrix shape = {labeled_matrix_with_columns.shape}')
+    print(f'CSV dataset file "{data_filename}" created')
+    print(f'Network graphml file "{network_filename}" created')
+    print(f'Rules text file "{rules_filename}" created')
 
 if __name__ == '__main__':
-   simulate_network()
+    start_time = time.time()
+    simulate_network()
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    formatted_time = str(timedelta(seconds=round(elapsed_time)))
 
-
-
+    print(f'Time Elapsed: {formatted_time}')

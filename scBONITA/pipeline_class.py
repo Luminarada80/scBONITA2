@@ -45,6 +45,7 @@ class Pipeline():
         self.sample_cells = self._convert_string_to_boolean(getattr(parser_argument, 'sample_cells', True))
         self.binarize_threshold = float(getattr(parser_argument, 'binarize_threshold', 0.001))
         self.display_title = getattr(parser_argument, 'display_title', True)
+        self.minOverlap = 1
 
         # Other variables
         self.write_graphml = True
@@ -77,20 +78,20 @@ class Pipeline():
                 kegg_pathway_list=self.list_of_kegg_pathways,
                 write_graphml=self.write_graphml,
                 organism=self.organism,
-                minimumOverlap=25
+                minimumOverlap=self.minOverlap
             )
 
-            pathways.add_pathways(pathways.pathway_graphs, minOverlap=25, organism=self.organism)
+            pathways.add_pathways(pathways.pathway_graphs, minOverlap=self.minOverlap, organism=self.organism)
         
         # Use the pathway(s) specified by pathway_list
         else:
             if isinstance(self.pathway_list, str):
                 logging.info(f'\tPathways = {self.pathway_list}')
-                pathways.add_pathways([self.pathway_list], minOverlap=25, organism=self.organism)
+                pathways.add_pathways([self.pathway_list], minOverlap=self.minOverlap, organism=self.organism)
 
             elif isinstance(self.pathway_list, list):
                 logging.info(f'\tPathways = {self.pathway_list}')
-                pathways.add_pathways(self.pathway_list, minOverlap=25, organism=self.organism)
+                pathways.add_pathways(self.pathway_list, minOverlap=self.minOverlap, organism=self.organism)
 
             # Else throw an exception if no pathways are specified
             else:
@@ -100,7 +101,7 @@ class Pipeline():
 
         if len(self.network_files) > 0:
             logging.info(f'\tCustom pathway: {self.network_files}')
-            pathways.add_pathways(self.network_files, minOverlap=25, organism=self.organism)
+            pathways.add_pathways(self.network_files, minOverlap=self.minOverlap, organism=self.organism)
 
         # Get the information from each pathway and pass the network information into a ruleset object
         for pathway in pathways.pathway_graphs:
@@ -108,12 +109,11 @@ class Pipeline():
             graph = pathways.pathway_graphs[pathway]
 
             # Catches if the graph does not have enough overlapping nodes after processing
-            if len(graph.nodes()) > 25:
+            if len(graph.nodes()) > self.minOverlap:
                 node_indices = []
             
                 for node in graph.nodes():
                     node_indices.append(pathways.gene_list.index(node))
-                    
 
                 # node_indices = set(node_indices)  # Only keep unique values
                 self.node_indices = list(node_indices)  # Convert back to a list
@@ -130,7 +130,7 @@ class Pipeline():
                 self.infer_rules(pathway, processed_graphml_path, ruleset)
             
             else:
-                logging.info(f'\t\t\tNot enough overlapping nodes for {pathway} (min 25, overlap {len(graph.nodes())})')
+                logging.info(f'\t\t\tNot enough overlapping nodes for {pathway} (min {self.minOverlap}, overlap {len(graph.nodes())})')
     
     def generate_ruleset(self, network, node_indices, gene_list):
         # Create RuleInference object
