@@ -85,7 +85,7 @@ class RuleInference(NetworkSetup):
                 try:
                     cell.expression[self.gene_names[row_num]] = row_array[cell_index]
                 except IndexError as e:
-                    logging.info(f'Encountered error {e} at row {row_num}, col {cell_index}. If at the last gene position, ignore')
+                    logging.debug(f'Encountered error {e} at row {row_num}, col {cell_index}. If at the last gene position, ignore')
 
             self.cells.append(cell)
 

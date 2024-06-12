@@ -866,12 +866,7 @@ class Pathways:
                             G, self.output_path + organism + pathway + "_processed.graphml", infer_numeric_types=True
                         )
                 else:
-                    msg = f'Check the name (ex: {list(nodes)[0]}) and ID (ex: {list(pathwayGenes)[0]}) of nodes in the ' \
-                          f'graphml file, should be the same {minOverlap}. Check the formatting of the graphml file to see' \
-                          f'if the gene name is in another attribute of the node and try G.nodes[node_id].get("gene_symbol") ' \
-                          f'where "gene_symbol" is whatever the attribute with the gene name is. You might have to ignore "v_"' \
-                          f'in front of the attribute name. To get the name to use, try: "print(next(iter(G.nodes(data=True))))"'\
-                          f'to see how the keys are formatted.'
+                    msg = f'Overlap {overlap} is below the minimum {minOverlap}'
                     raise Exception(msg)
         else:
             if isinstance(pathway_list, dict):

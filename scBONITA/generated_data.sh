@@ -7,22 +7,25 @@
 # Which parts do you want to run? Set True to run or False to skip
     # Rule determination must be run prior to importance score, importance score must be run prior to relative abundance
 RUN_RULE_DETERMINATION=True
-RUN_IMPORTANCE_SCORE=True
+RUN_IMPORTANCE_SCORE=False
 RUN_RELATIVE_ABUNDANCE=False
 RUN_ATTRACTOR_ANALYSIS=False
 RUN_CELL_MAPPING=False
 
 # Set the directory path for where the main scBONITA files are found
-HOME=/home/emoeller/github/scBONITA2/scBONITA
+HOME=/home/emoeller/github/scBONITA/scBONITA
+
+NUM_GENES=100
+NUM_CELLS=5000
 
 # General Arguments (Required for all steps)
-DATA_FILE="../network_simulation/data/test_data_file.csv"
-DATASET_NAME="test_data"
+DATA_FILE="test_data_file_${NUM_GENES}_genes_${NUM_CELLS}_cells.csv"
+DATASET_NAME="test_data_${NUM_GENES}_genes"
 DATAFILE_SEP=","
 #  "04010" "04370" "04630" "04668" "04066" "04020" "04151" "04150" "00010" "00020" "04060" "04512" "04514" "04670" "04625" "04062"  "04810"
 KEGG_PATHWAYS=() # Enter KEGG pathway codes or leave blank to find all pathways with overlapping genes
 FIND_PATHWAYS=False
-CUSTOM_PATHWAYS=("test_network.graphml") #("modified_network.graphml") #Put custom networks in the scBONITA folder
+CUSTOM_PATHWAYS=("test_network_${NUM_GENES}_genes_${NUM_CELLS}_cells.graphml") #("modified_network.graphml") #Put custom networks in the scBONITA folder
 BINARIZE_THRESHOLD=0.01 # Data points with values above this number will be set to 1, lower set to 0
 ORGANISM_CODE="hsa" # Organism code in front of KEGG pathway numbers
 
@@ -98,6 +101,8 @@ if [ "$RUN_RULE_DETERMINATION" = "True" ]; then
         echo "No Custom Pathways specified, skipping this part..."
     fi
 fi
+
+
 
 #  --------------------------------------
 # |     IMPORTANCE SCORE CALCULATION     |
