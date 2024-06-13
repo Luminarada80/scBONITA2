@@ -76,10 +76,10 @@ def check_rules(dataset, rules):
     mismatches = np.sum(results != dataset)
     return mismatches
 
-def create_network(num_genes):
-    test_network = CreateTestNetwork(num_genes=num_genes)
-    network = test_network.graph
-    rule_dict = test_network.generate_network_rules()
+def generate_network(num_genes, network_object):
+    network_object.graph = network_object.create_network(num_genes)
+    network = network_object.graph
+    rule_dict = network_object.generate_network_rules()
 
     return rule_dict, network
 
@@ -101,13 +101,18 @@ def generate_dataset(chunks, ruleset, num_cells, num_genes):
                 num_tries += 1
                 if num_tries == 4:
                     return False
+                else:
+                    print('Found one chunk that works')
                 
             # Try more times if a chunk has already been created
             else:
                 num_tries += 1
-                if num_tries == 10:
+                if num_tries == 25:
                     return False
+                else:
+                    print(f'Chunk {i} try {num_tries}')
         matrix_chunks.append(matrix_chunk)
+        num_tries = 0
             
     return np.hstack(matrix_chunks)
 
@@ -124,11 +129,13 @@ def simulate_network():
     attempt_num = 1
     print(f'\tCreating network')
     print(f'\tAttempting to generate dataset')
+
+    test_network = CreateTestNetwork(num_genes=num_genes)
     
     with alive_bar(0, bar='classic2', spinner='dots_waves') as bar:
         while True:
             attempt_num += 1
-            rule_dict, network = create_network(num_genes)
+            rule_dict, network = generate_network(num_genes, test_network)
             ruleset = [rule.replace('Gene', '') for _, rule in rule_dict.items()]
             matrix = generate_dataset(chunks, ruleset, num_cells, num_genes)
             if isinstance(matrix, np.ndarray):
