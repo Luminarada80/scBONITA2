@@ -9,21 +9,21 @@ import re
 class CreateTestNetwork():
     def __init__(self, num_genes):
         self.num_genes = num_genes  # number of nodes in the network
-        self.graph = self.create_network()
+        self.graph = None
 
-    def create_network(self):
+    def create_network(self, num_genes):
         network = nx.DiGraph()
 
         # Add gene nodes using the gene name as the node identifier
-        for i in range(self.num_genes):
+        for i in range(num_genes):
             gene_name = f'Gene{i}'
             network.add_node(gene_name, name=gene_name)
 
         # Add random edges between genes
-        for node_num in range(self.num_genes):
+        for node_num in range(num_genes):
             gene_name = f'Gene{node_num}'
             num_connections = random.randint(1, 3)  # Random number of connections
-            possible_targets = [f'Gene{j}' for j in range(self.num_genes) if j != node_num and network.in_degree(f'Gene{j}') < 3]
+            possible_targets = [f'Gene{j}' for j in range(num_genes) if j != node_num and network.in_degree(f'Gene{j}') < 3]
             if possible_targets:
                 connections = random.sample(possible_targets, min(num_connections, len(possible_targets)))
                 for target in connections:
@@ -31,10 +31,13 @@ class CreateTestNetwork():
                     network.add_edge(gene_name, target, interaction=interaction)
 
         # Add self-loops to genes without predecessors
-        for node_num in range(self.num_genes):
+        for node_num in range(num_genes):
             gene_name = f'Gene{node_num}'
             if len(list(network.predecessors(gene_name))) == 0:
                 network.add_edge(gene_name, gene_name, interaction='a')
+        
+        self.num_genes = num_genes
+        self.graph = network
 
         return network
 
