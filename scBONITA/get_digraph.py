@@ -3,6 +3,8 @@ import glob
 import logging
 import numpy as np
 
+from file_paths import file_paths
+
 def load_all_network_pickles(dataset_name: str):
     """
     Loads in all network pickle files for a given dataset_name
@@ -10,7 +12,7 @@ def load_all_network_pickles(dataset_name: str):
     # Load in the network pickle files
     all_networks = []
 
-    pickle_file_path = f'pickle_files/{dataset_name}_pickle_files/network_pickle_files/'
+    pickle_file_path = f'{file_paths["pickle_files"]}/{dataset_name}_pickle_files/network_pickle_files/'
     for pickle_file in glob.glob(pickle_file_path + str(dataset_name) + "_" + "*" + ".network.pickle"):
         if pickle_file:
             logging.info(f'\tLoading data file: {pickle_file}')

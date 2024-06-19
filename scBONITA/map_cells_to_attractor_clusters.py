@@ -8,6 +8,7 @@ from cell_class import Cell
 import numpy as np
 from scipy.stats import chi2_contingency
 
+from file_paths import file_paths
 from setup.user_input_prompts import cell_attractor_mapping_arguments
 
 def load_all_network_pickles(dataset_name: str):
@@ -17,7 +18,7 @@ def load_all_network_pickles(dataset_name: str):
     # Load in the network pickle files
     all_networks = []
 
-    pickle_file_path = f'pickle_files/{dataset_name}_pickle_files/network_pickle_files/'
+    pickle_file_path = f'{file_paths["pickle_files"]}/{dataset_name}_pickle_files/network_pickle_files/'
     for pickle_file in glob.glob(pickle_file_path + str(dataset_name) + "_" + "*" + ".network.pickle"):
         if pickle_file:
             logging.info(f'\tLoading data file: {pickle_file}')
@@ -100,7 +101,7 @@ if __name__ == '__main__':
     network_info = {}
 
     # Load the cell objects for the dataset
-    cell_population = pickle.load(open(f'pickle_files/{dataset_name}_pickle_files/cells_pickle_file/{dataset_name}.cells.pickle', "rb"))
+    cell_population = pickle.load(open(f'{file_paths["pickle_files"]}/{dataset_name}_pickle_files/cells_pickle_file/{dataset_name}.cells.pickle', "rb"))
     cells = cell_population.cells
 
     num_cells = len(cells)
@@ -116,7 +117,7 @@ if __name__ == '__main__':
 
     # Write the combination cell counts and groups to an output file
     logging.info(f'\nWriting out the attractor mapping results to {dataset_name}_cell_attractor_states.csv')
-    path = f'attractor_analysis_output/{dataset_name}_attractors/{dataset_name}_cell_attractor_states.csv'
+    path = f'{file_paths["attractor_analysis_output"]}/{dataset_name}_attractors/{dataset_name}_cell_attractor_states.csv'
     with open(path, 'w') as combination_file:
         combination_file.write(f'{network_names}\t{group_names}\ttotal\n')
 

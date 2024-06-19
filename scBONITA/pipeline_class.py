@@ -3,6 +3,7 @@ from kegg_parser import Pathways
 from network import Network
 from importance_scores import CalculateImportanceScore
 from cell_class import CellPopulation
+from file_paths import file_paths
 
 # Setup
 from setup.scbonita_banner import make_banner
@@ -50,6 +51,9 @@ class Pipeline():
         # Other variables
         self.write_graphml = True
         self.node_indices = []
+
+        for path in file_paths.values():
+            os.makedirs(path, exist_ok=True)
 
         if self.display_title:
             logging.info(make_banner())
@@ -125,7 +129,7 @@ class Pipeline():
                 # Generate the rule inference object for the pathway
                 ruleset = self.generate_ruleset(pathway, node_indices, pathways.gene_list)
 
-                processed_graphml_path = f'graphml_files/{self.dataset_name}/{self.organism}{pathway}_processed.graphml'
+                processed_graphml_path = f'{file_paths["graphml_files"]}/{self.dataset_name}/{self.organism}{pathway}_processed.graphml'
 
                 self.infer_rules(pathway, processed_graphml_path, ruleset)
             
@@ -164,7 +168,7 @@ class Pipeline():
         logging.info(f'\tRunning rule inference for {network_name}')
 
         # Specify and create the folder for the dataset pickle files
-        data_pickle_folder = f'pickle_files/{self.dataset_name}_pickle_files/ruleset_pickle_files'
+        data_pickle_folder = f'{file_paths["pickle_files"]}/{self.dataset_name}_pickle_files/ruleset_pickle_files'
         os.makedirs(data_pickle_folder, exist_ok=True)
 
         # Specify the name of the pickle file for the dataset and network ruleset object
@@ -176,7 +180,7 @@ class Pipeline():
         # Write out the cells objects to a pickle file
         cell_population = CellPopulation(ruleset.cells)
 
-        cell_pickle_file_path = f'pickle_files/{self.dataset_name}_pickle_files/cells_pickle_file'
+        cell_pickle_file_path = f'{file_paths["pickle_files"]}/{self.dataset_name}_pickle_files/cells_pickle_file'
         os.makedirs(cell_pickle_file_path, exist_ok=True)
 
         cells_pickle_file = f'{self.dataset_name}.cells.pickle'

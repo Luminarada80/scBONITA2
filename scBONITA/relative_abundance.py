@@ -23,6 +23,7 @@ import requests
 
 from metadata_parser import metadata_parser
 from setup.user_input_prompts import *
+from file_paths import file_paths
 
 def extract_data(data_file, sep, sample_cells, node_indices, max_samples):
     """
@@ -289,7 +290,7 @@ if __name__ == '__main__':
     # If no network is specified, get all of the rulesets for the dataset
     if network_names[0] == "":
         network_names_list = []
-        for filename in os.listdir(f'./rules_output/{dataset_name}_rules/'):
+        for filename in os.listdir(f'{file_paths["rules_output"]}/{dataset_name}_rules/'):
             network = filename.split('_')[0]
             network_names_list.append(network)
         network_name_set = set(network_names_list)
@@ -317,8 +318,8 @@ if __name__ == '__main__':
         for network_name in network_names:
             network_name = organism + network_name
             # Path to the ruleset pickle file
-            ruleset_pickle_file_path = f'pickle_files/{dataset_name}_pickle_files/ruleset_pickle_files/{dataset_name}_{network_name}.ruleset.pickle'
-            network_pickle_file_path = f'pickle_files/{dataset_name}_pickle_files/network_pickle_files/{dataset_name}_{network_name}.network.pickle'
+            ruleset_pickle_file_path = f'{file_paths["pickle_files"]}/{dataset_name}_pickle_files/ruleset_pickle_files/{dataset_name}_{network_name}.ruleset.pickle'
+            network_pickle_file_path = f'{file_paths["pickle_files"]}/{dataset_name}_pickle_files/network_pickle_files/{dataset_name}_{network_name}.network.pickle'
 
             # Check to make sure the ruleset pickle file exists
             if os.path.exists(ruleset_pickle_file_path):
@@ -342,7 +343,7 @@ if __name__ == '__main__':
                     # Join the groups
                     group = groups[group_num]
                     # Specify the path to the group network pickle file
-                    network_folder = f'pickle_files/{dataset_name}_pickle_files/network_pickle_files/{dataset_name}_{group}_pickle_files'
+                    network_folder = f'{file_paths["pickle_files"]}/{dataset_name}_pickle_files/network_pickle_files/{dataset_name}_{group}_pickle_files'
                     network_file_path = f'{network_folder}/{dataset_name}_{network_name}_{group}.network.pickle'
 
                     # Check if the group file exists for this dataset and if the user passed in the overwrite argument
@@ -373,7 +374,7 @@ if __name__ == '__main__':
                         else:
                             raise ValueError("No samples selected for binarization")
                         
-                        network_folder = f'pickle_files/{dataset_name}_pickle_files/network_pickle_files/{dataset_name}_{group}_pickle_files'
+                        network_folder = f'{file_paths["pickle_files"]}/pickle_files/{dataset_name}_pickle_files/network_pickle_files/{dataset_name}_{group}_pickle_files'
                         
                         os.makedirs(network_folder, exist_ok=True)
                         logging.info(f'\tSaving network pickle file {group} dataset for {network_name}')
@@ -397,7 +398,7 @@ if __name__ == '__main__':
 
     # Specify the path to the network pickle files for this dataset
     while True:
-        pickle_file_path = f'pickle_files/{dataset_name}_pickle_files/network_pickle_files'
+        pickle_file_path = f'{file_paths["pickle_files"]}/{dataset_name}_pickle_files/network_pickle_files'
         if os.path.exists(pickle_file_path):
             logging.debug(f'\tPickle files found')
             break
@@ -486,7 +487,7 @@ if __name__ == '__main__':
 
                 relative_abundances = (np.round(mean_expression_experimental + 1e-3,3)) / (np.round(mean_expression_control+ 1e-3,3)) # pseudocount added to avoid large changes based on small numbers
 
-                file_path = f'relative_abundance_output/{dataset_name}/{experimental_group}_vs_{control_group}'
+                file_path = f'{file_paths["relative_abundance_output"]}/{dataset_name}/{experimental_group}_vs_{control_group}'
                 filename = f'{control_group_network.name.split("_")[0]}_{dataset_name}_{experimental_group}_vs_{control_group}_relative_abundance'
                 
                 figure = plot_abundance_heatmap(gene_list, mean_expression_control, mean_expression_experimental, control_group, experimental_group, network_name)

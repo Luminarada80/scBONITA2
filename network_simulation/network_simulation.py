@@ -121,9 +121,9 @@ def simulate_network():
     num_cells = 1
     chunks = 5000
 
-    rules_filename = f"network_rules_{num_genes}_genes_{num_cells*chunks}_cells.txt"
-    network_filename = f"test_network_{num_genes}_genes_{num_cells*chunks}_cells.graphml"
-    data_filename = f"test_data_file_{num_genes}_genes_{num_cells*chunks}_cells.csv"
+    rules_filename = f"/home/emoeller/github/scBONITA/network_simulation/data/network_rules_{num_genes}_genes_{num_cells*chunks}_cells.txt"
+    network_filename = f"/home/emoeller/github/scBONITA/network_simulation/data/test_network_{num_genes}_genes_{num_cells*chunks}_cells.graphml"
+    data_filename = f"/home/emoeller/github/scBONITA/network_simulation/data/test_data_file_{num_genes}_genes_{num_cells*chunks}_cells.csv"
 
     print('Generating simulated data...')
     attempt_num = 1

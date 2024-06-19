@@ -14,6 +14,7 @@ import argparse
 import pickle
 
 from setup.user_input_prompts import attractor_analysis_arguments
+from file_paths import file_paths
 
 def run_attractor_analysis(network, cells):
     """
@@ -303,11 +304,11 @@ if __name__ == '__main__':
     all_networks = []
 
     # Load the cell objects for the dataset
-    cell_population = pickle.load(open(f'pickle_files/{dataset_name}_pickle_files/cells_pickle_file/{dataset_name}.cells.pickle', "rb"))
+    cell_population = pickle.load(open(f'{file_paths["pickle_files"]}/{dataset_name}_pickle_files/cells_pickle_file/{dataset_name}.cells.pickle', "rb"))
     cells = cell_population.cells
 
     logging.info(f'\nRunning attractor analysis for all networks...')
-    pickle_file_path = f'pickle_files/{dataset_name}_pickle_files/network_pickle_files/'
+    pickle_file_path = f'{file_paths["pickle_files"]}/{dataset_name}_pickle_files/network_pickle_files/'
     for pickle_file in glob.glob(pickle_file_path + str(dataset_name) + "_" + "*" + ".network.pickle"):
         if pickle_file:
             logging.info(f'\t\tLoading data file: {pickle_file}')
@@ -360,7 +361,7 @@ if __name__ == '__main__':
             if attractor_num in attractor_counts:
 
                 # Create a dataset- and network-specific directory for the output
-                output_directory = f'attractor_analysis_output/{dataset_name}_attractors/{network.name}_attractors/attractor_{str(attractor_num)}'
+                output_directory = f'{file_paths["attractor_analysis_output"]}/{dataset_name}_attractors/{network.name}_attractors/attractor_{str(attractor_num)}'
                 os.makedirs(output_directory, exist_ok=True)
 
                 filename = f'{dataset_name}_{network.name}_attractor_{attractor_num}.txt'
@@ -384,14 +385,14 @@ if __name__ == '__main__':
 
 
         logging.info(f'\nAdding representative attractor map to network pickle files:')
-        network_directory_path = f"pickle_files/{dataset_name}_pickle_files/network_pickle_files"
+        network_directory_path = f"{file_paths["pickle_files"]}/{dataset_name}_pickle_files/network_pickle_files"
         os.makedirs(network_directory_path, exist_ok=True)
 
         network_pickle_file_path = f"{network_directory_path}/{dataset_name}_{network.name}.network.pickle"
         logging.info(f'\tFile: {dataset_name}_{network.name}.network.pickle')
         pickle.dump(network, open(network_pickle_file_path, "wb"))
 
-        cell_pickle_file_path = f'pickle_files/{dataset_name}_pickle_files/cells_pickle_file'
+        cell_pickle_file_path = f'{file_paths["pickle_files"]}/{dataset_name}_pickle_files/cells_pickle_file'
         os.makedirs(cell_pickle_file_path, exist_ok=True)
 
         cells_pickle_file = f'{dataset_name}.cells.pickle'

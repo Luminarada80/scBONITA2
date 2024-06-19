@@ -8,6 +8,8 @@ from heatmap import create_heatmap
 import numexpr as ne
 import random
 
+from file_paths import file_paths
+
 def get_starting_state(file):
     starting_state = []
 
@@ -162,7 +164,7 @@ if __name__ == '__main__':
     # network_name = 'hsa04670'
 
     # Specifies the path to the correct network pickle file
-    network_pickle_file = f'/home/emoeller/github/scBONITA/scBONITA/pickle_files/{dataset_name}_pickle_files/network_pickle_files/{dataset_name}_{network_name}.network.pickle'
+    network_pickle_file = f'{file_paths["pickle_files"]}/{dataset_name}_pickle_files/network_pickle_files/{dataset_name}_{network_name}.network.pickle'
 
     # Read in the network pickle file from the path
     network = pickle.load(open(network_pickle_file, 'rb'))
@@ -186,7 +188,7 @@ if __name__ == '__main__':
         transposed_random_column = selected_column.reshape(-1,1)
 
         # Specify outfile path for the simulation results
-        outfile_folder = f'trajectories/{dataset_name}_{network_name}'
+        outfile_folder = f'{file_paths["trajectories"]}/{dataset_name}_{network_name}'
         os.makedirs(outfile_folder, exist_ok=True)
         file_path = f'{outfile_folder}/cell_{cell_index}_trajectory'
         

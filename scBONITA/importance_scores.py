@@ -13,6 +13,8 @@ from path_manager import PathManager
 from setup.user_input_prompts import *
 import numexpr as ne
 
+from file_paths import file_paths
+
 class CalculateImportanceScore():
     def __init__(self, nodes, binarized_matrix):
         self.binarized_matrix = binarized_matrix
@@ -259,7 +261,7 @@ class CalculateImportanceScore():
 
 def run_full_importance_score(dataset_name, network_names): 
     # Path to the ruleset pickle file
-    ruleset_pickle_file_path = f'pickle_files/{dataset_name}_pickle_files/ruleset_pickle_files/'
+    ruleset_pickle_file_path = f'{file_paths["pickle_files"]}/{dataset_name}_pickle_files/ruleset_pickle_files/'
 
     network_name_check = []
     for file_name in os.listdir(ruleset_pickle_file_path):
@@ -289,7 +291,7 @@ def run_full_importance_score(dataset_name, network_names):
             importance_score(ruleset, network, importance_score_folder, importance_score_file_name)
 
             logging.info(f'Saving network object as a pickle file')
-            network_folder = f'pickle_files/{dataset_name}_pickle_files/network_pickle_files'
+            network_folder = f'{file_paths["pickle_files"]}/{dataset_name}_pickle_files/network_pickle_files'
             os.makedirs(network_folder, exist_ok=True)
 
             network_file_path = f'{network_folder}/{dataset_name}_{network_name}.network.pickle'
@@ -329,7 +331,7 @@ if __name__ == '__main__':
     # Set the logging level for output
     logging.basicConfig(format='%(message)s', level=logging.INFO)
 
-    path_manager = PathManager('importance_score_output')
+    path_manager = PathManager(f'{file_paths["importance_score_output"]}')
 
     parser = ArgumentParser()
 
@@ -346,7 +348,7 @@ if __name__ == '__main__':
     # If no network is specified, get all of the rulesets for the dataset
     if network_names[0] == "":
         network_names_list = []
-        for filename in os.listdir(f'./rules_output/{dataset_name}_rules/'):
+        for filename in os.listdir(f'{file_paths["rules_output"]}/{dataset_name}_rules/'):
             network = filename.split('_')[0]
             network_names_list.append(network)
         network_name_set = set(network_names_list)
