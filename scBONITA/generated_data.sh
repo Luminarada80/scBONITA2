@@ -18,14 +18,27 @@ HOME=/home/emoeller/github/scBONITA/scBONITA
 NUM_GENES=100
 NUM_CELLS=5000
 
+NUM_GENES=50
+NUM_CELLS=2000
+PER_ERR=44
+
 # General Arguments (Required for all steps)
+<<<<<<< HEAD
 DATA_FILE="test_data_file_${NUM_GENES}_genes_${NUM_CELLS}_cells.csv"
 DATASET_NAME="test_data_${NUM_GENES}_genes"
+=======
+DATA_FILE="test_data_file_${NUM_GENES}g_${NUM_CELLS}c_${PER_ERR}e.csv"
+DATASET_NAME="test_data_${NUM_GENES}g_${NUM_CELLS}c_${PER_ERR}e"
+>>>>>>> 8d47ab02881342d43c2a52c7151cbc2cdbe854aa
 DATAFILE_SEP=","
 #  "04010" "04370" "04630" "04668" "04066" "04020" "04151" "04150" "00010" "00020" "04060" "04512" "04514" "04670" "04625" "04062"  "04810"
 KEGG_PATHWAYS=() # Enter KEGG pathway codes or leave blank to find all pathways with overlapping genes
 FIND_PATHWAYS=False
+<<<<<<< HEAD
 CUSTOM_PATHWAYS=("test_network_${NUM_GENES}_genes_${NUM_CELLS}_cells.graphml") #("modified_network.graphml") #Put custom networks in the scBONITA folder
+=======
+CUSTOM_PATHWAYS=("test_network_${NUM_GENES}g_${NUM_CELLS}c_${PER_ERR}e.graphml") #("modified_network.graphml") #Put custom networks in the scBONITA folder
+>>>>>>> 8d47ab02881342d43c2a52c7151cbc2cdbe854aa
 BINARIZE_THRESHOLD=0.01 # Data points with values above this number will be set to 1, lower set to 0
 ORGANISM_CODE="hsa" # Organism code in front of KEGG pathway numbers
 
