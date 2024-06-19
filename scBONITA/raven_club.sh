@@ -6,11 +6,11 @@
 
 # Which parts do you want to run? Set True to run or False to skip
     # Rule determination must be run prior to importance score, importance score must be run prior to relative abundance
-RUN_RULE_DETERMINATION=False
+RUN_RULE_DETERMINATION=True
 RUN_IMPORTANCE_SCORE=True
-RUN_RELATIVE_ABUNDANCE=False
-RUN_ATTRACTOR_ANALYSIS=False
-RUN_CELL_MAPPING=False
+RUN_RELATIVE_ABUNDANCE=True
+RUN_ATTRACTOR_ANALYSIS=True
+RUN_CELL_MAPPING=True
 
 # General Arguments (Required for all steps)
 DATA_FILE="../../../raven_data_covid/Club_Cells_data.csv"

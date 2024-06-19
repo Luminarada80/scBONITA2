@@ -118,9 +118,10 @@ def simulate_network():
     print(f'Number of mismatches = {total_mismatches}')
     print(f'Percent rule mismatch = {percent_error}')
 
-    rules_filename = f"test_network_rules_{num_genes}g_{num_cells*chunks}c_{percent_error}e.txt"
-    network_filename = f"test_network_{num_genes}g_{num_cells*chunks}c_{percent_error}e.graphml"
-    data_filename = f"test_data_file_{num_genes}g_{num_cells*chunks}c_{percent_error}e.csv"
+    rules_filename = f"/home/emoeller/github/scBONITA/network_simulation_data/test_network_rules_{num_genes}g_{num_cells*chunks}c.txt"
+    network_filename = f"/home/emoeller/github/scBONITA/network_simulation_data/test_network_{num_genes}g_{num_cells*chunks}c.graphml"
+    data_filename = f"/home/emoeller/github/scBONITA/network_simulation_data/test_data_file_{num_genes}g_{num_cells*chunks}c.csv"
+    percent_error_file_path = f'/home/emoeller/github/scBONITA/network_simulation_data/percent_error_log.txt'
 
     nx.write_graphml(network, network_filename)
 
@@ -148,6 +149,10 @@ def simulate_network():
     print(f'CSV dataset file "{data_filename}" created')
     print(f'Network graphml file "{network_filename}" created')
     print(f'Rules text file "{rules_filename}" created')
+
+    with open(percent_error_file_path, 'a') as percent_error_file:
+        percent_error_file.write(f'network_{num_genes}g_{num_cells*chunks}c\t->\t{percent_error}')
+
 
 if __name__ == '__main__':
     start_time = time.time()

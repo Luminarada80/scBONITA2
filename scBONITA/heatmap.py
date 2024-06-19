@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 from matplotlib.patches import Patch
 
+from file_paths import file_paths
 
 def create_heatmap(path, title):
     data = []
@@ -50,8 +51,8 @@ def create_heatmap(path, title):
 
 if __name__ == '__main__':
 
-    atherosclerosis_main_path = 'scBONITA/attractor_analysis_output/atherosclerosis_attractors/hsa05166_attractors/'
-    george_hiv_main_path = 'scBONITA/attractor_analysis_output/george_hiv_attractors/hsa04010_attractors/'
+    atherosclerosis_main_path = f'{file_paths["attractor_analysis_output"]}/atherosclerosis_attractors/hsa05166_attractors/'
+    george_hiv_main_path = f'{file_paths["attractor_analysis_output"]}/attractor_analysis_output/george_hiv_attractors/hsa04010_attractors/'
 
 
     create_heatmap(f'{george_hiv_main_path}/attractor_15/george_hiv_hsa04010_simulated_attractor_15.txt', 'George HIV hsa04010 attractor 15')

@@ -10,6 +10,8 @@ import logging
 import os
 from alive_progress import alive_bar
 
+from file_paths import file_paths
+
 class Pathways:
     def __init__(self, dataset_name, cv_threshold, data_file, sep, write_graphml, organism):
         self.cv_threshold = cv_threshold
@@ -17,7 +19,7 @@ class Pathways:
         self.gene_list = self._find_genes(sep)
         self.pathway_graphs = {}
         self.dataset_name = dataset_name
-        self.output_path = f'graphml_files/{dataset_name}/'
+        self.output_path = f'{file_paths["graphml_files"]}/{dataset_name}/'
         self.gene_indices = []
         self.pathway_dict = {}
         self.organism = organism
@@ -61,9 +63,9 @@ class Pathways:
         gene_dict = {}
 
         # If the dictionary file exists, use that (much faster than streaming)
-        if 'kegg_dict.csv' in os.listdir('pathway_xml_files'):
+        if 'kegg_dict.csv' in os.listdir(f'{file_paths["pathway_xml_files"]}'):
             logging.info(f'\t\t\tReading in KEGG dictionary file...')
-            with open('pathway_xml_files/kegg_dict.csv', 'r') as kegg_dict_file:
+            with open(f'{file_paths["pathway_xml_files"]}/kegg_dict.csv', 'r') as kegg_dict_file:
                 for line in kegg_dict_file:
                     line = line.strip().split('\t')
                     kegg_code = line[0]
@@ -75,7 +77,7 @@ class Pathways:
             logging.info(f'\t\t\tKEGG dictionary not found, downloading...')
 
             pathway_file = requests.get("http://rest.kegg.jp/get/br:ko00001", stream=True)
-            with open('pathway_xml_files/kegg_dict.csv', 'w') as kegg_dict_file:
+            with open(f'{file_paths["pathway_xml_files"]}/kegg_dict.csv', 'w') as kegg_dict_file:
                 for line in pathway_file.iter_lines():
                     line = line.decode("utf-8")
                     if len(line) > 1 and line[0] == "D":  # lines which begin with D translate kegg codes to gene names
@@ -292,12 +294,10 @@ class Pathways:
         num_pathways = len(subpaths)
 
         for pathway_num, pathway in enumerate(subpaths):
-            logging.info(f'Parsing {pathway}')
-            for xml_file in os.listdir(f'pathway_xml_files/{self.organism}'):
+            for xml_file in os.listdir(f'{file_paths["pathway_xml_files"]}/{self.organism}'):
                 xml_pathway_name = xml_file.split('.')[0]
                 if pathway == xml_pathway_name:
-                    print(pathway)
-                    with open(f'pathway_xml_files/{self.organism}/{xml_file}', 'r') as pathway_file:
+                    with open(f'{file_paths["pathway_xml_files"]}/{self.organism}/{xml_file}', 'r') as pathway_file:
                         text = [line for line in pathway_file]
                     soup = BeautifulSoup("".join(text), "xml")
                     for entry in soup.find_all("entry"):
@@ -474,7 +474,6 @@ class Pathways:
                             )
 
 
-        print(subpaths)
 
         # self.add_pathways(subpath_graphs, minOverlap=25, organism=self.organism)
 
@@ -519,15 +518,15 @@ class Pathways:
                 origCode = code
 
                 code = str("ko" + code)  # add ko
-                os.makedirs(f'pathway_xml_files/{organism}/', exist_ok=True)
+                os.makedirs(f'{file_paths["pickle_files"]}/{organism}/', exist_ok=True)
 
                 # If the pathway is not in the list of xml files, find it and create it
-                if f'{code}.xml' not in os.listdir(f"pathway_xml_files/{organism}/"):
+                if f'{code}.xml' not in os.listdir(f'{file_paths["pickle_files"]}/{organism}/'):
                     logging.debug(f'\t\t\tFinding xml file for pathway ko{origCode} and {organism}{origCode}')
 
                     # Write out the ko pathway xml files
                     try:
-                        with open(f"pathway_xml_files/{organism}/{code}.xml", 'w') as pathway_file:
+                        with open('{file_paths["pickle_files"]}/{organism}/{code}.xml', 'w') as pathway_file:
                             url = requests.get(
                                 "http://rest.kegg.jp/get/" + code + "/kgml", stream=True
                             )
@@ -541,7 +540,7 @@ class Pathways:
                     code = str(organism + origCode)  # set up with org letters
 
                     try:
-                        with open(f"pathway_xml_files/{organism}/{code}.xml", 'w') as pathway_file:
+                        with open(f'{file_paths["pickle_files"]}/{organism}/{code}.xml', 'w') as pathway_file:
                             url = requests.get(
                                 "http://rest.kegg.jp/get/" + code + "/kgml", stream=True
                             )
@@ -639,12 +638,12 @@ class Pathways:
         kegg_dict = self.parse_kegg_dict()  # parse the dictionary of ko codes
         logging.info("\t\t\tLoaded KEGG code dictionary")
         
-        pathway_dict_path = f'pathway_xml_files/{organism}_dict.csv'
+        pathway_dict_path = f'{file_paths["pickle_files"]}/{organism}_dict.csv'
         aliasDict = {}
         orgDict = {}
 
         # If the dictionary file exists, use that (much faster than streaming)
-        if f'{organism}_dict.csv' in os.listdir('pathway_xml_files'):
+        if f'{organism}_dict.csv' in os.listdir(f'{file_paths["pickle_files"]}'):
             logging.info(f'\t\t\tReading {organism} dictionary file...')
             with open(pathway_dict_path, 'r') as kegg_dict_file:
                 for line in kegg_dict_file:
@@ -683,13 +682,13 @@ class Pathways:
 
         if len(kegg_pathway_list) == 0:
             # Read in the pre-downloaded xml files and read them into a DiGraph object
-            num_pathways = len(os.listdir(f'pathway_xml_files/{organism}'))
+            num_pathways = len(os.listdir(f'{file_paths["pickle_files"]}/{organism}'))
             logging.info(f'\t\tNo KEGG pathways specified, searching all overlapping pathways')
             logging.info(f'\t\tFinding pathways with at least {minimumOverlap} genes that overlap with the dataset')
             with alive_bar(num_pathways) as bar:
-                for pathway_num, xml_file in enumerate(os.listdir(f'pathway_xml_files/{organism}')):
+                for pathway_num, xml_file in enumerate(os.listdir(f'{file_paths["pickle_files"]}/{organism}')):
                     pathway_name = xml_file.split('.')[0]
-                    with open(f'pathway_xml_files/{organism}/{xml_file}', 'r') as pathway_file:
+                    with open(f'{file_paths["pickle_files"]}/{organism}/{xml_file}', 'r') as pathway_file:
                         text = [line for line in pathway_file]
 
                         # Read the kegg xml file
@@ -709,10 +708,10 @@ class Pathways:
             logging.info(f'\tFinding pathways with at least {minimumOverlap} genes that overlap with the dataset')
             with alive_bar(num_pathways) as bar:
                 for pathway_num, pathway in enumerate(pathway_list):
-                    for xml_file in os.listdir(f'pathway_xml_files/{organism}'):
+                    for xml_file in os.listdir(f'{file_paths["pickle_files"]}/{organism}'):
                         xml_pathway_name = xml_file.split('.')[0]
                         if organism + pathway == xml_pathway_name:
-                            with open(f'pathway_xml_files/{organism}/{xml_file}', 'r') as pathway_file:
+                            with open(f'{file_paths["pickle_files"]}/{organism}/{xml_file}', 'r') as pathway_file:
                                 text = [line for line in pathway_file]
 
                                 # Read the kegg xml file
@@ -722,7 +721,7 @@ class Pathways:
                                 self.parse_kegg_pathway(graph, minimumOverlap, pathway, pathway_num, num_pathways)
 
                         elif 'ko' + pathway == xml_pathway_name:
-                            with open(f'pathway_xml_files/{organism}/{xml_file}', 'r') as pathway_file:
+                            with open(f'{file_paths["pickle_files"]}/{organism}/{xml_file}', 'r') as pathway_file:
                                 text = [line for line in pathway_file]
 
                                 # Read the kegg xml file

@@ -15,6 +15,7 @@ from alive_progress import alive_bar
 import os
 import random
 from rule_refinement import *
+from file_paths import file_paths
 
 # -------- Genetic Algorithm Code --------
 class CustomDeap:
@@ -153,13 +154,6 @@ class CustomDeap:
             total_fitnesses.append(raw_fitnesses)
 
             if gen == self.generations:
-                # self.graph_genetic_algorithm_results(total_fitnesses)
-                with open("deap_results.txt", "w") as temp_file:
-
-                    joined_generations = ",".join([str(i) for i in range(self.generations+1)])
-                    joined_fitness = ",".join([str(i) for i in total_fitnesses])
-                    temp_file.write(str(joined_generations))
-                    temp_file.write(str(joined_fitness))
                 return raw_fitnesses, invalid_offspring, logbook
             else:
 
@@ -247,8 +241,8 @@ class CustomDeap:
 
     def write_ruleset(self, ruleset, error, individual_num):
         # Write out the rules to an output file
-        rule_path = f'rules_output/{self.dataset_name}_rules/{self.network_name}_{self.dataset_name}_ind_{individual_num}_rules.txt'
-        os.makedirs(f'rules_output/{self.dataset_name}_rules/', exist_ok=True)
+        rule_path = f'{file_paths["rules_output"]}/{self.dataset_name}_rules/{self.network_name}_{self.dataset_name}_ind_{individual_num}_rules.txt'
+        os.makedirs(f'{file_paths["rules_output"]}/{self.dataset_name}_rules/', exist_ok=True)
         with open(rule_path, 'w') as rule_file:
             
             # Reverses the nodeDict dictionary for easy node name lookup by index
