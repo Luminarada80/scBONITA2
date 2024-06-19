@@ -3,6 +3,11 @@ import statistics
 import random
 import matplotlib.pyplot as plt
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+from scipy.stats import chi2_contingency
+import numpy as np
+>>>>>>> 8d47ab02881342d43c2a52c7151cbc2cdbe854aa
 =======
 from scipy.stats import chi2_contingency
 import numpy as np
@@ -52,18 +57,24 @@ def parse_ruleset(rule_file_path):
     return ruleset
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 num_genes = 100
 num_cells = 5000
 
 true_ruleset_path = f'/home/emoeller/github/scBONITA/scBONITA/network_rules_{num_genes}_genes_{num_cells}_cells.txt'
 test_ruleset_path = f'/home/emoeller/github/scBONITA/scBONITA/rules_output/test_data_{num_genes}_genes_rules/test_network_{num_genes}_genes_{num_cells}_cells.graphml_test_data_{num_genes}_genes_ind_1_rules.txt'
 =======
+=======
+>>>>>>> 8d47ab02881342d43c2a52c7151cbc2cdbe854aa
 num_genes = 50
 num_cells = 2000
 per_err = 44
 
 true_ruleset_path = f'/home/emoeller/github/scBONITA2/scBONITA/test_network_rules_{num_genes}g_{num_cells}c_{per_err}e.txt'
 test_ruleset_path = f'/home/emoeller/github/scBONITA2/scBONITA/rules_output/test_data_{num_genes}g_{num_cells}c_{per_err}e_rules/test_network_{num_genes}g_{num_cells}c_{per_err}e.graphml_test_data_{num_genes}g_{num_cells}c_{per_err}e_ind_1_rules.txt'
+<<<<<<< HEAD
+>>>>>>> 8d47ab02881342d43c2a52c7151cbc2cdbe854aa
+=======
 >>>>>>> 8d47ab02881342d43c2a52c7151cbc2cdbe854aa
 
 true_ruleset = parse_ruleset(true_ruleset_path)
@@ -77,12 +88,18 @@ num_genes = len(true_ruleset)
 percent_matches = []
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 8d47ab02881342d43c2a52c7151cbc2cdbe854aa
 TP = 0
 TN = 0
 FP = 0
 FN = 0
 
+<<<<<<< HEAD
+>>>>>>> 8d47ab02881342d43c2a52c7151cbc2cdbe854aa
+=======
 >>>>>>> 8d47ab02881342d43c2a52c7151cbc2cdbe854aa
 with alive_bar(num_trials) as bar:
     for i in range(num_trials):
@@ -93,7 +110,10 @@ with alive_bar(num_trials) as bar:
             # print(f'\tSimulation step {j}')
             match_percentage, results1, results2 = compare_rulesets(true_ruleset, test_ruleset, state)
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 8d47ab02881342d43c2a52c7151cbc2cdbe854aa
 
             # True positive
             for true, test in zip(results1, results2):
@@ -112,6 +132,9 @@ with alive_bar(num_trials) as bar:
                 elif true == 1 and test == 0:
                     FN += 1
 
+<<<<<<< HEAD
+>>>>>>> 8d47ab02881342d43c2a52c7151cbc2cdbe854aa
+=======
 >>>>>>> 8d47ab02881342d43c2a52c7151cbc2cdbe854aa
             state_matches.append(match_percentage)
             state = results1
@@ -119,7 +142,10 @@ with alive_bar(num_trials) as bar:
         percent_matches.append(statistics.mean(state_matches))
         bar()
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 8d47ab02881342d43c2a52c7151cbc2cdbe854aa
 
 precision = TP / (TP + FP)
 recall = TP / (TP + FN)
@@ -137,6 +163,9 @@ chi2, p, dof, ex = chi2_contingency(contingency_table)
 
 print(f'Chi-square value = {chi2}, p = {p}')
 print(f'DoF = {dof}, Expected frequencies = {ex}\n')
+<<<<<<< HEAD
+>>>>>>> 8d47ab02881342d43c2a52c7151cbc2cdbe854aa
+=======
 >>>>>>> 8d47ab02881342d43c2a52c7151cbc2cdbe854aa
         
 avg = statistics.mean(percent_matches)

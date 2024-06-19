@@ -22,10 +22,19 @@ NUM_GENES=50
 NUM_CELLS=2000
 PER_ERR=44
 
+NUM_GENES=50
+NUM_CELLS=2000
+PER_ERR=44
+
 # General Arguments (Required for all steps)
+<<<<<<< HEAD
 <<<<<<< HEAD
 DATA_FILE="test_data_file_${NUM_GENES}_genes_${NUM_CELLS}_cells.csv"
 DATASET_NAME="test_data_${NUM_GENES}_genes"
+=======
+DATA_FILE="test_data_file_${NUM_GENES}g_${NUM_CELLS}c_${PER_ERR}e.csv"
+DATASET_NAME="test_data_${NUM_GENES}g_${NUM_CELLS}c_${PER_ERR}e"
+>>>>>>> 8d47ab02881342d43c2a52c7151cbc2cdbe854aa
 =======
 DATA_FILE="test_data_file_${NUM_GENES}g_${NUM_CELLS}c_${PER_ERR}e.csv"
 DATASET_NAME="test_data_${NUM_GENES}g_${NUM_CELLS}c_${PER_ERR}e"
@@ -35,7 +44,11 @@ DATAFILE_SEP=","
 KEGG_PATHWAYS=() # Enter KEGG pathway codes or leave blank to find all pathways with overlapping genes
 FIND_PATHWAYS=False
 <<<<<<< HEAD
+<<<<<<< HEAD
 CUSTOM_PATHWAYS=("test_network_${NUM_GENES}_genes_${NUM_CELLS}_cells.graphml") #("modified_network.graphml") #Put custom networks in the scBONITA folder
+=======
+CUSTOM_PATHWAYS=("test_network_${NUM_GENES}g_${NUM_CELLS}c_${PER_ERR}e.graphml") #("modified_network.graphml") #Put custom networks in the scBONITA folder
+>>>>>>> 8d47ab02881342d43c2a52c7151cbc2cdbe854aa
 =======
 CUSTOM_PATHWAYS=("test_network_${NUM_GENES}g_${NUM_CELLS}c_${PER_ERR}e.graphml") #("modified_network.graphml") #Put custom networks in the scBONITA folder
 >>>>>>> 8d47ab02881342d43c2a52c7151cbc2cdbe854aa
