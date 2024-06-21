@@ -485,31 +485,10 @@ class Pathways:
         k = KEGG()  # read KEGG from bioservices
         k.organism = organism     
         pathway_list = list(k.pathwayIds)              
-        # try:  # try to retrieve and parse the dictionary containing organism gene names to codes conversion
-        #     url = requests.get("http://rest.kegg.jp/list/" + organism, stream=True)
-        #     # reads KEGG dictionary of identifiers between numbers and actual protein names and saves it to a python dictionary
-        #     aliasDict = {}
-        #     orgDict = {}
-        #     for line in url.iter_lines():
-        #         line = line.decode("utf-8")
-        #         line_split = line.split("\t")
-        #         k = line_split[0].split(":")[1]
-        #         nameline = line_split[1].split(";")
-        #         name = nameline[0]
-        #         if "," in name:
-        #             nameline = name.split(",")
-        #             name = nameline[0]
-        #             for entry in range(1, len(nameline)):
-        #                 aliasDict[nameline[entry].strip()] = name.upper()
-        #         orgDict[k] = name
-        #     url.close()
-        # except:
-        #     logging.info("Could not get library: " + organism)
         
         logging.info(f'\t\tDownloading any missing pathway xml files, this may take a while...')
         with alive_bar(len(pathway_list)) as bar:
             for pathway in pathway_list:
-
                 pathway = pathway.replace("path:", "")
                 code = str(pathway)
                 code = re.sub(
@@ -518,15 +497,15 @@ class Pathways:
                 origCode = code
 
                 code = str("ko" + code)  # add ko
-                os.makedirs(f'{file_paths["pickle_files"]}/{organism}/', exist_ok=True)
+                os.makedirs(f'{file_paths["pathway_xml_files"]}/{organism}/', exist_ok=True)
 
                 # If the pathway is not in the list of xml files, find it and create it
-                if f'{code}.xml' not in os.listdir(f'{file_paths["pickle_files"]}/{organism}/'):
+                if f'{code}.xml' not in os.listdir(f'{file_paths["pathway_xml_files"]}/{organism}/'):
                     logging.debug(f'\t\t\tFinding xml file for pathway ko{origCode} and {organism}{origCode}')
 
                     # Write out the ko pathway xml files
                     try:
-                        with open('{file_paths["pickle_files"]}/{organism}/{code}.xml', 'w') as pathway_file:
+                        with open(f'{file_paths["pathway_xml_files"]}/{organism}/{code}.xml', 'w') as pathway_file:
                             url = requests.get(
                                 "http://rest.kegg.jp/get/" + code + "/kgml", stream=True
                             )
@@ -540,7 +519,7 @@ class Pathways:
                     code = str(organism + origCode)  # set up with org letters
 
                     try:
-                        with open(f'{file_paths["pickle_files"]}/{organism}/{code}.xml', 'w') as pathway_file:
+                        with open(f'{file_paths["pathway_xml_files"]}/{organism}/{code}.xml', 'w') as pathway_file:
                             url = requests.get(
                                 "http://rest.kegg.jp/get/" + code + "/kgml", stream=True
                             )
@@ -708,10 +687,10 @@ class Pathways:
             logging.info(f'\tFinding pathways with at least {minimumOverlap} genes that overlap with the dataset')
             with alive_bar(num_pathways) as bar:
                 for pathway_num, pathway in enumerate(pathway_list):
-                    for xml_file in os.listdir(f'{file_paths["pickle_files"]}/{organism}'):
+                    for xml_file in os.listdir(f'{file_paths["pathway_xml_files"]}/{organism}'):
                         xml_pathway_name = xml_file.split('.')[0]
                         if organism + pathway == xml_pathway_name:
-                            with open(f'{file_paths["pickle_files"]}/{organism}/{xml_file}', 'r') as pathway_file:
+                            with open(f'{file_paths["pathway_xml_files"]}/{organism}/{xml_file}', 'r') as pathway_file:
                                 text = [line for line in pathway_file]
 
                                 # Read the kegg xml file
@@ -721,7 +700,7 @@ class Pathways:
                                 self.parse_kegg_pathway(graph, minimumOverlap, pathway, pathway_num, num_pathways)
 
                         elif 'ko' + pathway == xml_pathway_name:
-                            with open(f'{file_paths["pickle_files"]}/{organism}/{xml_file}', 'r') as pathway_file:
+                            with open(f'{file_paths["pathway_xml_files"]}/{organism}/{xml_file}', 'r') as pathway_file:
                                 text = [line for line in pathway_file]
 
                                 # Read the kegg xml file
@@ -761,15 +740,25 @@ class Pathways:
         elif not hasattr(self, "cv_genes"):
             # logging.info("\tYou have not filtered genes by any criterion.")
             pathwayGenes = set(self.gene_list)
-    
+
+        num_valid_paths = 0
+
+        logging.info(pathway_list)
+
         if isinstance(pathway_list, list):
             for (
                 pathway
             ) in (
                 pathway_list
             ):  # list(glob.glob("*.graphml")):  # list(glob.glob('*[0-9].graphml')):
-                G = nx.read_graphml(pathway)
+                if os.path.exists(pathway):
+                    G = nx.read_graphml(pathway)
+                else:
+                    custom_graphml_path = f'{file_paths["custom_graphml"]}/{pathway}'
+                    G = nx.read_graphml(custom_graphml_path)
+
                 nodes = set(G.nodes())
+                logging.info(f'Num nodes {len(nodes)}')
 
                 # Compute overlap based on node IDs first
                 overlap = len(nodes.intersection(pathwayGenes))
@@ -844,6 +833,8 @@ class Pathways:
 
                 
                 if overlap >= minOverlap:
+                    num_valid_paths += 1
+
                     logging.info(f'\tPathway: {pathway} Overlap: {overlap} Edges: {len(G.edges())}')
                     nodes = list(G.nodes())
                     if removeSelfEdges:
@@ -872,8 +863,15 @@ class Pathways:
                 for pathway, G in pathway_list.items():
                     nodes = set(G.nodes())
                     test = len(nodes.intersection(pathwayGenes))
+                    logging.info(f'Num nodes {len(nodes)}')
+                    
+                    # Find the pathway name if its in a different directory
+                    if '/' in pathway:
+                        pathway = pathway.split('/')[-1]
     
                     if test >= minOverlap:
+                        num_valid_paths += 1
+
                         logging.info(f'\t\t\tPathway: {pathway} Overlap: {test} Edges: {len(G.edges())}')
                         nodes = list(G.nodes())
 
@@ -906,3 +904,6 @@ class Pathways:
                         continue
                         # msg = f'Cant find an overlap between the network genes and the genes in the dataset, look at pathways.py'
                         # raise Exception(msg)
+
+        if num_valid_paths == 0:
+            raise Exception(f'\n\nWARNING: No pathways found with sufficient overlap')

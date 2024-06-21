@@ -385,10 +385,10 @@ if __name__ == '__main__':
 
 
         logging.info(f'\nAdding representative attractor map to network pickle files:')
-        network_directory_path = f"{file_paths["pickle_files"]}/{dataset_name}_pickle_files/network_pickle_files"
+        network_directory_path = f'{file_paths["pickle_files"]}/{dataset_name}_pickle_files/network_pickle_files'
         os.makedirs(network_directory_path, exist_ok=True)
 
-        network_pickle_file_path = f"{network_directory_path}/{dataset_name}_{network.name}.network.pickle"
+        network_pickle_file_path = f'{network_directory_path}/{dataset_name}_{network.name}.network.pickle'
         logging.info(f'\tFile: {dataset_name}_{network.name}.network.pickle')
         pickle.dump(network, open(network_pickle_file_path, "wb"))
 

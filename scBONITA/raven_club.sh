@@ -6,14 +6,14 @@
 
 # Which parts do you want to run? Set True to run or False to skip
     # Rule determination must be run prior to importance score, importance score must be run prior to relative abundance
-RUN_RULE_DETERMINATION=True
-RUN_IMPORTANCE_SCORE=True
-RUN_RELATIVE_ABUNDANCE=True
-RUN_ATTRACTOR_ANALYSIS=True
+RUN_RULE_DETERMINATION=False
+RUN_IMPORTANCE_SCORE=False
+RUN_RELATIVE_ABUNDANCE=False
+RUN_ATTRACTOR_ANALYSIS=False
 RUN_CELL_MAPPING=True
 
 # General Arguments (Required for all steps)
-DATA_FILE="../../../raven_data_covid/Club_Cells_data.csv"
+DATA_FILE="../input/datasets/raven_data_covid/Club_Cells_data.csv"
 DATASET_NAME="raven_club"
 DATAFILE_SEP=","
 #  "04010" "04370" "04630" "04668" "04066" "04020" "04151" "04150" "00010" "00020" "04060" "04512" "04514" "04670" "04625" "04062"  "04810"
@@ -23,7 +23,7 @@ BINARIZE_THRESHOLD=0.01 # Data points with values above this number will be set 
 ORGANISM_CODE="hsa" # Organism code in front of KEGG pathway numbers
 
 # Relative Abundance arguments
-METADATA_FILE="../../../raven_data_covid/Club_Cells_meta.txt"
+METADATA_FILE="../input/metadata_files/Club_Cells_meta.txt"
 METADATA_SEP=" "
 HEADER="y" # Does the metadata file contain a header before the entries start?
 OVERWRITE="n" # Do you want to overwrite the files generated for each of your different experimental groups?
