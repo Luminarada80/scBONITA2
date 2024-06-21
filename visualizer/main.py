@@ -121,7 +121,7 @@ class Game:
         self.dragging_selection = False
         self.moving_objects = False
 
-        self.save_file = 'hsa04621_save_game.pickle'
+        self.save_file = 'visualizer/save_states/hsa04621_save_game.pickle'
         self.mouse_pos = pygame.mouse.get_pos()
         self.keys = pygame.key.get_pressed()
 
