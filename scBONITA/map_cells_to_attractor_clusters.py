@@ -90,12 +90,12 @@ if __name__ == '__main__':
 
     # Create a dictionary of cell indices to group
     for group, cell_indices in all_networks[0].group_cell_indices.items():
-        logging.info(f'\tGroup: {group[0]}, {len(cell_indices)} cells')
-        groups.append(group[0])
+        logging.info(f'\tGroup: {group}, {len(cell_indices)} cells')
+        groups.append(group)
 
         for cell_index in cell_indices:
             cell_group_dict[cell_index] = group[0]
-            group_cell_counts[group[0]] = len(cell_indices)
+            group_cell_counts[group] = len(cell_indices)
 
     cell_info = {}
     network_info = {}

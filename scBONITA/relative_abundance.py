@@ -344,8 +344,10 @@ if __name__ == '__main__':
                     group = groups[group_num]
                     # Specify the path to the group network pickle file
                     network_folder = f'{file_paths["pickle_files"]}/{dataset_name}_pickle_files/network_pickle_files/{dataset_name}_{group}_pickle_files'
-                    network_file_path = f'{network_folder}/{dataset_name}_{network_name}_{group}.network.pickle'
+                    os.makedirs(network_folder, exist_ok=True)
 
+                    network_file_path = f'{network_folder}/{dataset_name}_{network_name}_{group}.network.pickle'
+                    
                     # Check if the group file exists for this dataset and if the user passed in the overwrite argument
                     if overwrite_check(overwrite, network_file_path) == True or os.path.exists(network_file_path) == False:
                         # Store the network information in a pickle file for each group
@@ -408,8 +410,8 @@ if __name__ == '__main__':
     # Find and load the group 1 pickle files
     control_group_networks = []
     while True:
-        group_path = f"{dataset_name}_{control_group}_pickle_files"
-        control_group_path = f"{pickle_file_path}/{group_path}/{dataset_name}_*_{control_group}.network.pickle"
+        group_path = f'{dataset_name}_{control_group}_pickle_files'
+        control_group_path = f'{pickle_file_path}/{group_path}/{dataset_name}_*_{control_group}.network.pickle'
 
         logging.info(f'\tLoading CONTROL group networks')
 
@@ -434,8 +436,8 @@ if __name__ == '__main__':
     # Find and load the group 2 pickle files
     experimental_group_networks = []
     while True:
-        group_path = f"{dataset_name}_{experimental_group}_pickle_files"
-        experimental_group_path = f"{pickle_file_path}/{group_path}/{dataset_name}_*_{experimental_group}.network.pickle"
+        group_path = f'{dataset_name}_{experimental_group}_pickle_files'
+        experimental_group_path = f'{pickle_file_path}/{group_path}/{dataset_name}_*_{experimental_group}.network.pickle'
 
         logging.info(f'\n\tLoading EXPERIMENTAL group networks')
 

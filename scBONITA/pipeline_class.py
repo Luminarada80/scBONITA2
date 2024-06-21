@@ -88,6 +88,7 @@ class Pipeline():
             pathways.add_pathways(pathways.pathway_graphs, minOverlap=self.minOverlap, organism=self.organism)
         
         # Use the pathway(s) specified by pathway_list
+        
         else:
             if isinstance(self.pathway_list, str):
                 logging.info(f'\tPathways = {self.pathway_list}')
@@ -104,6 +105,10 @@ class Pipeline():
                 assert Exception(msg)
 
         if len(self.network_files) > 0:
+            for i, file in enumerate(self.network_files):
+                if '/' in file:
+                    self.network_files.pop(i)
+                    self.network_files.append(file.split('/')[-1])
             logging.info(f'\tCustom pathway: {self.network_files}')
             pathways.add_pathways(self.network_files, minOverlap=self.minOverlap, organism=self.organism)
 
