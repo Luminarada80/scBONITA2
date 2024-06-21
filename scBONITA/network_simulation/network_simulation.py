@@ -6,6 +6,14 @@ import networkx as nx
 import time
 from datetime import timedelta
 from alive_progress import alive_bar
+import os
+import sys
+
+# Get the files from the parent dir so that file_paths can be imported
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(parent_dir)
+
+from file_paths import sim_data_file_paths
 
 def generate_random_state(length):
     return np.random.randint(2, size=length)
@@ -121,10 +129,13 @@ def simulate_network():
     num_cells = 1
     chunks = 5000
 
-    rules_filename = f"/home/emoeller/github/scBONITA/network_simulation/data/network_rules_{num_genes}_genes_{num_cells*chunks}_cells.txt"
-    network_filename = f"/home/emoeller/github/scBONITA/network_simulation/data/test_network_{num_genes}_genes_{num_cells*chunks}_cells.graphml"
-    data_filename = f"/home/emoeller/github/scBONITA/network_simulation/data/test_data_file_{num_genes}_genes_{num_cells*chunks}_cells.csv"
+    for dir in sim_data_file_paths.values():
+        os.makedirs(dir, exist_ok=True)
 
+    rules_filename = f'{sim_data_file_paths["sim_ruleset"]}/sim_rules_{num_genes}g_{num_cells*chunks}c.txt'
+    network_filename = f'{sim_data_file_paths["sim_network"]}/sim_network_{num_genes}g_{num_cells*chunks}c.graphml'
+    data_filename = f'{sim_data_file_paths["sim_dataset"]}/sim_dataset_{num_genes}g_{num_cells*chunks}c.csv'
+    
     print('Generating simulated data...')
     attempt_num = 1
     print(f'\tCreating network')
