@@ -6,14 +6,17 @@
 
 # Which parts do you want to run? Set True to run or False to skip
     # Rule determination must be run prior to importance score, importance score must be run prior to relative abundance
-RUN_RULE_DETERMINATION=False
-RUN_IMPORTANCE_SCORE=False
-RUN_RELATIVE_ABUNDANCE=False
-RUN_ATTRACTOR_ANALYSIS=False
+RUN_RULE_DETERMINATION=True
+RUN_IMPORTANCE_SCORE=True
+RUN_RELATIVE_ABUNDANCE=True
+RUN_ATTRACTOR_ANALYSIS=True
 RUN_CELL_MAPPING=True
 
+# Set the directory path for where the main scBONITA files are found
+HOME=/home/emoeller/github/scBONITA/
+
 # General Arguments (Required for all steps)
-DATA_FILE="../input/datasets/raven_data_covid/Club_Cells_data.csv"
+DATA_FILE="$HOME/input/datasets/raven_data_covid/Club_Cells_data.csv"
 DATASET_NAME="raven_club"
 DATAFILE_SEP=","
 #  "04010" "04370" "04630" "04668" "04066" "04020" "04151" "04150" "00010" "00020" "04060" "04512" "04514" "04670" "04625" "04062"  "04810"
@@ -23,7 +26,7 @@ BINARIZE_THRESHOLD=0.01 # Data points with values above this number will be set 
 ORGANISM_CODE="hsa" # Organism code in front of KEGG pathway numbers
 
 # Relative Abundance arguments
-METADATA_FILE="../input/metadata_files/Club_Cells_meta.txt"
+METADATA_FILE="$HOME/input/metadata_files/Club_Cells_meta.txt"
 METADATA_SEP=" "
 HEADER="y" # Does the metadata file contain a header before the entries start?
 OVERWRITE="n" # Do you want to overwrite the files generated for each of your different experimental groups?
@@ -55,7 +58,7 @@ if [ "$RUN_RULE_DETERMINATION" = "True" ]; then
         # Using a list of KEGG pathways:
         KEGG_PATHWAYS_ARGS="${KEGG_PATHWAYS[@]}"
 
-        /home/emoeller/anaconda3/envs/scBonita/bin/python pipeline_class.py \
+        /home/emoeller/anaconda3/envs/scBonita/bin/python "$HOME"/scBONITA/pipeline_class.py \
             --data_file "$DATA_FILE" \
             --dataset_name "$DATASET_NAME" \
             --datafile_sep "$DATAFILE_SEP" \
@@ -64,7 +67,7 @@ if [ "$RUN_RULE_DETERMINATION" = "True" ]; then
             --organism $ORGANISM_CODE
     else
         echo "No KEGG pathways specified, finding kegg pathways with overlapping genes..."
-        /home/emoeller/anaconda3/envs/scBonita/bin/python pipeline_class.py \
+        /home/emoeller/anaconda3/envs/scBonita/bin/python "$HOME"/scBONITA/pipeline_class.py \
         --data_file "$DATA_FILE" \
         --dataset_name "$DATASET_NAME" \
         --datafile_sep "$DATAFILE_SEP" \
@@ -84,7 +87,7 @@ if [ "$RUN_RULE_DETERMINATION" = "True" ]; then
             CUSTOM_PATHWAYS_ARGS+="--network_files $pathway "
         done
 
-        /home/emoeller/anaconda3/envs/scBonita/bin/python pipeline_class.py \
+        /home/emoeller/anaconda3/envs/scBonita/bin/python "$HOME"/scBONITA/pipeline_class.py \
         --data_file "$DATA_FILE" \
         --dataset_name "$DATASET_NAME" \
         --datafile_sep "$DATAFILE_SEP" \
@@ -108,7 +111,7 @@ if [ "$RUN_IMPORTANCE_SCORE" = "True" ]; then
         # Using a list of KEGG pathways:
         KEGG_PATHWAYS_ARGS="${KEGG_PATHWAYS[@]}"
 
-        /home/emoeller/anaconda3/envs/scBonita/bin/python importance_scores.py \
+        /home/emoeller/anaconda3/envs/scBonita/bin/python "$HOME"/scBONITA/importance_scores.py \
             --dataset_name "$DATASET_NAME" \
             --list_of_kegg_pathways $KEGG_PATHWAYS_ARGS
     else
@@ -147,7 +150,7 @@ if [ "$RUN_RELATIVE_ABUNDANCE" = "True" ]; then
         EXPERIMENTAL_GROUP=${EXPERIMENTAL_GROUPS[$i]}
 
         # Execute the command with the current pair of control and experimental group
-        /home/emoeller/anaconda3/envs/scBonita/bin/python relative_abundance.py \
+        /home/emoeller/anaconda3/envs/scBonita/bin/python "$HOME"/scBONITA/relative_abundance.py \
             --dataset_name "$DATASET_NAME" \
             --dataset_file "$DATA_FILE" \
             --metadata_file "$METADATA_FILE" \
@@ -172,7 +175,7 @@ fi
 if [ "$RUN_ATTRACTOR_ANALYSIS" = "True" ]; then
     echo "Running Attractor Analysis..."
 
-    /home/emoeller/anaconda3/envs/scBonita/bin/python attractor_analysis.py \
+    /home/emoeller/anaconda3/envs/scBonita/bin/python "$HOME"/scBONITA/attractor_analysis.py \
         --dataset_name "$DATASET_NAME"
 fi
 
@@ -185,6 +188,6 @@ fi
 if [ "$RUN_CELL_MAPPING" = "True" ]; then
     echo "Running Cell Mapping..."
 
-    /home/emoeller/anaconda3/envs/scBonita/bin/python map_cells_to_attractor_clusters.py \
+    /home/emoeller/anaconda3/envs/scBonita/bin/python "$HOME"/scBONITA/map_cells_to_attractor_clusters.py \
         --dataset_name "$DATASET_NAME"
 fi

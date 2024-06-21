@@ -736,7 +736,6 @@ class Pathways:
         logging.info(f'\t\tAdding graphml pathways to rule_inference object...')
         if hasattr(self, "cv_genes"):
             pathwayGenes = set(self.cv_genes)
-            logging.info(pathwayGenes)
         elif not hasattr(self, "cv_genes"):
             # logging.info("\tYou have not filtered genes by any criterion.")
             pathwayGenes = set(self.gene_list)
@@ -758,7 +757,6 @@ class Pathways:
                     G = nx.read_graphml(custom_graphml_path)
 
                 nodes = set(G.nodes())
-                logging.info(f'Num nodes {len(nodes)}')
 
                 # Compute overlap based on node IDs first
                 overlap = len(nodes.intersection(pathwayGenes))

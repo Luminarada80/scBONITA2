@@ -9,7 +9,6 @@ import pickle
 from argparse import ArgumentParser
 import matplotlib.pyplot as plt
 import csv
-from path_manager import PathManager
 from setup.user_input_prompts import *
 import numexpr as ne
 
@@ -311,27 +310,23 @@ def importance_score(ruleset, network, folder_path, file_name):
     
     importance_score_calculator.calculate_importance_scores()
 
-    # Create the paths to the relative abundance results
-    content = "\n".join(f"{node.name} = {round(node.importance_score, 3)}" for node in network.nodes)
-
     # Save the importance scores to a file
     logging.info(f'Saving importance scores to file: {file_name}.txt')
-    path_manager.save_text_file(folder_path, file_name, content)
+    with open(f'{file_paths["importance_score_output"]}/text_files/{file_name}.txt', 'w') as file:
+        file.write("\n".join(f"{node.name} = {round(node.importance_score, 3)}" for node in network.nodes))
 
     # Create and save the figure
     fig = ruleset.plot_graph_from_graphml(network.network)
 
     logging.info(f'Saving importance score figures')
-    path_manager.save_png_file(folder_path, file_name, fig)
-    path_manager.save_svg_file(folder_path, file_name, fig)
+    fig.savefig(f'{file_paths["importance_score_output"]}/png_files/{file_name}.png', bbox_inches='tight', format='png')
+    fig.savefig(f'{file_paths["importance_score_output"]}/svg_files/{file_name}.png', bbox_inches='tight', format='svg')
 
     plt.close(fig)
 
 if __name__ == '__main__':
     # Set the logging level for output
     logging.basicConfig(format='%(message)s', level=logging.INFO)
-
-    path_manager = PathManager(f'{file_paths["importance_score_output"]}')
 
     parser = ArgumentParser()
 

@@ -332,7 +332,7 @@ if __name__ == '__main__':
 
         logging.info(f'\n----- ATTRACTOR ANALYSIS -----')
         cluster_fig = run_attractor_analysis(network, cells)
-        cluster_path = f'attractor_analysis_output/{dataset_name}_attractors'
+        cluster_path = f'{file_paths["attractor_analysis_output"]}/{dataset_name}_attractors'
         os.makedirs(cluster_path, exist_ok=True)
 
         cluster_filename = f'{cluster_path}/{network.name}_cluster.png'
