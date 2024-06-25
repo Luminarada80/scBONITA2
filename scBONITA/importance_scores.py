@@ -312,15 +312,23 @@ def importance_score(ruleset, network, folder_path, file_name):
 
     # Save the importance scores to a file
     logging.info(f'Saving importance scores to file: {file_name}.txt')
-    with open(f'{file_paths["importance_score_output"]}/text_files/{file_name}.txt', 'w') as file:
+    text_file_path = f'{file_paths["importance_score_output"]}/{dataset_name}/text_files'
+    png_file_path = f'{file_paths["importance_score_output"]}/{dataset_name}/png_files'
+    svg_file_path = f'{file_paths["importance_score_output"]}/{dataset_name}/svg_files'
+
+    os.makedirs(text_file_path, exist_ok=True)
+    os.makedirs(png_file_path, exist_ok=True)
+    os.makedirs(svg_file_path, exist_ok=True)
+
+    with open(f'{text_file_path}/{file_name}.txt', 'w') as file:
         file.write("\n".join(f"{node.name} = {round(node.importance_score, 3)}" for node in network.nodes))
 
     # Create and save the figure
     fig = ruleset.plot_graph_from_graphml(network.network)
 
     logging.info(f'Saving importance score figures')
-    fig.savefig(f'{file_paths["importance_score_output"]}/png_files/{file_name}.png', bbox_inches='tight', format='png')
-    fig.savefig(f'{file_paths["importance_score_output"]}/svg_files/{file_name}.png', bbox_inches='tight', format='svg')
+    fig.savefig(f'{png_file_path}/{file_name}.png', bbox_inches='tight', format='png')
+    fig.savefig(f'{svg_file_path}/{file_name}.png', bbox_inches='tight', format='svg')
 
     plt.close(fig)
 

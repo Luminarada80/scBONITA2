@@ -5,8 +5,12 @@ import pickle
 from setup.user_input_prompts import *
 import logging
 from heatmap import create_heatmap
+import seaborn as sns
+import matplotlib.colors as mcolors
+from matplotlib.patches import Patch
 import numexpr as ne
 import random
+from argparse import ArgumentParser
 
 from file_paths import file_paths
 
@@ -26,7 +30,7 @@ def use_cell_starting_state(file):
         return network_object
 
 def simulate_network(nodes, filename):
-    steps = 100
+    steps = 20
 
     # starting_state = get_starting_state(filename)
     starting_state = []
@@ -156,9 +160,26 @@ if __name__ == '__main__':
 
     logging.basicConfig(format='%(message)s', level=logging.INFO)
 
-    # Add in arguments to find the attractor file
-    dataset_name = input("Enter dataset name: ")
-    network_name = input("Enter network name: ")
+    parser = ArgumentParser()
+
+    parser.add_argument(
+        '--dataset_name',
+        type=str,
+        required=True,
+        help='Number of genes to generate'
+    )
+
+    parser.add_argument(
+        '--network_name',
+        type=str,
+        required=True,
+        help='Number of cells to generate'
+    )
+
+    results = parser.parse_args()
+
+    dataset_name = getattr(results, 'dataset_name')
+    network_name = getattr(results, 'network_name')
 
     # dataset_name = 'george_hiv'
     # network_name = 'hsa04670'
@@ -189,8 +210,12 @@ if __name__ == '__main__':
 
         # Specify outfile path for the simulation results
         outfile_folder = f'{file_paths["trajectories"]}/{dataset_name}_{network_name}'
+        png_folder = f'{outfile_folder}/png_files'
+        text_folder = f'{outfile_folder}/text_files'
+
         os.makedirs(outfile_folder, exist_ok=True)
-        file_path = f'{outfile_folder}/cell_{cell_index}_trajectory'
+        os.makedirs(png_folder, exist_ok=True)
+        os.makedirs(text_folder, exist_ok=True)
         
         # Simulate the network
         simulated_attractor = simulate_network(network.nodes, transposed_random_column)
@@ -200,13 +225,13 @@ if __name__ == '__main__':
 
         # # Save the attractor states to a csv file
         # logging.info(f'Saved file to: "{file_path}"')
-        save_attractor_simulation(f'{outfile_folder}/cell_{cell_index}_trajectory.txt', network, simulated_attractor)
+        save_attractor_simulation(f'{text_folder}/cell_{cell_index}_trajectory.txt', network, simulated_attractor)
         plt.close(fig)
 
         # Create a heatmap of the expression for easier attractor visualization
-        heatmap = create_heatmap(f'{outfile_folder}/cell_{cell_index}_trajectory.txt', f'Simulation for {dataset_name} {network_name} cell {cell_index} pathway ')
+        heatmap = create_heatmap(f'{text_folder}/cell_{cell_index}_trajectory.txt', f'Simulation for {dataset_name} {network_name} cell {cell_index} pathway ')
         # heatmap.show()
 
         # Saves a png of the results
-        heatmap.savefig(f'{outfile_folder}/cell_{cell_index}_trajectory.png', format='png')
+        heatmap.savefig(f'{png_folder}/cell_{cell_index}_trajectory.png', format='png')
         plt.close(heatmap)

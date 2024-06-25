@@ -163,7 +163,7 @@ def find_min_error_indices(prediction_errors):
 
     return min_error_indices, min_error
 
-def minimize_incoming_connections(min_error_indices, rules, prediction_errors):
+def maximize_incoming_connections(min_error_indices, rules, prediction_errors):
     """
     For each of the rules with a minimum error, finds the rules with the greatest incoming node connections
 
@@ -284,7 +284,7 @@ def calculate_refined_errors(node, chunked_dataset):
 
         # Now that we have found the rules with the minimum error, we want to maximize the number of connections
         # logging.info(f'\t\tMaximizing the number of connections')
-        max_incoming_node_rules, best_rule_indices, best_rule_errors = minimize_incoming_connections(min_error_indices, rules, prediction_errors)
+        max_incoming_node_rules, best_rule_indices, best_rule_errors = maximize_incoming_connections(min_error_indices, rules, prediction_errors)
         # logging.info(f'\t\t\tFound {len(max_incoming_node_rules)} rule(s)')
 
         # Find the rules with the fewest 'and' statements
