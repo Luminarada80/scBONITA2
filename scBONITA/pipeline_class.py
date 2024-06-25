@@ -172,6 +172,9 @@ class Pipeline():
     def infer_rules(self, network_name, processed_graphml_path, ruleset):
         logging.info(f'\tRunning rule inference for {network_name}')
 
+        if ".graphml" in network_name:
+            network_name = '_custom_network'
+
         # Specify and create the folder for the dataset pickle files
         data_pickle_folder = f'{file_paths["pickle_files"]}/{self.dataset_name}_pickle_files/ruleset_pickle_files'
         os.makedirs(data_pickle_folder, exist_ok=True)

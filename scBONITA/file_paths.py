@@ -15,5 +15,5 @@ file_paths = {
 sim_data_file_paths = {
     'sim_network' : '../input/custom_graphml_files',
     'sim_dataset' : '../input/datasets',
-    'sim_ruleset' : '../simulated_rulesets',
+    'sim_ruleset' : '../../simulated_rulesets',
 }
