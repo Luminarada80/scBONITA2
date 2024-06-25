@@ -3,9 +3,9 @@
 # Set the directory path for where the main scBONITA files are found
 HOME=/home/emoeller/github/scBONITA
 
-NUM_GENES=10
-NUM_CELLS=20
-NUM_CHUNKS=100
+NUM_GENES=60
+NUM_CELLS=1
+NUM_CHUNKS=2000
 ALLOW_MISMATCHES=false
 
 until [ $NUM_GENES -gt 100 ]; do
