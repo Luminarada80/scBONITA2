@@ -65,6 +65,7 @@ class RuleInference(NetworkSetup):
         if self.data.shape[0] > 0:
             # Binarize the values in the sparse matrix
             logging.info(f'\tBinarized sparse matrix')
+            
             self.binarized_matrix = preprocessing.binarize(self.sparse_matrix, threshold=binarize_threshold, copy=True)
             logging.debug(f'{self.binarized_matrix[:5,:5]}')
             
@@ -137,7 +138,7 @@ class RuleInference(NetworkSetup):
             gene_names = []
             data_row_index = 0  # Separate index for data array
             for i, row in enumerate(reader):
-                if (i + 1) in node_indices:  # Only keeps the nodes involved, skips the cell name row
+                if i in node_indices:  # Only keeps the nodes involved, skips the cell name row
                     gene_names.append(row[0])
                     
                     # Offset cell indices by 1 to skip the gene name column
