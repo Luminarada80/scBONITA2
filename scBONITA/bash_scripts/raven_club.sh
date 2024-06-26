@@ -6,7 +6,7 @@
 
 # Which parts do you want to run? Set True to run or False to skip
     # Rule determination must be run prior to importance score, importance score must be run prior to relative abundance
-RUN_RULE_DETERMINATION=True
+RUN_RULE_DETERMINATION=False
 RUN_IMPORTANCE_SCORE=True
 RUN_RELATIVE_ABUNDANCE=True
 RUN_ATTRACTOR_ANALYSIS=True
@@ -31,7 +31,7 @@ ORGANISM_CODE="hsa" # Organism code in front of KEGG pathway numbers
 METADATA_FILE="$HOME/input/metadata_files/Club_Cells_meta.txt"
 METADATA_SEP=" "
 HEADER="y" # Does the metadata file contain a header before the entries start?
-OVERWRITE="n" # Do you want to overwrite the files generated for each of your different experimental groups?
+OVERWRITE="y" # Do you want to overwrite the files generated for each of your different experimental groups?
 CELL_NAME_COL=1 # What column contains the cell names (first column = 0)
 GROUP_INDICES=(2 3)
 
@@ -67,6 +67,7 @@ if [ "$RUN_RULE_DETERMINATION" = "True" ]; then
             --list_of_kegg_pathways $KEGG_PATHWAYS_ARGS \
             --binarize_threshold $BINARIZE_THRESHOLD \
             --organism $ORGANISM_CODE
+
     elif [ "$FIND_PATHWAYS" = "True" ]; then
         echo "No KEGG pathways specified, finding kegg pathways with overlapping genes..."
         /home/emoeller/anaconda3/envs/scBonita/bin/python "$HOME"/scBONITA/pipeline_class.py \
@@ -113,15 +114,37 @@ if [ "$RUN_IMPORTANCE_SCORE" = "True" ]; then
 
     if [ ${#KEGG_PATHWAYS[@]} -gt 0 ]; then
         echo "Running with KEGG pathways"
-        # Using a list of KEGG pathways:
         KEGG_PATHWAYS_ARGS="${KEGG_PATHWAYS[@]}"
-
-        /home/emoeller/anaconda3/envs/scBonita/bin/python "$HOME"/scBONITA/importance_scores.py \
-            --dataset_name "$DATASET_NAME" \
-            --list_of_kegg_pathways $KEGG_PATHWAYS_ARGS
     else
         echo "No KEGG Pathways specified"
     fi
+
+    if [ ${#CUSTOM_PATHWAYS[@]} -gt 0 ]; then
+        echo "Running with Custom Pathways..."
+        CUSTOM_PATHWAYS_ARGS=""
+        for pathway in "${CUSTOM_PATHWAYS[@]}"; do
+            CUSTOM_PATHWAYS_ARGS+="--list_of_kegg_pathways $pathway "
+        done
+    else
+        echo "No Custom Pathways specified"
+    fi
+
+    # Build the command with common arguments
+    CMD="/home/emoeller/anaconda3/envs/scBonita/bin/python \"$HOME/scBONITA/importance_scores.py\" \
+        --dataset_name \"$DATASET_NAME\""
+
+    # Add KEGG pathways if available
+    if [ -n "$KEGG_PATHWAYS_ARGS" ]; then
+        CMD+=" --list_of_kegg_pathways $KEGG_PATHWAYS_ARGS"
+    fi
+
+    # Add custom pathways if available
+    if [ -n "$CUSTOM_PATHWAYS_ARGS" ]; then
+        CMD+=" $CUSTOM_PATHWAYS_ARGS"
+    fi
+
+    # Execute the command
+    eval $CMD
 fi
 
 #  -----------------------------------------
@@ -141,13 +164,18 @@ if [ "$RUN_RELATIVE_ABUNDANCE" = "True" ]; then
 
     if [ ${#KEGG_PATHWAYS[@]} -gt 0 ]; then
         echo "Running with KEGG pathways"
-        # Using a list of KEGG pathways:
         KEGG_PATHWAYS_ARGS="${KEGG_PATHWAYS[@]}"
     else
         echo "No KEGG Pathways specified"
     fi
 
-    
+    if [ ${#CUSTOM_PATHWAYS[@]} -gt 0 ]; then
+        echo "Running with Custom Pathways..."
+        CUSTOM_PATHWAYS_ARGS=""
+        for pathway in "${CUSTOM_PATHWAYS[@]}"; do
+            CUSTOM_PATHWAYS_ARGS+="--list_of_kegg_pathways $pathway "
+        done
+    fi
 
     # Loop through the control and experimental groups
     for (( i=0; i<${#CONTROL_GROUPS[@]}; i++ )); do
@@ -156,23 +184,33 @@ if [ "$RUN_RELATIVE_ABUNDANCE" = "True" ]; then
         CONTROL_GROUP=${CONTROL_GROUPS[$i]}
         EXPERIMENTAL_GROUP=${EXPERIMENTAL_GROUPS[$i]}
 
-        # Execute the command with the current pair of control and experimental group
-        /home/emoeller/anaconda3/envs/scBonita/bin/python "$HOME"/scBONITA/relative_abundance.py \
-            --dataset_name "$DATASET_NAME" \
-            --dataset_file "$DATA_FILE" \
-            --metadata_file "$METADATA_FILE" \
-            --metadata_sep "$METADATA_SEP" \
-            --dataset_sep "$DATAFILE_SEP" \
-            --control_group "$CONTROL_GROUP" \
-            --experimental_group "$EXPERIMENTAL_GROUP" \
+        # Build the command with common arguments
+        CMD="/home/emoeller/anaconda3/envs/scBonita/bin/python \"$HOME/scBONITA/relative_abundance.py\" \
+            --dataset_name \"$DATASET_NAME\" \
+            --dataset_file \"$DATA_FILE\" \
+            --metadata_file \"$METADATA_FILE\" \
+            --metadata_sep \"$METADATA_SEP\" \
+            --dataset_sep \"$DATAFILE_SEP\" \
+            --control_group \"$CONTROL_GROUP\" \
+            --experimental_group \"$EXPERIMENTAL_GROUP\" \
             --cell_name_index $CELL_NAME_COL \
             --group_indices $GROUP_INDICES_ARGS \
-            --header "$HEADER" \
-            --overwrite "$OVERWRITE" \
-            --organism "$ORGANISM_CODE" \
-            --list_of_kegg_pathways $KEGG_PATHWAYS_ARGS
-        done
+            --header \"$HEADER\" \
+            --overwrite \"$OVERWRITE\" \
+            --organism \"$ORGANISM_CODE\""
+
+        # Add custom pathways if available
+        if [ -n "$CUSTOM_PATHWAYS_ARGS" ]; then
+            CMD+=" $CUSTOM_PATHWAYS_ARGS"
+        elif [ -n "$KEGG_PATHWAYS_ARGS" ]; then
+            CMD+=" --list_of_kegg_pathways $KEGG_PATHWAYS_ARGS"
+        fi
+
+        # Execute the command
+        eval $CMD
+    done
 fi
+
 
 #  --------------------------------------
 # |          ATTRACTOR ANALYSIS          |

@@ -127,7 +127,7 @@ def find_similar_files(dtw_distances):
     return cluster_dict
 
 
-def summarize_clusters(directory, cell_names):
+def summarize_clusters(directory, cell_names, cluster):
     gene_expr_dict = {}
 
     trajectory_files = []
@@ -174,8 +174,8 @@ def summarize_clusters(directory, cell_names):
     # Create the heatmap
     plt.figure(figsize=(12, 8))
     sns.heatmap(df, cmap='Greys')
-    plt.title('Gene Expression Heatmap')
-    plt.xlabel('Sample')
+    plt.title(f'Average Gene Expression Heatmap for Cluster {cluster}')
+    plt.xlabel('Simulation Time Steps')
     plt.ylabel('Gene')
     plt.show()
 
@@ -225,7 +225,7 @@ if __name__ == '__main__':
 
     for cluster, cell_list in cluster_dict.items():
         print(f'Summarizing cluster {cluster}')
-        summarize_clusters(directory, cell_list)
+        summarize_clusters(directory, cell_list, cluster)
     
     plot_heatmap(distance_matrix, file_names)
 

@@ -94,8 +94,15 @@ while num_genes <= 100:
         FP = 0
         FN = 0
 
+        TPR = []
+        FPR = []
+
         with alive_bar(num_trials) as bar:
             for i in range(num_trials):
+                true_positive = 0
+                true_negative = 0
+                false_positive = 0
+                false_negative = 0
                 state = [random.choice([0,1]) for i in true_ruleset]
                 # print(f'State {state}')
                 state_matches = []
@@ -107,27 +114,54 @@ while num_genes <= 100:
                     for true, test in zip(results1, results2):
                         if true == 1 and test == 1:
                             TP += 1
+                            true_positive += 1
                         
                         # True negative
                         elif true == 0 and test == 0:
                             TN += 1
+                            true_negative += 1
                         
                         # False positive
                         elif true == 0 and test == 1:
                             FP += 1
+                            false_positive += 1
                         
                         # False negative
                         elif true == 1 and test == 0:
                             FN += 1
+                            false_negative += 1
 
                     state_matches.append(match_percentage)
                     state = results1
+
                     # print(f'\tPercent Match = {match_percentage}')
+                TPR.append(true_positive / (true_positive + false_negative))
+                FPR.append(false_positive / (false_positive + true_negative))
                 percent_matches.append(statistics.mean(state_matches))
                 bar()
 
         precision = TP / (TP + FP)
         recall = TP / (TP + FN)
+
+        print(f'TPR: {TPR[0:10]}')
+        print(f'FPR: {FPR[0:10]}')
+
+        # Plotting the ROC curve
+        plt.figure()
+        plt.plot(FPR, TPR, 'bo-', label='ROC curve')
+        plt.plot([0, 1], [0, 1], 'r--', label='Random guess')
+
+        # Annotating points for clarity
+        for i in range(len(TPR)):
+            plt.annotate(f'({FPR[i]:.2f},{TPR[i]:.2f})', (FPR[i], TPR[i]))
+
+        plt.xlim([0.0, 1.0])
+        plt.ylim([0.0, 1.05])
+        plt.xlabel('False Positive Rate')
+        plt.ylabel('True Positive Rate')
+        plt.title('Receiver Operating Characteristic (ROC) Curve')
+        plt.legend(loc="lower right")
+        plt.show()
 
         percent_true_positives = TP / (num_trials * num_genes * sim_steps) * 100
         percent_true_negatives = TN / (num_trials * num_genes * sim_steps) * 100
@@ -209,7 +243,7 @@ while num_genes <= 100:
             results_file.write(f'TN\t{percent_true_negatives}\n')
             results_file.write(f'FP\t{percent_false_positives}\n')
             results_file.write(f'FN\t{percent_false_positives}\n')
-
+            
             results_file.write(f'precision\t{precision}\n')
             results_file.write(f'recall\t{recall}\n')
 
