@@ -19,5 +19,5 @@ file_paths = {
 sim_data_file_paths = {
     'sim_network' : os.path.join(script_dir, '../input/custom_graphml_files'),
     'sim_dataset' : os.path.join(script_dir, '../input/datasets'),
-    'sim_ruleset' : os.path.join(script_dir, '../simulated_rulesets'),
+    'sim_ruleset' : os.path.join(script_dir, '../../simulated_rulesets'),
 }

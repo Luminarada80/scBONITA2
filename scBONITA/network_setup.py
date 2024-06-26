@@ -272,18 +272,14 @@ class NetworkSetup:
         with alive_bar(len(self.nodeList)) as bar:
             for node_index, node_name in enumerate(self.nodeList):
                 name = node_name
-                logging.info(f'Node {name}')
                 # Safely retrieve predecessors and put them into a dictionary where key = node index, value = node name
                 predecessor_indices = self.predecessors[node_index] if node_index < len(self.predecessors) else []
-                logging.info(f'\tPredecessor indices: {predecessor_indices}')
                 predecessors = {}
                 for index in predecessor_indices:
                     inverted_nodeDict = {v: k for k, v in self.nodeDict.items()}
                     predecessors[index] = inverted_nodeDict[index]
-                logging.info(f'\tPredecessors: {predecessors}')
                 
                 node_inversions = self.calculate_inversion_rules(predecessors, node_index)
-                logging.info(f'\tNode inversions: {node_inversions}')
                 # Create a new Node object
                 node = Node(name, node_index, predecessors, node_inversions)
 
