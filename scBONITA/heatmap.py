@@ -8,6 +8,7 @@ from matplotlib.patches import Patch
 def create_heatmap(path, title):
     data = []
     gene_names = []
+
     with open(path, 'r') as file:
         for line in file:
             line = line.strip().split(',')
@@ -28,18 +29,18 @@ def create_heatmap(path, title):
     norm = mcolors.BoundaryNorm(bounds, cmap.N)
 
     # Create a heatmap
-    plot = plt.figure(figsize=(12, 8))
-    sns.heatmap(data_array, cmap=cmap, norm=norm, cbar=False, yticklabels=gene_names, xticklabels=True)
+    plot = plt.figure(figsize=(12, 12))
+    sns.heatmap(data_array, cmap='Greys', yticklabels=gene_names, xticklabels=True)
     plt.title(title)
     plt.xlabel('Time Steps')
     plt.ylabel('Genes')
     plt.xticks(fontsize=8)
-    plt.yticks(fontsize=6)
+    plt.yticks(fontsize=8)
     # plt.tight_layout()
 
     legend_elements = [
         Patch(facecolor='grey', edgecolor='grey', label='Gene Inactive'),
-        Patch(facecolor='green', edgecolor='green', label='Gene Active')
+        Patch(facecolor='black', edgecolor='black', label='Gene Active')
     ]
     plt.legend(handles=legend_elements, loc='upper left', bbox_to_anchor=(1, 1), title="Legend")
 

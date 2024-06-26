@@ -8,6 +8,8 @@ def parse_node_activity(graph, nodeList, possibilities, i):
     for sequence in possibilities:
         activity = []
         for node in sequence:
+            print(node)
+            print(graph[nodeList[node]][nodeList[i]].keys())
             # check the 'interaction' edge attribute
             if "interaction" in list(graph[nodeList[node]][nodeList[i]].keys()):
                 if graph[nodeList[node]][nodeList[i]]["interaction"] == "a":

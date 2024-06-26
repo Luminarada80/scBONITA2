@@ -44,18 +44,55 @@ if __name__ == '__main__':
 
     gene_expr_dict = {}
 
+    genes_of_interest = [
+    'IL6',
+    'IL6R',
+    'IL6ST',
+    'IFNAR1',
+    'IRNAR2',
+    'TYK2',
+    'JAK1',
+    'STAT2',
+    'STAT1',
+    'IRF9',
+    'ADAR',
+    'EIF2AK2',
+    'STAT',
+    'NFKBIB',
+    'NFKNIA',
+    'NFKB1',
+    'RELA'
+    'HBEGF',
+    'ADAM17',
+    'EGFR',
+    'TNF',
+    'TNFRSF1',
+    'TLR4',
+    'TLR2',
+    'MYD88',
+    'TLR7',
+    'TLR8',
+    'IRAK4',
+    'IRAK1',
+    'TRAF6',
+    'MAP3K7',
+    'IKBKB',
+    'IKBKG',
+    ]
+
     for file in os.listdir(simulation_result_dir):
         file_path = os.path.join(simulation_result_dir, file)
         with open(file_path, 'r') as sim_file:
             for line in sim_file:
                 line = line.strip().split(',')
                 gene_name = line[0]
-                gene_expression = [int(i) for i in line[1:]]
-                
-                if gene_name not in gene_expr_dict:
-                    gene_expr_dict[gene_name] = []
-                
-                gene_expr_dict[gene_name].append(gene_expression)
+                if gene_name in genes_of_interest:
+                    gene_expression = [int(i) for i in line[1:]]
+                    
+                    if gene_name not in gene_expr_dict:
+                        gene_expr_dict[gene_name] = []
+                    
+                    gene_expr_dict[gene_name].append(gene_expression)
 
     gene_avg_expr = {}
 

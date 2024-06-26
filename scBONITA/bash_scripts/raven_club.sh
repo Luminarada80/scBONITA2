@@ -20,10 +20,12 @@ DATA_FILE="$HOME/input/datasets/raven_data_covid/Club_Cells_data.csv"
 DATASET_NAME="raven_club"
 DATAFILE_SEP=","
 #  "04010" "04370" "04630" "04668" "04066" "04020" "04151" "04150" "00010" "00020" "04060" "04512" "04514" "04670" "04625" "04062"  "04810"
-KEGG_PATHWAYS=("05171") # Enter KEGG pathway codes or leave blank to find all pathways with overlapping genes
-CUSTOM_PATHWAYS=() #("modified_network.graphml") #Put custom networks in the scBONITA folder
+KEGG_PATHWAYS=() # Enter KEGG pathway codes or leave blank to find all pathways with overlapping genes
+FIND_PATHWAYS=False
+CUSTOM_PATHWAYS=("05171_modified.graphml") #("modified_network.graphml") #Put custom networks in the scBONITA folder
 BINARIZE_THRESHOLD=0.01 # Data points with values above this number will be set to 1, lower set to 0
 ORGANISM_CODE="hsa" # Organism code in front of KEGG pathway numbers
+#"05171_modified.graphml"
 
 # Relative Abundance arguments
 METADATA_FILE="$HOME/input/metadata_files/Club_Cells_meta.txt"
@@ -65,7 +67,7 @@ if [ "$RUN_RULE_DETERMINATION" = "True" ]; then
             --list_of_kegg_pathways $KEGG_PATHWAYS_ARGS \
             --binarize_threshold $BINARIZE_THRESHOLD \
             --organism $ORGANISM_CODE
-    else
+    elif [ "$FIND_PATHWAYS" = "True" ]; then
         echo "No KEGG pathways specified, finding kegg pathways with overlapping genes..."
         /home/emoeller/anaconda3/envs/scBonita/bin/python "$HOME"/scBONITA/pipeline_class.py \
         --data_file "$DATA_FILE" \
@@ -74,6 +76,9 @@ if [ "$RUN_RULE_DETERMINATION" = "True" ]; then
         --get_kegg_pathways True \
         --binarize_threshold $BINARIZE_THRESHOLD \
         --organism $ORGANISM_CODE
+    
+    else
+        echo "Find pathways False and no KEGG pathways specified, checking for custom pathways"
     fi
 
     # Using a custom network saved to the scBONITA directory:
@@ -141,6 +146,8 @@ if [ "$RUN_RELATIVE_ABUNDANCE" = "True" ]; then
     else
         echo "No KEGG Pathways specified"
     fi
+
+    
 
     # Loop through the control and experimental groups
     for (( i=0; i<${#CONTROL_GROUPS[@]}; i++ )); do

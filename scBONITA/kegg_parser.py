@@ -665,13 +665,13 @@ class Pathways:
 
         if len(kegg_pathway_list) == 0:
             # Read in the pre-downloaded xml files and read them into a DiGraph object
-            num_pathways = len(os.listdir(f'{file_paths["pickle_files"]}/{organism}'))
+            num_pathways = len(os.listdir(f'{file_paths["pathway_xml_files"]}/{organism}'))
             logging.info(f'\t\tNo KEGG pathways specified, searching all overlapping pathways')
             logging.info(f'\t\tFinding pathways with at least {minimumOverlap} genes that overlap with the dataset')
             with alive_bar(num_pathways) as bar:
-                for pathway_num, xml_file in enumerate(os.listdir(f'{file_paths["pickle_files"]}/{organism}')):
+                for pathway_num, xml_file in enumerate(os.listdir(f'{file_paths["pathway_xml_files"]}/{organism}')):
                     pathway_name = xml_file.split('.')[0]
-                    with open(f'{file_paths["pickle_files"]}/{organism}/{xml_file}', 'r') as pathway_file:
+                    with open(f'{file_paths["pathway_xml_files"]}/{organism}/{xml_file}', 'r') as pathway_file:
                         text = [line for line in pathway_file]
 
                         # Read the kegg xml file

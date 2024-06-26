@@ -13,6 +13,8 @@ import pandas
 from heatmap import create_heatmap
 import numexpr as ne
 
+from file_paths import file_paths
+
 def get_starting_state(file):
     starting_state = []
 
@@ -24,7 +26,7 @@ def get_starting_state(file):
     return starting_state
 
 def simulate_network(nodes, filename):
-    steps = 100
+    steps = 20
 
     starting_state = get_starting_state(filename)
 
@@ -159,19 +161,36 @@ if __name__ == '__main__':
     # Add in arguments to find the attractor file
     parser = ArgumentParser()
 
-    add_dataset_name_arg(parser)
-    add_network_name(parser)
+    parser.add_argument(
+        '--dataset_name',
+        type=str,
+        required=True,
+        help='Number of genes to generate'
+    )
 
-    args = parser.parse_args()
+    parser.add_argument(
+        '--network_name',
+        type=str,
+        required=True,
+        help='Number of cells to generate'
+    )
 
-    dataset_name = check_dataset_name(args.dataset_name)
-    network_name = args.network_name
+    parser.add_argument(
+        '--attractor',
+        type=str,
+        required=True,
+        help='Attractor number'
+    )
 
-    attractor_num = input("Enter attractor number: ")
+    results = parser.parse_args()
+
+    dataset_name = getattr(results, 'dataset_name')
+    network_name = getattr(results, 'network_name')
+    attractor_num = getattr(results, 'attractor')
 
     # Simulates and saves heatmaps for all attractors for the network if you type 'all'
     if attractor_num == "all":
-        directory = f'attractor_analysis_output/{dataset_name}_attractors/{network_name}_attractors'
+        directory = f'{file_paths["attractor_analysis_output"]}/{dataset_name}_attractors/{network_name}_attractors'
         attractors = []
         for dirpath, dirnames, filenames in os.walk(directory):
             for filename in filenames:
@@ -183,9 +202,9 @@ if __name__ == '__main__':
         
         for attractor in attractors:
             # Specify file paths
-            network_pickle_file_path = f'pickle_files/{dataset_name}_pickle_files/network_pickle_files/{dataset_name}_{network_name}.network.pickle'
-            attractor_path = f'attractor_analysis_output/{dataset_name}_attractors/{network_name}_attractors/attractor_{attractor}/{dataset_name}_{network_name}_attractor_{attractor}.txt'
-            outfile = f'attractor_analysis_output/{dataset_name}_attractors/{network_name}_attractors/attractor_{attractor}/{dataset_name}_{network_name}_simulated_attractor_{attractor}.txt'
+            network_pickle_file_path = f'{file_paths["pickle_files"]}/{dataset_name}_pickle_files/network_pickle_files/{dataset_name}_{network_name}.network.pickle'
+            attractor_path = f'{file_paths["attractor_analysis_output"]}/{dataset_name}_attractors/{network_name}_attractors/attractor_{attractor}/{dataset_name}_{network_name}_attractor_{attractor}.txt'
+            outfile = f'{file_paths["attractor_analysis_output"]}/{dataset_name}_attractors/{network_name}_attractors/attractor_{attractor}/{dataset_name}_{network_name}_simulated_attractor_{attractor}.txt'
 
             # Load the network pickle file
             network = pickle.load(open(network_pickle_file_path, "rb"))
@@ -208,9 +227,9 @@ if __name__ == '__main__':
             plt.close(heatmap)
     else:
         # Specify file paths
-        network_pickle_file_path = f'pickle_files/{dataset_name}_pickle_files/network_pickle_files/{dataset_name}_{network_name}.network.pickle'
-        attractor_path = f'attractor_analysis_output/{dataset_name}_attractors/{network_name}_attractors/attractor_{attractor_num}/{dataset_name}_{network_name}_attractor_{attractor_num}.txt'
-        outfile = f'attractor_analysis_output/{dataset_name}_attractors/{network_name}_attractors/attractor_{attractor_num}/{dataset_name}_{network_name}_simulated_attractor_{attractor_num}.txt'
+        network_pickle_file_path = f'{file_paths["pickle_files"]}/{dataset_name}_pickle_files/network_pickle_files/{dataset_name}_{network_name}.network.pickle'
+        attractor_path = f'{file_paths["attractor_analysis_output"]}/{dataset_name}_attractors/{network_name}_attractors/attractor_{attractor_num}/{dataset_name}_{network_name}_attractor_{attractor_num}.txt'
+        outfile = f'{file_paths["attractor_analysis_output"]}/{dataset_name}_attractors/{network_name}_attractors/attractor_{attractor_num}/{dataset_name}_{network_name}_simulated_attractor_{attractor_num}.txt'
 
         # Load the network pickle file
         network = pickle.load(open(network_pickle_file_path, "rb"))
@@ -229,7 +248,7 @@ if __name__ == '__main__':
 
         heatmap = create_heatmap(outfile, f'Simulation for {dataset_name} {network_name}')
 
-        heatmap.savefig(f'attractor_analysis_output/{dataset_name}_attractors/{network_name}_attractors/attractor_{attractor_num}/{dataset_name}_{network_name}_simulated_attractor_{attractor_num}_heatmap.png', format='png')
+        heatmap.savefig(f'{file_paths["attractor_analysis_output"]}/{dataset_name}_attractors/{network_name}_attractors/attractor_{attractor_num}/{dataset_name}_{network_name}_simulated_attractor_{attractor_num}_heatmap.png', format='png')
         plt.close(heatmap)
 
 
