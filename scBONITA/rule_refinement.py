@@ -102,9 +102,9 @@ def prioritize_pkn_inversion_rules(node, rules, prediction_errors):
 
     # Prioritize the rules that follow the node's inversion rules
     # logging.info(f'\n\t\tHANDLING INVERSION RULES')
-    # logging.info(f'\t\t\tNode inversion rules:')
+    # logging.info(f'\t\t\tNode {node.name} inversion rules:')
     # for key, value in node.inversions.items():
-        # logging.info(f'\t\t\t\t{node.predecessors[key]}: {value}')
+    #     logging.info(f'\t\t\t\t{node.predecessors[key]}: {value}')
     follows_inversion_rules = []
     does_not_follow_inversion_rules = []
 

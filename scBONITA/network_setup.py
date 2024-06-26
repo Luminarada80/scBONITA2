@@ -231,6 +231,7 @@ class NetworkSetup:
         inversion_rules = {}
         for incoming_node in list(node_predecessors):
             edge_attribute = list(self.graph[self.nodeList[incoming_node]][self.nodeList[node_index]].keys())
+
             # check the 'interaction' edge attribute
             if "interaction" in edge_attribute:
                 if self.graph[self.nodeList[incoming_node]][self.nodeList[node_index]]["interaction"] == "i":
@@ -244,6 +245,17 @@ class NetworkSetup:
                     inversion_rules[incoming_node] = True
                 else:
                     inversion_rules[incoming_node] = False
+            
+            # for some reason, when I used a modified processed graphml file as a custom graphml file I needed to use this method
+            else:
+                for _, value in self.graph[self.nodeList[incoming_node]][self.nodeList[node_index]].items():
+                    for attribute, value in value.items():
+                        if attribute == "signal" or "interaction":
+                            if value == "i":
+                                inversion_rules[incoming_node] = True
+                            else:
+                                inversion_rules[incoming_node] = False
+
         return inversion_rules
 
     # 1.6 Creates nodes containing the information calculated from the graph
@@ -260,15 +272,18 @@ class NetworkSetup:
         with alive_bar(len(self.nodeList)) as bar:
             for node_index, node_name in enumerate(self.nodeList):
                 name = node_name
-
+                logging.info(f'Node {name}')
                 # Safely retrieve predecessors and put them into a dictionary where key = node index, value = node name
                 predecessor_indices = self.predecessors[node_index] if node_index < len(self.predecessors) else []
+                logging.info(f'\tPredecessor indices: {predecessor_indices}')
                 predecessors = {}
                 for index in predecessor_indices:
                     inverted_nodeDict = {v: k for k, v in self.nodeDict.items()}
                     predecessors[index] = inverted_nodeDict[index]
+                logging.info(f'\tPredecessors: {predecessors}')
                 
                 node_inversions = self.calculate_inversion_rules(predecessors, node_index)
+                logging.info(f'\tNode inversions: {node_inversions}')
                 # Create a new Node object
                 node = Node(name, node_index, predecessors, node_inversions)
 
