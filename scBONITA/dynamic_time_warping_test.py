@@ -6,6 +6,7 @@ import os
 from argparse import ArgumentParser
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from scipy.cluster.hierarchy import linkage, dendrogram, fcluster
+from scipy.spatial.distance import squareform
 import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
@@ -18,7 +19,6 @@ def read_data_from_directory(directory):
     print(f'Reading data from the files')
     dataframes = {}
     for filename in os.listdir(directory):
-        print(f'\t{filename}')
         if filename.endswith("_trajectory.csv"):
             filepath = os.path.join(directory, filename)
             df = pd.read_csv(filepath, header=None)
@@ -173,16 +173,31 @@ def summarize_clusters(directory, cell_names, cluster):
 
     # Create the heatmap
     plt.figure(figsize=(12, 8))
-    sns.heatmap(df, cmap='Greys')
+    sns.heatmap(df, cmap='Greys', yticklabels=True)
     plt.title(f'Average Gene Expression Heatmap for Cluster {cluster}')
     plt.xlabel('Simulation Time Steps')
     plt.ylabel('Gene')
+    plt.yticks(fontsize=8)
+    plt.xticks(fontsize=8)
     plt.show()
 
 def plot_heatmap(distance_matrix, file_names):
+    # Convert the square distance matrix to a condensed distance matrix
+    condensed_distance_matrix = squareform(distance_matrix)
+    
+    # Perform hierarchical clustering
+    linkage_matrix = linkage(condensed_distance_matrix, method='average')
+    
+    # Create a dendrogram to get the order of the leaves
+    dendro = dendrogram(linkage_matrix, no_plot=True)
+    order = dendro['leaves']
+    
+    # Reorder the distance matrix
+    reordered_matrix = distance_matrix[np.ix_(order, order)]
+    reordered_file_names = [file_names[i].split('_trajectory')[0] for i in order]
+    
     plt.figure(figsize=(8, 8))
-    file_names = [i.split('_trajectory')[0] for i in file_names]
-    sns.heatmap(distance_matrix, xticklabels=file_names, yticklabels=file_names, cmap='Greys', annot=False)
+    sns.heatmap(reordered_matrix, xticklabels=reordered_file_names, yticklabels=reordered_file_names, cmap='Greys', annot=False)
     plt.yticks(fontsize=8)
     plt.xticks(fontsize=8)
     plt.title("DTW Distance Heatmap")
