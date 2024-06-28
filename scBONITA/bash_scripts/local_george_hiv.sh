@@ -6,9 +6,9 @@
 
 # Which parts do you want to run? Set True to run or False to skip
     # Rule determination must be run prior to importance score, importance score must be run prior to relative abundance
-RUN_RULE_DETERMINATION=False
-RUN_IMPORTANCE_SCORE=False
-RUN_RELATIVE_ABUNDANCE=False
+RUN_RULE_DETERMINATION=True
+RUN_IMPORTANCE_SCORE=True
+RUN_RELATIVE_ABUNDANCE=True
 RUN_ATTRACTOR_ANALYSIS=True
 RUN_CELL_MAPPING=True
 
@@ -17,7 +17,7 @@ DATA_FILE="../../george_data/hiv_dataset/HIV_dataset_normalized_integrated_count
 DATASET_NAME="george_hiv"
 DATAFILE_SEP=","
 #  "04010" "04370" "04630" "04668" "04066" "04020" "04151" "04150" "00010" "00020" "04060" "04512" "04514" "04670" "04625" "04062"  "04810"
-KEGG_PATHWAYS=("04010" "04370" "04630" "04668" "04670") # Enter KEGG pathway codes or leave blank to find all pathways with overlapping genes
+KEGG_PATHWAYS=("04370") # Enter KEGG pathway codes or leave blank to find all pathways with overlapping genes
 CUSTOM_PATHWAYS=() #("modified_network.graphml") #Put custom networks in the scBONITA folder
 BINARIZE_THRESHOLD=0.01 # Data points with values above this number will be set to 1, lower set to 0
 ORGANISM_CODE="hsa" # Organism code in front of KEGG pathway numbers
