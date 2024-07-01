@@ -104,13 +104,14 @@ def find_similar_files(dtw_distances):
 
 
     # Plot the dendrogram
-    plt.figure(figsize=(12, 8))
+    plt.figure(figsize=(10, 12))
     dendrogram(Z, labels=distance_matrix.index, orientation='top')
-    plt.title('Hierarchical Clustering Dendrogram', fontsize=12)
-    plt.yticks(fontsize=12)
-    plt.xticks(fontsize=12)
-    plt.xlabel('Cells', fontsize=12)
-    plt.ylabel('Distance', fontsize=12)
+    plt.title('Hierarchical Clustering Dendrogram', fontsize=24)
+    plt.yticks(fontsize=24)
+    plt.xticks(fontsize=18, rotation=90)
+    plt.xlabel('Cells', fontsize=24)
+    plt.ylabel('Distance', fontsize=24)
+    plt.tight_layout()
 
     plt.show()
 
@@ -173,13 +174,14 @@ def summarize_clusters(directory, cell_names, cluster):
     df = df.transpose()
 
     # Create the heatmap
-    plt.figure(figsize=(8, 12))
+    plt.figure(figsize=(12, 14))
     sns.heatmap(df, cmap='Greys', yticklabels=True)
-    plt.title(f'Average Gene Expression Heatmap for Cluster {cluster}')
-    plt.xlabel(xlabel='Simulation Time Steps', fontsize=10)
-    plt.ylabel(ylabel='Gene', fontsize=10)
-    plt.yticks(fontsize=10)
-    plt.xticks(fontsize=10)
+    plt.title(f'Average Gene Expression Heatmap for Cluster {cluster}', fontsize=24)
+    plt.xlabel(xlabel='Simulation Time Steps', fontsize=24)
+    plt.ylabel(ylabel='Gene', fontsize=24)
+    plt.yticks(fontsize=14)
+    plt.xticks(fontsize=14)
+    plt.tight_layout()
     plt.show()
 
 def plot_heatmap(distance_matrix, file_names):
