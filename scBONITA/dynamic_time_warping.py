@@ -104,13 +104,14 @@ def find_similar_files(dtw_distances):
 
 
     # Plot the dendrogram
-    plt.figure(figsize=(12, 10))
+    plt.figure(figsize=(12, 8))
     dendrogram(Z, labels=distance_matrix.index, orientation='top')
-    plt.title('Hierarchical Clustering Dendrogram')
-    plt.yticks(fontsize=8)
-    plt.xticks(fontsize=8)
-    plt.xlabel('Distance')
-    plt.ylabel('Cells')
+    plt.title('Hierarchical Clustering Dendrogram', fontsize=12)
+    plt.yticks(fontsize=12)
+    plt.xticks(fontsize=12)
+    plt.xlabel('Cells', fontsize=12)
+    plt.ylabel('Distance', fontsize=12)
+
     plt.show()
 
     # Set a threshold and get the clusters
@@ -172,13 +173,13 @@ def summarize_clusters(directory, cell_names, cluster):
     df = df.transpose()
 
     # Create the heatmap
-    plt.figure(figsize=(12, 8))
+    plt.figure(figsize=(8, 12))
     sns.heatmap(df, cmap='Greys', yticklabels=True)
     plt.title(f'Average Gene Expression Heatmap for Cluster {cluster}')
-    plt.xlabel('Simulation Time Steps')
-    plt.ylabel('Gene')
-    plt.yticks(fontsize=8)
-    plt.xticks(fontsize=8)
+    plt.xlabel(xlabel='Simulation Time Steps', fontsize=10)
+    plt.ylabel(ylabel='Gene', fontsize=10)
+    plt.yticks(fontsize=10)
+    plt.xticks(fontsize=10)
     plt.show()
 
 def plot_heatmap(distance_matrix, file_names):
@@ -196,10 +197,10 @@ def plot_heatmap(distance_matrix, file_names):
     reordered_matrix = distance_matrix[np.ix_(order, order)]
     reordered_file_names = [file_names[i].split('_trajectory')[0] for i in order]
     
-    plt.figure(figsize=(8, 8))
+    plt.figure(figsize=(8, 9))
     sns.heatmap(reordered_matrix, xticklabels=reordered_file_names, yticklabels=reordered_file_names, cmap='Greys', annot=False)
-    plt.yticks(fontsize=8)
-    plt.xticks(fontsize=8)
+    plt.yticks(fontsize=10)
+    plt.xticks(fontsize=10)
     plt.title("DTW Distance Heatmap")
     plt.tight_layout()
     plt.show()
