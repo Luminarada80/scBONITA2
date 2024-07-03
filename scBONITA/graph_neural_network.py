@@ -12,12 +12,13 @@ import os
 import random
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
+import numpy as np
 import seaborn as sns
-
-
-
-
+from fastdtw import fastdtw
+from scipy.spatial.distance import euclidean
 from file_paths import file_paths
+import statistics
+from alive_progress import alive_bar
 
 class GNN(torch.nn.Module):
     def __init__(self, num_node_features, hidden_channels, output_dim):
@@ -85,6 +86,11 @@ class EarlyStopping:
             self.counter += 1
             if self.counter >= self.patience:
                 self.early_stop = True
+
+def calculate_dtw(actual, predicted):
+    distance, path = fastdtw(actual, predicted, dist=euclidean)
+    return distance
+    
 
 def prepare_data(network, starting_states, trajectories):
     print(f'Preparing data for the GNN')
@@ -159,16 +165,20 @@ def read_data_from_directory(directory):
     gene_to_idx = {}
     cell_name_list = []
     idx = 0
-    
+    num_files = 0
+
     # First pass to build the gene_to_idx mapping
     for filename in os.listdir(directory):
         if filename.endswith("_trajectory.csv"):
+            num_files += 1
             filepath = os.path.join(directory, filename)
             df = pd.read_csv(filepath, header=None)
             for gene in df.iloc[:, 0]:
                 if gene not in gene_to_idx:
                     gene_to_idx[gene] = idx
                     idx += 1
+
+    print(f'Found {num_files} trajectory files')
     
     # Second pass to convert gene names to indices and extract data
     for filename in os.listdir(directory):
@@ -191,8 +201,19 @@ def read_data_from_directory(directory):
             cell_name_list.append(cell_number)
             starting_states[filename] = starting_state
             trajectories[filename] = trajectory
+
+            # if len(cell_name_list) < 5:
+            #     print(f'{cell_number}')
+            #     print(f'\t{starting_states[filename]}')
+            #     print(f'\t{trajectories[filename]}')
     
     return cell_name_list, starting_states, trajectories, gene_to_idx
+
+def min_max_scale(data):
+    min_val = np.min(data)
+    max_val = np.max(data)
+    scaled_data = (data - min_val) / (max_val - min_val)
+    return scaled_data
 
 if __name__ == '__main__':
     parser = ArgumentParser()
@@ -245,7 +266,7 @@ if __name__ == '__main__':
     cell_name_list, starting_states, trajectories, gene_to_idx = read_data_from_directory(directory)
 
     # Convert gene names to indices for the edges
-    edges = [(int(gene_to_idx[src]), int(gene_to_idx[dst])) for src, dst in edges]
+    edges = [(int(gene_to_idx[src]), int(gene_to_idx[dst])) for src, dst, _ in edges]
     new_network.add_edges_from(edges)
 
     data_list = prepare_data(new_network, starting_states, trajectories)
@@ -262,7 +283,7 @@ if __name__ == '__main__':
         train_losses, val_losses = train_model(data_list, model)
 
         # Save the trained model (optional, if you want to save and load later)
-        torch.save(model.state_dict(), 'gat_model.pth')
+        torch.save(model.state_dict(), f'gat_{dataset_name}_{network_name}_model.pth')
 
         # Plot the training and validation loss
         plt.figure(figsize=(10, 6))
@@ -278,39 +299,76 @@ if __name__ == '__main__':
         plt.close()
 
     else:
-        model.load_state_dict(torch.load('gat_model.pth'))
+        dtw_matrix = []
 
-        for i, sample_data in enumerate(data_list):
-            # Set the model to evaluation mode
-            model.eval()
+        model.load_state_dict(torch.load(f'gat_{dataset_name}_{network_name}_model.pth'))
 
-            # Make predictions
-            with torch.no_grad():
-                output = model(sample_data)
+        png_directory = f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/png_files'
 
-            # Output is a tensor; convert it to a numpy array or list if needed
-            output_array = output.numpy()
+        # Set the model to evaluation mode
+        model.eval()
 
-            # For binary classification, apply a sigmoid function to get probabilities
-            predictions = torch.sigmoid(output).numpy()
+        total_dtw_distances = []
 
-            # For each gene, determine if it is activated (1) or not (0) based on a threshold
-            threshold = 0.5
-            binary_predictions = (predictions > threshold).astype(int)
+        with alive_bar(len(data_list)) as bar:
+            for i, sample_data in enumerate(data_list):
+                # print(sample_data.x)
+                # Make predictions
+                with torch.no_grad():
+                    output = model(sample_data)
 
-            png_directory = f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/png_files'
+                # Output is a tensor; convert it to a numpy array or list if needed
+                output_array = output.numpy()
 
-            # Create a heatmap
-            plot = plt.figure(figsize=(12, 12))
-            sns.heatmap(binary_predictions, cmap='Greys', yticklabels=gene_to_idx, xticklabels=True)
-            plt.title(f'GNN Prediction for {cell_name_list[i]}')
-            plt.xlabel('Time Steps')
-            plt.ylabel('Genes')
-            plt.xticks(fontsize=8)
-            plt.yticks(fontsize=8)
-            plt.tight_layout()
-            # plt.show()
+                # For binary classification, apply a sigmoid function to get probabilities
+                predictions = torch.sigmoid(output).numpy()
 
-            # Saves a png of the results
-            plot.savefig(f'{png_directory}/{cell_name_list[i]}_GAT_prediction.png', format='png')
-            plt.close(plot)
+                # Scale predictions between 0 and 1
+                scaled_predictions = min_max_scale(predictions)
+
+                # Calculate DTW between predictions and actual trajectory
+                actual_trajectory = sample_data.y.numpy()
+                
+                # For each gene, determine if it is activated (1) or not (0) based on a threshold
+                threshold = 0.5
+                binary_predictions = (scaled_predictions > threshold).astype(int)
+
+                dtw_distance = calculate_dtw(actual_trajectory, predictions)
+                total_dtw_distances.append(dtw_distance)
+
+                # Combine the starting state with the predicted trajectories
+                starting_state = sample_data.x.numpy().reshape(-1, 1)  # Convert to 2D array if needed
+
+                # Non-binarized combined data
+                combined_data = np.concatenate((starting_state, scaled_predictions), axis=1)
+
+                # Binarized combined data
+                combined_data = np.concatenate((starting_state, binary_predictions), axis=1)
+
+                # Create a heatmap
+                plot = plt.figure(figsize=(12, 12))
+                sns.heatmap(combined_data, cmap='Greys', yticklabels=gene_to_idx, xticklabels=True)
+                plt.title(f'GNN Prediction for {cell_name_list[i]}')
+                plt.xlabel('Time Steps')
+                plt.ylabel('Genes')
+                plt.xticks(fontsize=8)
+                plt.yticks(fontsize=8)
+                plt.tight_layout()
+                # plt.show()
+
+                # Saves a png of the results
+                plot.savefig(f'{png_directory}/{cell_name_list[i]}_GAT_prediction.png', format='png')
+                plt.close(plot)
+
+                bar()
+
+        average_dtw_distance = statistics.mean(total_dtw_distances)
+        stdev_dtw_distance = statistics.stdev(total_dtw_distances)
+        min_dtw_distance = min(total_dtw_distances)
+        max_dtw_distance = max(total_dtw_distances)
+
+        print(f'DTW distance btw prediction and trajectory: {average_dtw_distance}')
+        print(f'Avg = {average_dtw_distance}')
+        print(f'Stdev = {stdev_dtw_distance}')
+        print(f'Min = {min_dtw_distance}')
+        print(f'Max = {max_dtw_distance}')
