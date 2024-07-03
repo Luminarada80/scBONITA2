@@ -104,13 +104,13 @@ def find_similar_files(dtw_distances):
 
 
     # Plot the dendrogram
-    plt.figure(figsize=(10, 12))
+    plt.figure(figsize=(8, 10))
     dendrogram(Z, labels=distance_matrix.index, orientation='top')
-    plt.title('Hierarchical Clustering Dendrogram', fontsize=24)
-    plt.yticks(fontsize=24)
-    plt.xticks(fontsize=18, rotation=90)
-    plt.xlabel('Cells', fontsize=24)
-    plt.ylabel('Distance', fontsize=24)
+    plt.title('Hierarchical Clustering Dendrogram', fontsize=12)
+    plt.yticks(fontsize=12)
+    plt.xticks(fontsize=8, rotation=90)
+    plt.xlabel('Cells', fontsize=8)
+    plt.ylabel('Distance', fontsize=8)
     plt.tight_layout()
 
     plt.show()
@@ -127,8 +127,6 @@ def find_similar_files(dtw_distances):
         cluster_dict[cluster_id].append(cell)
 
     return cluster_dict
-
-
 def summarize_clusters(directory, cell_names, cluster):
     gene_expr_dict = {}
 
@@ -174,13 +172,13 @@ def summarize_clusters(directory, cell_names, cluster):
     df = df.transpose()
 
     # Create the heatmap
-    plt.figure(figsize=(12, 14))
+    plt.figure(figsize=(8, 10))
     sns.heatmap(df, cmap='Greys', yticklabels=True)
-    plt.title(f'Average Gene Expression Heatmap for Cluster {cluster}', fontsize=24)
-    plt.xlabel(xlabel='Simulation Time Steps', fontsize=24)
-    plt.ylabel(ylabel='Gene', fontsize=24)
-    plt.yticks(fontsize=14)
-    plt.xticks(fontsize=14)
+    plt.title(f'Average Gene Expression Heatmap for Cluster {cluster}', fontsize=12)
+    plt.xlabel(xlabel='Simulation Time Steps', fontsize=12)
+    plt.ylabel(ylabel='Gene', fontsize=12)
+    plt.yticks(fontsize=8)
+    plt.xticks(fontsize=8)
     plt.tight_layout()
     plt.show()
 
@@ -201,8 +199,8 @@ def plot_heatmap(distance_matrix, file_names):
     
     plt.figure(figsize=(8, 9))
     sns.heatmap(reordered_matrix, xticklabels=reordered_file_names, yticklabels=reordered_file_names, cmap='Greys', annot=False)
-    plt.yticks(fontsize=10)
-    plt.xticks(fontsize=10)
+    plt.yticks(fontsize=8)
+    plt.xticks(fontsize=8)
     plt.title("DTW Distance Heatmap")
     plt.tight_layout()
     plt.show()
