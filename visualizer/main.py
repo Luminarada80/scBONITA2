@@ -138,10 +138,10 @@ class Game:
         self.update_time = None
         self.can_update = True
 
-        # num_nodes = 10
-        # num_and_gates = 10
-        # num_or_gates = 10
-        # num_not_gates = 4
+        num_nodes = 10
+        num_and_gates = 10
+        num_or_gates = 10
+        num_not_gates = 4
 
         # relative_abundance = False
 
@@ -149,14 +149,16 @@ class Game:
         self.gates = []
 
         # read_rule_file.create_nodes_and_gates('visualizer/04670.txt', self)
-        read_rule_file.create_nodes_and_gates('visualizer/04621.txt', self)
+        # read_rule_file.create_nodes_and_gates('04621.txt', self)
 
-        # Boolean Nodes
+        # # Boolean Nodes
         # for i in range(1, num_nodes+1):
-        #     self.nodes.append(Node('', (self.WIDTH/2+350,self.HEIGHT/2+(50*i)), "light blue"))
+        #     self.nodes.append(Node('', (self.WIDTH+350,self.HEIGHT+(50*i)), "light blue"))
 
-        # for i in range(1, num_nodes+1):
-        #     self.nodes.append(Node(f'Node {i}', (self.WIDTH/2+350,self.HEIGHT/2+(50*i)), "light blue"))
+        node_letters = ["A", "B", "C", "D", "E", "F", "G"]
+
+        for i, letter in enumerate(node_letters):
+            self.nodes.append(Node(f'{letter}', (self.WIDTH/2+350,self.HEIGHT/2+(50*i)), "light blue"))
 
         # Change the size and color of the nodes for relative abundance. Manual entry required
         # if relative_abundance:
@@ -167,17 +169,17 @@ class Game:
         #         node.set_size(sizes[node_num])
         #         node.font = pygame.font.Font('arial.ttf', int(round(node.size / 2, 1)))
 
-        # # AND Gates
-        # for i in range(num_and_gates):
-        #     self.gates.append(Gate('AND', (self.WIDTH/2+200, self.HEIGHT/2-150 - (15*i))))
+        # AND Gates
+        for i in range(num_and_gates):
+            self.gates.append(Gate('AND', (self.WIDTH/2+200, self.HEIGHT/2-150 - (15*i))))
 
-        # # OR Gates
-        # for i in range(num_or_gates):
-        #     self.gates.append(Gate('OR', (self.WIDTH/2+300, self.HEIGHT/2-150 - (15*i))))
+        # OR Gates
+        for i in range(num_or_gates):
+            self.gates.append(Gate('OR', (self.WIDTH/2+300, self.HEIGHT/2-150 - (15*i))))
 
-        # # NOT Gates
-        # for i in range(num_not_gates):
-        #     self.gates.append(Gate('NOT', (self.WIDTH/2+400, self.HEIGHT/2-150 - (15*i))))
+        # NOT Gates
+        for i in range(num_not_gates):
+            self.gates.append(Gate('NOT', (self.WIDTH/2+400, self.HEIGHT/2-150 - (15*i))))
 
         # Create a list of the unique IDs for the objects
         self.node_ids = [node.id for node in self.nodes]
@@ -479,26 +481,26 @@ class Game:
             for object in self.nodes_group:
                 object.draw_lock()
 
-            # if self.keys[pygame.K_TAB]:
-            #     self.display_box.display_text('Node State', (self.WIDTH / 4 + 25, self.HEIGHT - 400))
-            #     self.display_box.display_text(f'Update {len(self.states)}', (self.WIDTH / 4 + 25, self.HEIGHT - 375))
+            if self.keys[pygame.K_TAB]:
+                self.display_box.display_text('Node State', (self.WIDTH / 4 + 25, self.HEIGHT - 400))
+                self.display_box.display_text(f'Update {len(self.states)}', (self.WIDTH / 4 + 25, self.HEIGHT - 375))
 
-            #     if self.nodes[0].update_num <= 35:
-            #         self.states[self.nodes[0].update_num] = []
-            #         for node_num, node in enumerate(self.nodes_group):
-            #             position_adjustment = 15 * node_num
-            #             update_adjustment = 10 * self.nodes[0].update_num - 150
-            #             self.states[self.nodes[0].update_num].append((node.state, (self.WIDTH / 4 + update_adjustment, self.HEIGHT - 350 + position_adjustment)))
+                if self.nodes[0].update_num <= 35:
+                    self.states[self.nodes[0].update_num] = []
+                    for node_num, node in enumerate(self.nodes_group):
+                        position_adjustment = 15 * node_num
+                        update_adjustment = 10 * self.nodes[0].update_num - 150
+                        self.states[self.nodes[0].update_num].append((node.state, (self.WIDTH / 4 + update_adjustment, self.HEIGHT - 350 + position_adjustment)))
 
-            #     # Displaying states
-            #     for update in self.states:
-            #         for node_num, node in enumerate(self.nodes_group):
-            #             position_adjustment = 25 * node_num
-            #             update_adjustment = 15 * len(self.states) - 100
-            #             self.display_box.display_text(f'{self.states[update][node_num][0]}', self.states[update][node_num][1])
+                # Displaying states
+                for update in self.states:
+                    for node_num, node in enumerate(self.nodes_group):
+                        position_adjustment = 25 * node_num
+                        update_adjustment = 15 * len(self.states) - 100
+                        self.display_box.display_text(f'{self.states[update][node_num][0]}', self.states[update][node_num][1])
 
-            # else:
-            #     self.states = {}
+            else:
+                self.states = {}
 
             self.draw_selection_box()  # Draw the selection box
             self.highlight_selected_objects()  # Highlight selected objects

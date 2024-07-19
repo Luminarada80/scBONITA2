@@ -7,19 +7,18 @@
 # Which parts do you want to run? Set True to run or False to skip
     # Rule determination must be run prior to importance score, importance score must be run prior to relative abundance
 RUN_RULE_DETERMINATION=True
-RUN_IMPORTANCE_SCORE=True
-RUN_RELATIVE_ABUNDANCE=True
-RUN_ATTRACTOR_ANALYSIS=True
-RUN_CELL_MAPPING=True
+RUN_IMPORTANCE_SCORE=False
+RUN_RELATIVE_ABUNDANCE=False
+RUN_ATTRACTOR_ANALYSIS=False
 
 # General Arguments (Required for all steps)
 DATA_FILE="../../george_data/hiv_dataset/HIV_dataset_normalized_integrated_counts.csv"
 DATASET_NAME="george_hiv"
 DATAFILE_SEP=","
-#  "04010" "04370" "04630" "04668" "04066" "04020" "04151" "04150" "00010" "00020" "04060" "04512" "04514" "04670" "04625" "04062"  "04810"
-KEGG_PATHWAYS=("04370") # Enter KEGG pathway codes or leave blank to find all pathways with overlapping genes
-CUSTOM_PATHWAYS=() #("modified_network.graphml") #Put custom networks in the scBONITA folder
+KEGG_PATHWAYS=("04370") # Enter KEGG pathway codes or leave blank to find all pathways with overlapping genes. Separate like: ("hsa04670" "hsa05171")
+CUSTOM_PATHWAYS=() #("modified_network.graphml") #Put custom networks in the input folder
 BINARIZE_THRESHOLD=0.01 # Data points with values above this number will be set to 1, lower set to 0
+MINIMUM_OVERLAP=1 # Specifies how many genes you want to ensure overlap with the genes in the KEGG pathways. Default is 25
 ORGANISM_CODE="hsa" # Organism code in front of KEGG pathway numbers
 
 # Relative Abundance arguments
@@ -58,7 +57,8 @@ if [ "$RUN_RULE_DETERMINATION" = "True" ]; then
             --datafile_sep "$DATAFILE_SEP" \
             --list_of_kegg_pathways $KEGG_PATHWAYS_ARGS \
             --binarize_threshold $BINARIZE_THRESHOLD \
-            --organism $ORGANISM_CODE
+            --organism $ORGANISM_CODE \
+            --minimum_overlap $MINIMUM_OVERLAP
     else
         echo "No KEGG pathways specified, finding kegg pathways with overlapping genes..."
         /home/emoeller/anaconda3/envs/scBonita/bin/python pipeline_class.py \
@@ -67,7 +67,8 @@ if [ "$RUN_RULE_DETERMINATION" = "True" ]; then
         --datafile_sep "$DATAFILE_SEP" \
         --get_kegg_pathways True \
         --binarize_threshold $BINARIZE_THRESHOLD \
-        --organism $ORGANISM_CODE
+        --organism $ORGANISM_CODE \
+        --minimum_overlap $MINIMUM_OVERLAP
     fi
 
     # Using a custom network saved to the scBONITA directory:
@@ -87,7 +88,8 @@ if [ "$RUN_RULE_DETERMINATION" = "True" ]; then
         --datafile_sep "$DATAFILE_SEP" \
         $CUSTOM_PATHWAYS_ARGS \
         --binarize_threshold $BINARIZE_THRESHOLD \
-        --get_kegg_pathways "False"
+        --get_kegg_pathways "False" \
+        --minimum_overlap $MINIMUM_OVERLAP
     else
         echo "No Custom Pathways specified, skipping this part..."
     fi
@@ -170,18 +172,5 @@ if [ "$RUN_ATTRACTOR_ANALYSIS" = "True" ]; then
     echo "Running Attractor Analysis..."
 
     /home/emoeller/anaconda3/envs/scBonita/bin/python attractor_analysis.py \
-        --dataset_name "$DATASET_NAME"
-fi
-
-#  --------------------------------------
-# |             CELL MAPPING             |
-#  --------------------------------------
-
-# Maps each cell to the attractors from each network that best matches its gene expression
-# Requires attractor analysis
-if [ "$RUN_CELL_MAPPING" = "True" ]; then
-    echo "Running Cell Mapping..."
-
-    /home/emoeller/anaconda3/envs/scBonita/bin/python map_cells_to_attractor_clusters.py \
         --dataset_name "$DATASET_NAME"
 fi

@@ -98,6 +98,14 @@ def rule_inference_arguments(parser):
     )
 
     parser.add_argument(
+        "--minimum_overlap",
+        type=int,
+        help="The minimum number of genes shared between the dataset and the patwhay. Default is 25.",
+        default=25,
+        required=False
+    )
+
+    parser.add_argument(
         "--sample_cells",
         type=str,
         help="If True, scBonita will use a representative set of samples to infer rules. This is automatically done if the number of cells in the training dataset exceeds 15000, in order to reduce memory usage.",

@@ -37,7 +37,7 @@ class Gate(Object):
         self.rect = self.image.get_rect(center=self.position)
         self.original_image = self.image  # This will hold the currently displayed image
 
-        self.font_size = 8
+        self.font_size = 12
         self.font = pygame.freetype.Font('visualizer/arial.ttf', self.font_size)
 
         self.is_node = False
@@ -58,7 +58,7 @@ class Gate(Object):
         elif self.gate_type == 'NOT':
             inactive_image = self.inactive_not_image
             active_image = self.active_not_image
-            self.label_offset = 15
+            self.label_offset = 10
         
         return inactive_image, active_image
 
