@@ -266,7 +266,7 @@ if __name__ == '__main__':
     cell_name_list, starting_states, trajectories, gene_to_idx = read_data_from_directory(directory)
 
     # Convert gene names to indices for the edges
-    edges = [(int(gene_to_idx[src]), int(gene_to_idx[dst])) for src, dst, _ in edges]
+    edges = [(int(gene_to_idx[src]), int(gene_to_idx[dst])) for src, dst in edges]
     new_network.add_edges_from(edges)
 
     data_list = prepare_data(new_network, starting_states, trajectories)

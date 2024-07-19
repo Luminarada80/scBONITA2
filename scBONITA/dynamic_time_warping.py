@@ -11,6 +11,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 import statistics
+import math
 from alive_progress import alive_bar
 
 from file_paths import file_paths
@@ -102,15 +103,19 @@ def find_similar_files(dtw_distances):
     distance_array = distance_matrix.values[np.triu_indices_from(distance_matrix, k=1)]
     Z = linkage(distance_array, method='ward')
 
-
     # Plot the dendrogram
-    plt.figure(figsize=(8, 10))
-    dendrogram(Z, labels=distance_matrix.index, orientation='top')
-    plt.title('Hierarchical Clustering Dendrogram', fontsize=12)
-    plt.yticks(fontsize=12)
-    plt.xticks(fontsize=8, rotation=90)
-    plt.xlabel('Cells', fontsize=8)
-    plt.ylabel('Distance', fontsize=8)
+    plt.figure(figsize=(6, 6))
+    dendrogram(Z, orientation='top')
+
+    # Increase the line width
+    for i in plt.gca().get_lines():
+        i.set_linewidth(4)  # Adjust the value to make lines thicker
+
+    plt.title('Hierarchical Clustering Dendrogram', fontsize=16)
+    plt.xlabel('Cells', fontsize=16)
+    plt.ylabel('Distance', fontsize=16)
+    plt.xticks([])
+    plt.yticks([])
     plt.tight_layout()
 
     plt.show()
@@ -125,8 +130,30 @@ def find_similar_files(dtw_distances):
         if cluster_id not in cluster_dict:
             cluster_dict[cluster_id] = []
         cluster_dict[cluster_id].append(cell)
+    
+     # Calculate the percentage of cells in each cluster
+    total_cells = len(cells)
+    cluster_percentages = {cluster_id: (len(cluster_cells) / total_cells) * 100 for cluster_id, cluster_cells in cluster_dict.items()}
 
-    return cluster_dict
+    # Create a DataFrame for the clusters and their percentages
+    cluster_df = pd.DataFrame(list(cluster_percentages.items()), columns=['Cluster ID', 'Percentage of Cells'])
+    cluster_df = cluster_df.sort_values('Cluster ID').reset_index(drop=True)
+
+    # Plot a bar graph of the cluster percentages
+    colors = sns.color_palette("hsv", num_clusters)
+
+    plt.figure(figsize=(6, 6))
+    plt.bar(cluster_df['Cluster ID'], cluster_df['Percentage of Cells'], color="black")
+    plt.xlabel('Cluster', fontsize=16)
+    plt.ylabel('Percentage of Cells', fontsize=16)
+    plt.title('Percentage of Cells in Each Cluster', fontsize=16)
+    plt.xticks(cluster_df["Cluster ID"])
+    plt.yticks(fontsize=14)
+    plt.tight_layout()
+    plt.show()
+
+    return cluster_df
+
 def summarize_clusters(directory, cell_names, cluster):
     gene_expr_dict = {}
 
@@ -138,7 +165,7 @@ def summarize_clusters(directory, cell_names, cluster):
     files_to_open = []
     for cell in cell_names:
         for file_name in trajectory_files:
-            if cell in file_name:
+            if str(cell) in file_name:
                 files_to_open.append(file_name)
 
     for file_path in files_to_open:
@@ -242,6 +269,8 @@ if __name__ == '__main__':
     for cluster, cell_list in cluster_dict.items():
         print(f'Summarizing cluster {cluster}')
         summarize_clusters(directory, cell_list, cluster)
+
+    
     
     plot_heatmap(distance_matrix, file_names)
 
