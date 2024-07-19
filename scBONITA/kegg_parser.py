@@ -640,8 +640,6 @@ class Pathways:
         aliasDict = {}
         orgDict = {}
 
-        xml_file_path = os.listdir(f'{file_paths["pathway_xml_files"]}/{organism}')
-
         # If the dictionary file exists, use that (much faster than streaming)
         if f'{organism}_dict.csv' in os.listdir(f'{file_paths["pickle_files"]}'):
             logging.info(f'\t\t\tReading {organism} dictionary file...')
@@ -680,7 +678,9 @@ class Pathways:
         # Write all xml files from the kegg api rather than requesting each one individually. Finds any missing xml files
         self.write_all_organism_xml_files(organism)
 
-        def parse_xml_files(xml_file):
+        xml_file_path = os.listdir(f'{file_paths["pathway_xml_files"]}/{organism}')
+
+        def parse_xml_files(xml_file, pathway_name):
             """
             Reads in the pathway xml file and parses the connections. Creates a networkx directed graph of the pathway
             """
@@ -710,16 +710,17 @@ class Pathways:
             pathway_list = list(kegg_pathway_list)
             num_pathways = len(pathway_list)
             minimumOverlap = 1  # Minimum number of genes that need to be in both the dataset and pathway for the pathway to be considered
-            logging.info(f'\tFinding pathways with at least {minimumOverlap} genes that overlap with the dataset')
+            logging.info(f'\t\tFinding pathways with at least {minimumOverlap} genes that overlap with the dataset')
 
             with alive_bar(num_pathways) as bar:
                 for pathway_num, pathway in enumerate(pathway_list):
-                    if organism + pathway == xml_pathway_name:
-                        xml_pathway_name = xml_file.split('.')[0]
-                        parse_xml_files(xml_pathway_name)
+                    for xml_pathway_name in xml_file_path:
+                        if organism + pathway + '.xml' == xml_pathway_name:
+                            parse_xml_files(xml_pathway_name, pathway)
 
-                    elif 'ko' + pathway == xml_pathway_name:
-                        parse_xml_files(xml_pathway_name)
+                        elif 'ko' + pathway + '.xml'== xml_pathway_name:
+                            parse_xml_files(xml_pathway_name, pathway)
+                        
                     bar()
 
         if len(self.pathway_dict.keys()) == 0:
@@ -743,8 +744,6 @@ class Pathways:
         elif not hasattr(self, "cv_genes"):
             pathway_genes = set(self.gene_list)
 
-        num_valid_paths = 0
-
         def create_processed_networkx_graphml(G, pathway):
             """
             Reads in the graph and the pathway and filters out self edges and isolates
@@ -758,9 +757,8 @@ class Pathways:
 
             # Check to see if there are enough genes in the dataset that overlap with the genes in the pathway
             if overlap >= minOverlap:
-                num_valid_paths += 1
 
-                logging.info(f'\tPathway: {pathway} Overlap: {overlap} Edges: {len(G.edges())}')
+                logging.info(f'\t\tPathway: {pathway} Overlap: {overlap} Edges: {len(G.edges())}')
                 nodes = list(G.nodes())
 
                 if removeSelfEdges:
@@ -776,13 +774,15 @@ class Pathways:
                 G.remove_nodes_from(list(nx.isolates(G)))
 
                 self.pathway_graphs[pathway] = G
-                logging.info(f'\t\t\t\tEdges after processing: {len(G.edges())} Overlap: {len(set(G.nodes()).intersection(pathway_genes))}')
+                logging.info(f'\t\t\tEdges after processing: {len(G.edges())} Overlap: {len(set(G.nodes()).intersection(pathway_genes))}')
                 filtered_overlap = len(set(G.nodes()).intersection(pathway_genes))
 
                 if write_graphml and filtered_overlap > minOverlap:
                     nx.write_graphml(
                         G, self.output_path + organism + pathway + "_processed.graphml", infer_numeric_types=True
                     )
+                
+                
             else:
                 msg = f'Overlap {overlap} is below the minimum {minOverlap}'
                 raise Exception(msg)
@@ -798,12 +798,11 @@ class Pathways:
                     custom_graphml_path = f'{file_paths["custom_graphml"]}/{pathway}'
                     G = nx.read_graphml(custom_graphml_path)
                 create_processed_networkx_graphml(G, pathway)
+                
 
         # If pathway_list is a dictionary
-        else:
-            if isinstance(pathway_list, dict):
+        elif isinstance(pathway_list, dict):
                 for pathway, G in pathway_list.items():
                     create_processed_networkx_graphml(G, pathway)
+        
 
-        if num_valid_paths == 0:
-            raise Exception(f'\n\nWARNING: No pathways found with sufficient overlap')

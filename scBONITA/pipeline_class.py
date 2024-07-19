@@ -1,6 +1,6 @@
 from rule_inference import RuleInference
 from kegg_parser import Pathways
-from network import Network
+from network_class import Network
 from importance_scores import CalculateImportanceScore
 from cell_class import CellPopulation
 from file_paths import file_paths
@@ -45,12 +45,11 @@ class Pipeline():
         self.sample_cells = self._convert_string_to_boolean(getattr(parser_argument, 'sample_cells', True))
         self.binarize_threshold = float(getattr(parser_argument, 'binarize_threshold', 0.001))
         self.display_title = getattr(parser_argument, 'display_title', True)
+        self.minOverlap = getattr(parser_argument, 'minimum_overlap', 25)
         
-
         # Other variables
         self.write_graphml = True
         self.node_indices = []
-        self.minOverlap = 1
 
         # Make the paths for the output files
         for path in file_paths.values():
@@ -124,7 +123,7 @@ class Pipeline():
             graph = pathways.pathway_graphs[pathway]
 
             # Catches if the graph does not have enough overlapping nodes after processing
-            if len(graph.nodes()) > self.minOverlap:
+            if len(graph.nodes()) >= self.minOverlap:
                 node_indices = []
             
                 for node in graph.nodes():

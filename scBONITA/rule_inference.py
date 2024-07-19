@@ -199,13 +199,8 @@ class RuleInference(NetworkSetup):
 
         logging.debug(f'Network Genes: {netGenes}')
 
-        self.__inherit(
-            self.network,
-            removeSelfEdges=False,
-            restrictIncomingEdges=True,
-            maxIncomingEdges=3,
-            groundTruth=False,
-        )
+        # Sets up the nodes and classes
+        self.__inherit(self.network)
         
         # Runs the genetic algorithm and rule refinement
         self.best_ruleset = self.genetic_algorithm(self.network)
@@ -256,20 +251,6 @@ class RuleInference(NetworkSetup):
 
         return fig
     
-    def __inherit(
-        self,
-        graph,
-        removeSelfEdges=False,
-        restrictIncomingEdges=True,
-        maxIncomingEdges=3,
-        groundTruth=False,
-        graphName=""):
-        super().__init__(
-            graph,
-            removeSelfEdges,
-            restrictIncomingEdges,
-            maxIncomingEdges,
-            groundTruth,
-            graphName,
-        )
+    def __inherit(self, graph):
+        super().__init__(graph)
 

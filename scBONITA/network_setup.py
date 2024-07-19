@@ -23,8 +23,7 @@ import logging
 from alive_progress import alive_bar
 
 class NetworkSetup:
-    def __init__(self, graph, gene_list, removeSelfEdges=False, restrictIncomingEdges=True,
-                 maxIncomingEdges=3, groundTruth=False, graphName=""):
+    def __init__(self, graph):
         """Initialize a NetworkSetup object for rule inference with scBONITA - RD"""
 
         # Initialize lists to store information about nodes and connections

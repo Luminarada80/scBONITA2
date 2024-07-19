@@ -3,7 +3,7 @@ import random
 import numpy as np
 from alive_progress import alive_bar
 from scipy.sparse import csr_matrix, csc_matrix
-from network import Network
+from network_class import Network
 import os
 import pickle
 from argparse import ArgumentParser
