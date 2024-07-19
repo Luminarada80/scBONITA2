@@ -12,7 +12,7 @@ class Node:
 
         self.name = name # Gene name
         self.index = index # Index in the network
-        self.dataset_index = None
+        self.dataset_index = None # Row index in the dataset
 
         # Combining all of the combinations
         self.rvalues = None
@@ -54,8 +54,6 @@ class Node:
         self.relative_abundance = None
     
     def enumerate_possibilities(self):
-        # logging.debug(f'Node {self.name} enumerate_possibilities function:')
-
         # This creates all possible AND and OR possibilities between all input strings
         # See: https://stackoverflow.com/questions/76611116/explore-all-possible-boolean-combinations-of-variables
         cache = dict()
@@ -103,8 +101,6 @@ class Node:
                         addResult(left,right)
             return cacheResult(keys,result)
         
-        # logging.debug(f'\tNode {self.name}\nPredecessors: {self.predecessors} ({len(self.predecessors)} incoming nodes)')
-
         num_incoming_nodes = len(self.predecessors)
         
         # Find the possible combinations based on the number of incoming nodes
@@ -118,8 +114,6 @@ class Node:
             possibilities = np.array(["A"])
         else:
             assert IndexError('Num incoming nodes out of range')
-        
-        # logging.debug(f'\tPossibilities = {possibilities}')
 
         return possibilities
 
@@ -148,20 +142,14 @@ class Node:
                     selected_rule = selected_rule.replace('C', 'not C')
                 elif i == 3:
                     selected_rule = selected_rule.replace('D', 'not D')
-        
-        # logging.debug(f'\tBitstring = {bitstring}')
-        # logging.debug(f'\nSelected_rule: {selected_rule}\n')
 
         return bitstring, selected_rule
     
     def find_multiple_rule_predictions(self, individual_bitstring):
-        # logging.info(f'Node {self.name} find_multiple_rule_predictions:')
         rule_predictions = []
 
         # Extract the bitstring for this node from the individual
         bitstring_length = self.rule_end_index - self.rule_start_index
-        # logging.info(f'\tRule start: {self.rule_start_index}')
-        # logging.info(f'\tRule end: {self.rule_end_index}')
 
         if bitstring_length >= 1:
             bitstring = np.array(individual_bitstring[self.rule_start_index:self.rule_end_index])
@@ -169,11 +157,7 @@ class Node:
         elif bitstring_length == 0:
             bitstring = np.array(individual_bitstring[self.rule_start_index])
         
-        # logging.info(f'\tBitstring = {bitstring}')
-        
         selected_rules = [rule.replace("  ", " ") for rule in self.possibilities[bitstring == 1]]
-        # logging.info(f'\tPossible rules = {self.possibilities}')
-        # logging.info(f'\tSelected rules = {selected_rules}')
 
         # Add in the inversion rules
         for rule in selected_rules:
@@ -193,23 +177,13 @@ class Node:
             node_rules.append([self.name, [i for i in self.predecessors], rule])
 
         self.node_rules = node_rules
-
-        # logging.info(f'\tRule predictions:')
-        # for predicted_rule in rule_predictions:
-        #     logging.info(f'\t\t{predicted_rule}')
-
-        # logging.info(f'\tNode rules:')
-        # for rule in self.node_rules:
-        #     logging.info(f'\t\t{rule}')
         
         return rule_predictions
     
     def find_all_rule_predictions(self):
-        # logging.info(f'Node {self.name} find_multiple_rule_predictions:')
         rule_predictions = []
         
         rules = [rule.replace("  ", " ") for rule in self.possibilities]
-        # logging.info(f'\tPossible rules = {self.possibilities}')
 
         # Add in the inversion rules
         for rule in rules:
@@ -227,18 +201,8 @@ class Node:
         node_rules = []
         for rule in rule_predictions:
             node_rules.append([self.name, [i for i in self.predecessors], rule])
-
-        # self.node_rules = node_rules
         
         return node_rules
-
-
-    # Print information about the node
-    def print_info(self):
-        logging.info(f'\nNode {self.name} print_info function results:')
-        logging.info(f'\tindex {self.index}')
-        logging.info(f'\tpredecessors: {self.predecessors}')
-        logging.info(f'\tNode rules: {self.node_rules}')
 
     # Reset the state of the node
     def reset_state(self):

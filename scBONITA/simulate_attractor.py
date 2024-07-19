@@ -1,15 +1,10 @@
-from importance_scores import CalculateImportanceScore
 import matplotlib.pyplot as plt
-import matplotlib.animation as animation
-from matplotlib.patches import Circle
 import networkx as nx
 import numpy as np
 import pickle
 from argparse import ArgumentParser
 from setup.user_input_prompts import *
 import logging
-import random
-import pandas
 from heatmap import create_heatmap
 import numexpr as ne
 

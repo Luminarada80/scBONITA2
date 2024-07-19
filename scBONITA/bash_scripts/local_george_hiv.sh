@@ -6,15 +6,15 @@
 
 # Which parts do you want to run? Set True to run or False to skip
     # Rule determination must be run prior to importance score, importance score must be run prior to relative abundance
-RUN_RULE_DETERMINATION=True
+RUN_RULE_DETERMINATION=False
 RUN_IMPORTANCE_SCORE=False
-RUN_RELATIVE_ABUNDANCE=False
-RUN_ATTRACTOR_ANALYSIS=False
+RUN_RELATIVE_ABUNDANCE=True
+RUN_ATTRACTOR_ANALYSIS=True
 
 # General Arguments (Required for all steps)
-DATA_FILE="../../george_data/hiv_dataset/HIV_dataset_normalized_integrated_counts.csv"
-DATASET_NAME="george_hiv"
-DATAFILE_SEP=","
+DATA_FILE="../input/george_data/hiv_dataset/HIV_dataset_normalized_integrated_counts.csv"
+DATASET_NAME="george_hiv" # Enter the name of your dataset
+DATAFILE_SEP="," # Enter the character that the values in your dataset are split by
 KEGG_PATHWAYS=("04370") # Enter KEGG pathway codes or leave blank to find all pathways with overlapping genes. Separate like: ("hsa04670" "hsa05171")
 CUSTOM_PATHWAYS=() #("modified_network.graphml") #Put custom networks in the input folder
 BINARIZE_THRESHOLD=0.01 # Data points with values above this number will be set to 1, lower set to 0
@@ -22,7 +22,7 @@ MINIMUM_OVERLAP=1 # Specifies how many genes you want to ensure overlap with the
 ORGANISM_CODE="hsa" # Organism code in front of KEGG pathway numbers
 
 # Relative Abundance arguments
-METADATA_FILE="../../george_data/hiv_dataset/hiv_meta.txt"
+METADATA_FILE="../input/george_data/hiv_dataset/hiv_meta.txt"
 METADATA_SEP=" "
 HEADER="n" # Does the metadata file contain a header before the entries start?
 OVERWRITE="n" # Do you want to overwrite the files generated for each of your different experimental groups?
@@ -31,11 +31,10 @@ GROUP_INDICES=(2)
 
 # Specify the control groups and experimental groups that you want to compare
     # 1st entry in control is compared to 1st entry in experimental, 2nd entry compared to 2nd entry, etc.
-
 CONTROL_GROUPS=("Healthy")
 EXPERIMENTAL_GROUPS=("HIV")
 
-# -------------- End of user input --------------
+# -------------- End of user input, shouldn't have to change anything below here --------------
 
 #  ----------------------------
 # |     RULE DETERMINATION     |
