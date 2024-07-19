@@ -27,9 +27,8 @@ class Pipeline():
         # Set the logging level for output
         logging.basicConfig(format='%(message)s', level=logging.INFO)
 
-        parser = ArgumentParser()
-
         # Read in arguments from shell script using argparse
+        parser = ArgumentParser()
         parser_argument = rule_inference_arguments(parser)
         
         # Store the results from argparse
@@ -46,26 +45,34 @@ class Pipeline():
         self.sample_cells = self._convert_string_to_boolean(getattr(parser_argument, 'sample_cells', True))
         self.binarize_threshold = float(getattr(parser_argument, 'binarize_threshold', 0.001))
         self.display_title = getattr(parser_argument, 'display_title', True)
-        self.minOverlap = 1
+        
 
         # Other variables
         self.write_graphml = True
         self.node_indices = []
+        self.minOverlap = 1
 
+        # Make the paths for the output files
         for path in file_paths.values():
             os.makedirs(path, exist_ok=True)
 
+        # Chooses whether or not to display the scBONTIA banner in the terminal
         if self.display_title:
             logging.info(make_banner())
         
+        # Runs the rule inference
         self.rule_inference()
     
     def rule_inference(self):
+        """
+        Wrapper script for running scBONITA rule inference
+        """
+
         # Create a Pathways object to store the network information
         pathways = Pathways(
             self.dataset_name, self.cv_threshold, self.data_file, self.datafile_sep, self.write_graphml, self.organism)
 
-        # Use a list of kegg pathways specified by the user
+        # Use a list of KEGG pathways specified by the user
         logging.info(f'-----PARSING NETWORKS-----')
         if self.list_of_kegg_pathways is None:
             logging.info(f'\tNo KEGG Pathways listed...')
@@ -73,8 +80,7 @@ class Pipeline():
         else:
             logging.info(f'\tKEGG pathways = {self.list_of_kegg_pathways}')
 
-
-        # Get all kegg pathways matching the genes in the dataset
+        # If the user specifies to look for overlapping pathways, gets all KEGG pathways matching the genes in the dataset
         if self.get_kegg_pathways == True:
             logging.info(f'\tFinding and formatting KEGG Pathways...')
 
@@ -85,10 +91,10 @@ class Pipeline():
                 minimumOverlap=self.minOverlap
             )
 
+            # Add the patwhays
             pathways.add_pathways(pathways.pathway_graphs, minOverlap=self.minOverlap, organism=self.organism)
         
         # Use the pathway(s) specified by pathway_list
-        
         else:
             if isinstance(self.pathway_list, str):
                 logging.info(f'\tPathways = {self.pathway_list}')
@@ -147,7 +153,7 @@ class Pipeline():
             self.data_file,
             self.dataset_name,
             network,
-            self.datafile_sep,
+            self.datafile_sep, 
             node_indices,
             gene_list,
             self.max_nodes,

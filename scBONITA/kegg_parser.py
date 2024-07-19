@@ -13,8 +13,11 @@ from alive_progress import alive_bar
 from file_paths import file_paths
 
 class Pathways:
+    """
+    Reads in and processes the KEGG pathways as networkx graphs
+    """
     def __init__(self, dataset_name, cv_threshold, data_file, sep, write_graphml, organism):
-        self.cv_threshold = cv_threshold
+        self.cv_threshold = cv_threshold # The cutoff value threshold for binarizing 
         self.data_file = data_file
         self.gene_list = self._find_genes(sep)
         self.pathway_graphs = {}
@@ -35,7 +38,10 @@ class Pathways:
             yield b
             b = reader(1024 * 1024)
     
-    def _find_genes(self, sep):
+    def _find_genes(self, separator):
+        """
+        Finds the names of the genes in the datafile
+        """
         gene_list = []  # Initialize a list to store the first column data
         
         with open(self.data_file, "rb") as file:
@@ -47,13 +53,34 @@ class Pathways:
             for line in file:
                 # Split the line into columns (assuming columns are separated by spaces or tabs)
                 line = line.replace('"', '')
-                columns = line.strip().split(sep)
+                columns = line.strip().split(separator)
                 
                 if columns:
                     gene_list.append(columns[0])  # Append the first column to the list
+
         logging.info(f'Number of genes in the data file: {len(gene_list)}')
         logging.info(f'First 5 genes: {gene_list[0:5]}\n')
+
         return gene_list
+    
+    def filter_data(self):
+        """
+        Filters out genes with low variability. The threshold is low by default (0.001) to allow for most genes
+        to be kept in. Increasing this value will lead to only including highly variable genes
+        """
+        logging.info(f'\tFiltering data based on cv threshold of {self.cv_threshold}')
+        self.cv_genes = []
+        with open(self.data_file, "r") as file:
+            next(file)
+            for line in file:
+                column = line.split(',')
+                gene_name = column[0]
+                row_data = [float(cell_value) for cell_value in column[1:]]
+                
+                # Calculate the cutoff value 
+                if np.std(row_data) / np.mean(row_data) >= self.cv_threshold:
+                    if gene_name in self.gene_list:
+                        self.cv_genes.append(gene_name)
 
     def parse_kegg_dict(self):
         """
@@ -116,15 +143,11 @@ class Pathways:
         
         # Look at each entry in the kgml file. Info: (https://www.kegg.jp/kegg/xml/)
         for entry in soup.find_all("entry"):
-            # logging.info(f'\nEntry:')
-            # logging.info(f'\t{entry}')
 
             # Name of each gene in the entry
             # If there are multiple genes in the entry, store them all with the same id
             entry_split = entry["name"].split(":")
 
-            # logging.info(f'\tentry_split: {entry_split}')
-            # logging.info(f'\tlen(entry_split) : {len(entry_split)}')
             # If the entry is part of a group (in the network coded by a group containing lots of related genes)
             if len(entry_split) > 2:
 
@@ -222,8 +245,6 @@ class Pathways:
 
         # For each of the relationships
         for relation in soup.find_all("relation"):
-            # logging.info(f'Relation:')
-            # logging.info(f'\t{relation}')
             (color, signal) = ("black", "a")
 
             relation_entry1 = relation["entry1"] # Upstream node
@@ -287,14 +308,13 @@ class Pathways:
                     type=relation_type,
                     signal=signal,
                 )
+        
+        # ------------------ UNCOMMENTING THE FOLLOWING LOADS ALL REFERENCED SUBGRAPHS, WORK IN PROGRESS -------------------------------
         # logging.info(f'Subpaths:')
         # for path_name in subpaths:
         #     logging.info(f'\t{path_name}')
 
         # num_pathways = len(subpaths)
-
-        # ------------------ UNCOMMENTING THE FOLLOWING LOADS ALL REFERENCED SUBGRAPHS, WORK IN PROGRESS -------------------------------
-
         # for pathway_num, pathway in enumerate(subpaths):
         #     for xml_file in os.listdir(f'{file_paths["pathway_xml_files"]}/{self.organism}'):
         #         xml_pathway_name = xml_file.split('.')[0]
@@ -481,11 +501,14 @@ class Pathways:
 
         # self.add_pathways(subpath_graphs, minOverlap=25, organism=self.organism)
 
-
-
         return graph
 
     def write_all_organism_xml_files(self, organism): 
+        """
+        Reads in all xml files for the organism, faster to do this once at the start and just use
+        the cached files. They aren't that big, so I'd rather store them at the beginning.
+        """
+
         k = KEGG()  # read KEGG from bioservices
         k.organism = organism     
         pathway_list = list(k.pathwayIds)              
@@ -535,6 +558,10 @@ class Pathways:
                 bar()
     
     def parse_kegg_pathway(self, graph, minimumOverlap, pathway, pathway_num, num_pathways):
+        """
+        Read in and format the KEGG pathway
+        """
+
         pathway = pathway.replace("path:", "")
         code = str(pathway)
         code = re.sub(
@@ -584,27 +611,14 @@ class Pathways:
                 graph.remove_edge(edge[0], edge[1])
 
         # check to see if there is a connected component, simplify graph and print if so
-        allNodes = set(graph.nodes())
-        overlap = len(allNodes.intersection(self.gene_list))
-
-        # nx.write_graphml(graph,coder+'.graphml')
-
-    
-        # logging.info(f'Nodes:')
-        # for node in graph.nodes():
-        #     logging.info(f'\t{node}')
-
-        # logging.info(f'Edges:')
-        # for edge in graph.edges():
-        #     logging.info(f'\t{edge}')
-
-        if overlap > minimumOverlap and len(graph.edges()) > 0:  # if there are at least minimumOverlap genes shared between the network and the genes in the dataset
-            # nx.write_graphml(graph,coder+'_processed.graphml') # write graph out
+        pathway_nodes = set(graph.nodes())
+        overlap = len(pathway_nodes.intersection(self.gene_list))
+        
+        # Keep the pathway if there are at least minimumOverlap genes shared between the network and the genes in the dataset
+        if overlap > minimumOverlap and len(graph.edges()) > 0:  
             logging.info(f'\t\t\tPathway ({pathway_num}/{num_pathways}): {pathway} Overlap: {overlap} Edges: {len(graph.edges())}')
             nx.write_graphml(graph, self.output_path + coder + ".graphml")
 
-
-            
             # Add the pathway graph to the dictionary with the pathway code as the key
             self.pathway_dict[code] = graph
 
@@ -612,10 +626,11 @@ class Pathways:
             logging.debug(f'\t\t\tPathway ({pathway_num}/{num_pathways}): {pathway} not enough overlapping genes (min = {minimumOverlap}, found {overlap})')
 
     def find_kegg_pathways(self, kegg_pathway_list: list, write_graphml: bool, organism: str, minimumOverlap: int):
-    
         """
         write_graphml = whether or not to write out a graphml (usually true)
         organism = organism code from kegg. Eg human = 'hsa', mouse = 'mus'
+
+        Finds the KEGG pathways from the pathway dictionaries
         """
         logging.info("\t\tFinding KEGG pathways...")
         kegg_dict = self.parse_kegg_dict()  # parse the dictionary of ko codes
@@ -624,6 +639,8 @@ class Pathways:
         pathway_dict_path = f'{file_paths["pickle_files"]}/{organism}_dict.csv'
         aliasDict = {}
         orgDict = {}
+
+        xml_file_path = os.listdir(f'{file_paths["pathway_xml_files"]}/{organism}')
 
         # If the dictionary file exists, use that (much faster than streaming)
         if f'{organism}_dict.csv' in os.listdir(f'{file_paths["pickle_files"]}'):
@@ -663,55 +680,46 @@ class Pathways:
         # Write all xml files from the kegg api rather than requesting each one individually. Finds any missing xml files
         self.write_all_organism_xml_files(organism)
 
+        def parse_xml_files(xml_file):
+            """
+            Reads in the pathway xml file and parses the connections. Creates a networkx directed graph of the pathway
+            """
+            with open(f'{file_paths["pathway_xml_files"]}/{organism}/{xml_file}', 'r') as pathway_file:
+                text = [line for line in pathway_file]
+
+                # Read the kegg xml file
+                graph = self.read_kegg(text, nx.DiGraph(), kegg_dict, orgDict)
+
+                # Parse the kegg pathway and determine if there is sufficient overlap for processing with scBONITA
+                self.parse_kegg_pathway(graph, minimumOverlap, pathway_name, pathway_num, num_pathways)
+
+        # If there aren't any kegg pathways specified, look for all overlapping pathways
         if len(kegg_pathway_list) == 0:
             # Read in the pre-downloaded xml files and read them into a DiGraph object
-            num_pathways = len(os.listdir(f'{file_paths["pathway_xml_files"]}/{organism}'))
+            num_pathways = len(xml_file_path)
             logging.info(f'\t\tNo KEGG pathways specified, searching all overlapping pathways')
             logging.info(f'\t\tFinding pathways with at least {minimumOverlap} genes that overlap with the dataset')
             with alive_bar(num_pathways) as bar:
-                for pathway_num, xml_file in enumerate(os.listdir(f'{file_paths["pathway_xml_files"]}/{organism}')):
+                for pathway_num, xml_file in enumerate(xml_file_path):
                     pathway_name = xml_file.split('.')[0]
-                    with open(f'{file_paths["pathway_xml_files"]}/{organism}/{xml_file}', 'r') as pathway_file:
-                        text = [line for line in pathway_file]
-
-                        # Read the kegg xml file
-                        graph = self.read_kegg(text, nx.DiGraph(), kegg_dict, orgDict)
-
-                        # Parse the kegg pathway and determine if there is sufficient overlap for processing with scBONITA
-                        self.parse_kegg_pathway(graph, minimumOverlap, pathway_name, pathway_num, num_pathways)
-
+                    parse_xml_files(pathway_name)
                     bar()
 
+        # If there are pathways specified by the user, load those in
         else:
             pathway_list = list(kegg_pathway_list)
             num_pathways = len(pathway_list)
-
-            minimumOverlap = 1
-            
+            minimumOverlap = 1  # Minimum number of genes that need to be in both the dataset and pathway for the pathway to be considered
             logging.info(f'\tFinding pathways with at least {minimumOverlap} genes that overlap with the dataset')
+
             with alive_bar(num_pathways) as bar:
                 for pathway_num, pathway in enumerate(pathway_list):
-                    for xml_file in os.listdir(f'{file_paths["pathway_xml_files"]}/{organism}'):
+                    if organism + pathway == xml_pathway_name:
                         xml_pathway_name = xml_file.split('.')[0]
-                        if organism + pathway == xml_pathway_name:
-                            with open(f'{file_paths["pathway_xml_files"]}/{organism}/{xml_file}', 'r') as pathway_file:
-                                text = [line for line in pathway_file]
+                        parse_xml_files(xml_pathway_name)
 
-                                # Read the kegg xml file
-                                graph = self.read_kegg(text, nx.DiGraph(), kegg_dict, orgDict)
-
-                                # Parse the kegg pathway and determine if there is sufficient overlap for processing with scBONITA
-                                self.parse_kegg_pathway(graph, minimumOverlap, pathway, pathway_num, num_pathways)
-
-                        elif 'ko' + pathway == xml_pathway_name:
-                            with open(f'{file_paths["pathway_xml_files"]}/{organism}/{xml_file}', 'r') as pathway_file:
-                                text = [line for line in pathway_file]
-
-                                # Read the kegg xml file
-                                graph = self.read_kegg(text, nx.DiGraph(), kegg_dict, orgDict)
-
-                                # Parse the kegg pathway and determine if there is sufficient overlap for processing with scBONITA
-                                self.parse_kegg_pathway(graph, minimumOverlap, pathway, pathway_num, num_pathways)
+                    elif 'ko' + pathway == xml_pathway_name:
+                        parse_xml_files(xml_pathway_name)
                     bar()
 
         if len(self.pathway_dict.keys()) == 0:
@@ -719,190 +727,83 @@ class Pathways:
             assert Exception(msg)
         
         return self.pathway_dict
-                    
-    def filter_data(self):
-        """Filter data based on CV cutoffs"""
-        logging.info(f'\tFiltering data based on cv threshold of {self.cv_threshold}')
-        self.cv_genes = []
-        with open(self.data_file, "r") as file:
-            next(file)
-            for line in file:
-                column = line.split(',')
-                gene_name = column[0]
-                row_data = [float(cell_value) for cell_value in column[1:]]
-                if np.std(row_data) / np.mean(row_data) >= self.cv_threshold:
-                    if gene_name in self.gene_list:
-                        self.cv_genes.append(gene_name)
 
-    def add_pathways(
-        self, pathway_list, minOverlap, write_graphml=True, removeSelfEdges=False, organism='hsa'):
-        """Add a list of pathways in graphml format to the singleCell object"""
+    def add_pathways(self, pathway_list, minOverlap, write_graphml=True, removeSelfEdges=False, organism='hsa'):
+        """
+        Add a list of pathways in graphml format to the rule_inference object
+
+        Writes out the "_processed.graphml" files
+        """
+
         logging.info(f'\t\tAdding graphml pathways to rule_inference object...')
+
+        # Get a list of the genes in the dataset
         if hasattr(self, "cv_genes"):
-            pathwayGenes = set(self.cv_genes)
+            pathway_genes = set(self.cv_genes)
         elif not hasattr(self, "cv_genes"):
-            # logging.info("\tYou have not filtered genes by any criterion.")
-            pathwayGenes = set(self.gene_list)
+            pathway_genes = set(self.gene_list)
 
         num_valid_paths = 0
 
+        def create_processed_networkx_graphml(G, pathway):
+            """
+            Reads in the graph and the pathway and filters out self edges and isolates
+
+            Creates the "_processed.graphml" files
+            """
+            nodes = set(G.nodes())
+
+            # Compute the number of nodes that overlap with the pathway genes
+            overlap = len(nodes.intersection(pathway_genes))
+
+            # Check to see if there are enough genes in the dataset that overlap with the genes in the pathway
+            if overlap >= minOverlap:
+                num_valid_paths += 1
+
+                logging.info(f'\tPathway: {pathway} Overlap: {overlap} Edges: {len(G.edges())}')
+                nodes = list(G.nodes())
+
+                if removeSelfEdges:
+                    G.remove_edges_from(nx.selfloop_edges(G))  # remove self loops
+                # remove genes not in dataset
+                for pg in list(G.nodes()):
+                    if pg not in pathway_genes:
+                        G.remove_node(pg)
+
+
+                # graph post-processing
+                # remove singletons/isolates
+                G.remove_nodes_from(list(nx.isolates(G)))
+
+                self.pathway_graphs[pathway] = G
+                logging.info(f'\t\t\t\tEdges after processing: {len(G.edges())} Overlap: {len(set(G.nodes()).intersection(pathway_genes))}')
+                filtered_overlap = len(set(G.nodes()).intersection(pathway_genes))
+
+                if write_graphml and filtered_overlap > minOverlap:
+                    nx.write_graphml(
+                        G, self.output_path + organism + pathway + "_processed.graphml", infer_numeric_types=True
+                    )
+            else:
+                msg = f'Overlap {overlap} is below the minimum {minOverlap}'
+                raise Exception(msg)
+
+        # Create the "_processed.graphml" files
+
+        # If pathway_list is a list
         if isinstance(pathway_list, list):
-            for (
-                pathway
-            ) in (
-                pathway_list
-            ):  # list(glob.glob("*.graphml")):  # list(glob.glob('*[0-9].graphml')):
+            for pathway in pathway_list:  
                 if os.path.exists(pathway):
                     G = nx.read_graphml(pathway)
                 else:
                     custom_graphml_path = f'{file_paths["custom_graphml"]}/{pathway}'
                     G = nx.read_graphml(custom_graphml_path)
+                create_processed_networkx_graphml(G, pathway)
 
-                nodes = set(G.nodes())
-
-                # Compute overlap based on node IDs first
-                overlap = len(nodes.intersection(pathwayGenes))
-
-                # # Workaround to access raven's data, the gene names are found as a 'gene_symbol' attribute
-                # if overlap == 0:
-                #     try:
-                #         node_names = set()  # Use a set for efficient intersection operation
-                #         for node_id in G.nodes():
-                #             gene_symbol = G.nodes[node_id].get("gene_symbol")
-                #             if gene_symbol:  # Ensure gene_symbol is not None or empty
-                #                 node_names.add(gene_symbol)
-                #         overlap = len(node_names.intersection(pathwayGenes))
-
-                #         if overlap >= minOverlap:
-                #             logging.info(f'Overlap: {overlap}')
-                #             logging.info(f'\tPathway: {pathway} Overlap: {overlap} Edges: {len(G.edges())}')
-                #             nodes = list(G.nodes())
-                #             if removeSelfEdges:
-                #                 G.remove_edges_from(nx.selfloop_edges(G))  # remove self loops
-                #             # remove genes not in dataset
-                #             for node_id in list(G.nodes()):
-                #                 gene_symbol = G.nodes[node_id].get("gene_symbol")
-                #                 if gene_symbol not in pathwayGenes:
-                #                     G.remove_node(node_id)
-
-                #             # graph post-processing
-                #             # remove singletons/isolates
-                #             G.remove_nodes_from(list(nx.isolates(G)))
-
-                #             # Assuming G is your original graph loaded from GraphML
-                #             original_graph = G
-
-                #             # Create a new graph, which could be directed or undirected similar to the original
-                #             new_graph = nx.DiGraph() if original_graph.is_directed() else nx.Graph()
-
-                #             # Mapping from old node IDs to gene symbols for edge reassignment
-                #             node_id_to_gene_symbol = {}
-
-                #             # Add nodes with gene_symbol as ID
-                #             for node_id in original_graph.nodes():
-                #                 gene_symbol = original_graph.nodes[node_id].get("gene_symbol")
-                #                 if gene_symbol:
-                #                     new_graph.add_node(gene_symbol, **original_graph.nodes[node_id])
-                #                     node_id_to_gene_symbol[node_id] = gene_symbol
-                #                 else:
-                #                     # Handle case where gene_symbol is not defined
-                #                     # You might choose to skip these or add them with a placeholder
-                #                     logging.info(f"Node {node_id} has no gene_symbol")
-
-                #             # Add edges to the new graph, converting node IDs to gene symbols
-                #             for (u, v, attribs) in original_graph.edges(data=True):
-                #                 # Convert node IDs to gene symbols, if available
-                #                 gene_symbol_u = node_id_to_gene_symbol.get(u)
-                #                 gene_symbol_v = node_id_to_gene_symbol.get(v)
-
-                #                 if gene_symbol_u and gene_symbol_v:
-                #                     # Check if the edge already exists to avoid duplicates when gene symbols are not unique
-                #                     if not new_graph.has_edge(gene_symbol_u, gene_symbol_v):
-                #                         new_graph.add_edge(gene_symbol_u, gene_symbol_v, **attribs)
-                #             # To do: remove complexes, remove dependences of a node on complexes that include that node (which is a form of self-loop)
-                #             self.pathway_graphs[pathway] = new_graph
-                #             logging.debug(f'\t\t\t\tEdges after processing: {len(G.edges())} Overlap: {len(set(node_names).intersection(pathwayGenes))}')
-                            
-                #             if write_graphml:
-                #                 nx.write_graphml(
-                #                     G, self.output_path + organism + pathway + "_processed.graphml", infer_numeric_types=True
-                #                 )
-
-                #     except Exception as e:  # Catching any exception and logging it
-                #         logging.error(f'Error while extracting gene symbols: {e}')
-
-                
-                if overlap >= minOverlap:
-                    num_valid_paths += 1
-
-                    logging.info(f'\tPathway: {pathway} Overlap: {overlap} Edges: {len(G.edges())}')
-                    nodes = list(G.nodes())
-                    if removeSelfEdges:
-                        G.remove_edges_from(nx.selfloop_edges(G))  # remove self loops
-                    # remove genes not in dataset
-                    for pg in list(G.nodes()):
-                        if pg not in pathwayGenes:
-                            G.remove_node(pg)
-                    # graph post-processing
-                    # remove singletons/isolates
-                    G.remove_nodes_from(list(nx.isolates(G)))
-                    # To do: remove complexes, remove dependences of a node on complexes that include that node (which is a form of self-loop)
-                    self.pathway_graphs[pathway] = G
-                    logging.info(f'\t\t\t\tEdges after processing: {len(G.edges())} Overlap: {len(set(G.nodes()).intersection(pathwayGenes))}')
-                    filtered_overlap = len(set(G.nodes()).intersection(pathwayGenes))
-
-                    if write_graphml and filtered_overlap > minOverlap:
-                        nx.write_graphml(
-                            G, self.output_path + organism + pathway + "_processed.graphml", infer_numeric_types=True
-                        )
-                else:
-                    msg = f'Overlap {overlap} is below the minimum {minOverlap}'
-                    raise Exception(msg)
+        # If pathway_list is a dictionary
         else:
             if isinstance(pathway_list, dict):
                 for pathway, G in pathway_list.items():
-                    nodes = set(G.nodes())
-                    test = len(nodes.intersection(pathwayGenes))
-                    
-                    # Find the pathway name if its in a different directory
-                    if '/' in pathway:
-                        pathway = pathway.split('/')[-1]
-    
-                    if test >= minOverlap:
-                        num_valid_paths += 1
-
-                        logging.info(f'\t\t\tPathway: {pathway} Overlap: {test} Edges: {len(G.edges())}')
-                        nodes = list(G.nodes())
-
-                        # remove self loops
-                        if removeSelfEdges:
-                            G.remove_edges_from(
-                                nx.selfloop_edges(G)
-                            )  
-
-                        # remove genes not in dataset
-                        for pg in list(G.nodes()):
-                            if pg not in pathwayGenes:
-                                G.remove_node(pg)
-                        
-                        # remove singletons/isolates
-                        G.remove_nodes_from(list(nx.isolates(G)))
-
-                        # To do: remove complexes, remove dependences of a node on complexes that include that node (which is a form of self-loop)
-                        self.pathway_graphs[pathway] = G
-                        filtered_overlap = len(set(G.nodes()).intersection(pathwayGenes))
-                        logging.info(f'\t\t\tEdges after processing: {len(G.edges())} Overlap: {filtered_overlap}')
-
-
-                        if write_graphml and filtered_overlap > minOverlap:
-                            nx.write_graphml(
-                                G, self.output_path + organism + pathway +  "_processed.graphml", infer_numeric_types=True
-                            )
-                    else:
-                        logging.info(f'\t\t\tPathway does not have sufficient overlap with dataset genes: {pathway} Overlap: {test} Edges: {len(G.edges())}')
-                        continue
-                        # msg = f'Cant find an overlap between the network genes and the genes in the dataset, look at pathways.py'
-                        # raise Exception(msg)
+                    create_processed_networkx_graphml(G, pathway)
 
         if num_valid_paths == 0:
             raise Exception(f'\n\nWARNING: No pathways found with sufficient overlap')
