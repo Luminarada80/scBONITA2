@@ -12,6 +12,5 @@ file_paths = {
     'attractor_analysis_output' : os.path.join(script_dir, '../../scBONITA_output/attractor_analysis_output'),
     'relative_abundance_output' : os.path.join(script_dir, '../../scBONITA_output/relative_abundance_output'),
     'pathway_xml_files' : os.path.join(script_dir, '../../scBONITA_output/pathway_xml_files'),
-    'trajectories' : os.path.join(script_dir, '../../scBONITA_output/trajectories'),
     'custom_graphml' : os.path.join(script_dir, '../input/custom_graphml_files')
 }
