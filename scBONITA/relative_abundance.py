@@ -3,6 +3,7 @@ import logging
 import glob
 import pickle
 import numpy as np
+import pandas as pd
 from sklearn.preprocessing import MaxAbsScaler
 import os
 import matplotlib.pyplot as plt

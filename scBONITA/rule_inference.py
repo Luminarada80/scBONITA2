@@ -1,14 +1,19 @@
-from network_setup import *
-from kegg_parser import *
 import scipy.sparse as sparse
 import numpy as np
 from os import path
 import matplotlib.pyplot as plt
 import time
-from deap_class import CustomDeap
 import csv
 import networkx as nx
+import copy
+
 from cell_class import Cell
+from sklearn import preprocessing
+
+from network_setup import *
+from kegg_parser import *
+from deap_class import CustomDeap
+
 
 class RuleInference(NetworkSetup):
 
