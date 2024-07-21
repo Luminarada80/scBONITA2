@@ -1,10 +1,7 @@
 import pickle
 import logging
-import os
 import argparse
 import glob
-from itertools import product
-from cell_class import Cell
 import numpy as np
 from scipy.stats import chi2_contingency
 

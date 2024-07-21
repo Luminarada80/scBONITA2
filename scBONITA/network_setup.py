@@ -1,22 +1,8 @@
-from deap import base, creator, gp, tools
-from deap import algorithms as algo
 import numpy as np
 import networkx as nx
-from sklearn import preprocessing
 from scipy.stats.stats import spearmanr
 import ctypes as ctypes
-import itertools as itertool
-import copy
-import pickle
-from random import random, randint, sample, choice
-import math
-from collections import defaultdict
-from itertools import chain
-from operator import attrgetter
-import gc
-import pandas as pd
-import time
-import copy
+
 from setup.parameters import Params
 from parse_node import Node
 import logging
