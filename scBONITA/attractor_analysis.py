@@ -34,6 +34,7 @@ def run_attractor_analysis(network, cells):
         dense_dataset = simulated_dataset.todense()
     else:
         dense_dataset = simulated_dataset
+        
     # Generate Hamming distance matrix between cells and attractors
     logging.info(f'\tCalculating hamming distance between cells and attractors')
     logging.info(f'\tTransposed dataset shape: {dense_dataset.shape}')
