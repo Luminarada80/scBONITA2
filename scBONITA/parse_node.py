@@ -1,4 +1,3 @@
-import logging
 from itertools import combinations, product
 import numpy as np
 import random

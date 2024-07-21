@@ -3,6 +3,8 @@ Infers Boolean molecular signaling networks using scRNAseq data and prior knowle
 
 ## Setup:
 
+> NOTE: scBONITA only runs on Linux environments, if you use Windows please download and install Windows Subsystem for Linux (WSL) [here](https://learn.microsoft.com/en-us/windows/wsl/install)
+
 **Cloning repository**
 Go the the directory where you want to install this project and enter `git clone https://github.com/Luminarada80/scBONITA2.git` and enter your username and password.
 
@@ -23,6 +25,7 @@ Go the the directory where you want to install this project and enter `git clone
    - The `local_george_hiv.sh` file can be copied and modified to run different datasets / conditions
    - When running scBONITA, place bash scripts into this folder to run. scBONITA will automatically create the necessary output files in a directory called `scBONITA_output`.
    - Make sure that you have the `george_data` directory downloaded 
+   - If a package is missing, download it using the command `conda install <PACKAGE_NAME>` or `conda install -c conda-forge <PACKAGE_NAME>`
 
 ## Running scBONITA
 **BASH Script** 
@@ -32,6 +35,8 @@ scBONITA runs using a BASH script that allows you to specify all of your paramet
 Each of the steps for running scBONITA is modular, meaning that you can run the rule determination step first. This means that you dont have to run it all at the same time (although you do need to run it in order).
 
 You have to run Rule Determination $\rightarrow$ Importance Score $\rightarrow$ Relative Abundance $\rightarrow$ Attractor Analysis, but not at the same time. I recommend running Rule Determination first to make sure your environment and paths are correct.
+
+> IMPORTANT: Make sure that the CONDA_ENVIRONMENT_PYTHON path is correct. You can find the path using `which python` on macOS and Linux
 
 
 ```bash
@@ -46,6 +51,7 @@ RUN_ATTRACTOR_ANALYSIS=False
 
 # General Arguments (Required for all steps)
 DATA_FILE="../../george_data/hiv_dataset/HIV_dataset_normalized_integrated_counts.csv"
+CONDA_ENVIRONMENT_PYTHON="/home/emoeller/anaconda3/envs/scBonita_test2/bin/python" # Path to the installation of Python for the scBonita conda environment
 DATASET_NAME="george_hiv"
 DATAFILE_SEP=","
 KEGG_PATHWAYS=("04370") # Enter KEGG pathway codes or leave blank to find all pathways with overlapping genes. Separate like: ("hsa04670" "hsa05171")

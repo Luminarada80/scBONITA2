@@ -15,7 +15,6 @@ import scipy.sparse as sparse
 import csv
 import seaborn as sns
 from matplotlib.cm import ScalarMappable
-from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 from metadata_parser import metadata_parser
 from setup.user_input_prompts import *

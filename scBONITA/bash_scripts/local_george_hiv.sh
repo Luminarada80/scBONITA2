@@ -6,13 +6,14 @@
 
 # Which parts do you want to run? Set True to run or False to skip
     # Rule determination must be run prior to importance score, importance score must be run prior to relative abundance
-RUN_RULE_DETERMINATION=False
-RUN_IMPORTANCE_SCORE=False
+RUN_RULE_DETERMINATION=True
+RUN_IMPORTANCE_SCORE=True
 RUN_RELATIVE_ABUNDANCE=True
 RUN_ATTRACTOR_ANALYSIS=True
 
 # General Arguments (Required for all steps)
 DATA_FILE="../input/george_data/hiv_dataset/HIV_dataset_normalized_integrated_counts.csv"
+CONDA_ENVIRONMENT_PYTHON="/home/emoeller/anaconda3/envs/scBonita/bin/python" # Path to the installation of Python for the scBonita conda environment
 DATASET_NAME="george_hiv" # Enter the name of your dataset
 DATAFILE_SEP="," # Enter the character that the values in your dataset are split by
 KEGG_PATHWAYS=("04370") # Enter KEGG pathway codes or leave blank to find all pathways with overlapping genes. Separate like: ("hsa04670" "hsa05171")
@@ -50,7 +51,7 @@ if [ "$RUN_RULE_DETERMINATION" = "True" ]; then
         # Using a list of KEGG pathways:
         KEGG_PATHWAYS_ARGS="${KEGG_PATHWAYS[@]}"
 
-        /home/emoeller/anaconda3/envs/scBonita/bin/python pipeline_class.py \
+        $CONDA_ENVIRONMENT_PYTHON pipeline_class.py \
             --data_file "$DATA_FILE" \
             --dataset_name "$DATASET_NAME" \
             --datafile_sep "$DATAFILE_SEP" \
@@ -60,7 +61,7 @@ if [ "$RUN_RULE_DETERMINATION" = "True" ]; then
             --minimum_overlap $MINIMUM_OVERLAP
     else
         echo "No KEGG pathways specified, finding kegg pathways with overlapping genes..."
-        /home/emoeller/anaconda3/envs/scBonita/bin/python pipeline_class.py \
+        $CONDA_ENVIRONMENT_PYTHON pipeline_class.py \
         --data_file "$DATA_FILE" \
         --dataset_name "$DATASET_NAME" \
         --datafile_sep "$DATAFILE_SEP" \
@@ -81,7 +82,7 @@ if [ "$RUN_RULE_DETERMINATION" = "True" ]; then
             CUSTOM_PATHWAYS_ARGS+="--network_files $pathway "
         done
 
-        /home/emoeller/anaconda3/envs/scBonita/bin/python pipeline_class.py \
+        $CONDA_ENVIRONMENT_PYTHON pipeline_class.py \
         --data_file "$DATA_FILE" \
         --dataset_name "$DATASET_NAME" \
         --datafile_sep "$DATAFILE_SEP" \
@@ -106,7 +107,7 @@ if [ "$RUN_IMPORTANCE_SCORE" = "True" ]; then
         # Using a list of KEGG pathways:
         KEGG_PATHWAYS_ARGS="${KEGG_PATHWAYS[@]}"
 
-        /home/emoeller/anaconda3/envs/scBonita/bin/python importance_scores.py \
+        $CONDA_ENVIRONMENT_PYTHON importance_scores.py \
             --dataset_name "$DATASET_NAME" \
             --list_of_kegg_pathways $KEGG_PATHWAYS_ARGS
     else
@@ -145,7 +146,7 @@ if [ "$RUN_RELATIVE_ABUNDANCE" = "True" ]; then
         EXPERIMENTAL_GROUP=${EXPERIMENTAL_GROUPS[$i]}
 
         # Execute the command with the current pair of control and experimental group
-        /home/emoeller/anaconda3/envs/scBonita/bin/python relative_abundance.py \
+        $CONDA_ENVIRONMENT_PYTHON relative_abundance.py \
             --dataset_name "$DATASET_NAME" \
             --dataset_file "$DATA_FILE" \
             --metadata_file "$METADATA_FILE" \
@@ -170,6 +171,6 @@ fi
 if [ "$RUN_ATTRACTOR_ANALYSIS" = "True" ]; then
     echo "Running Attractor Analysis..."
 
-    /home/emoeller/anaconda3/envs/scBonita/bin/python attractor_analysis.py \
+    $CONDA_ENVIRONMENT_PYTHON attractor_analysis.py \
         --dataset_name "$DATASET_NAME"
 fi

@@ -1,5 +1,4 @@
 import logging
-import random
 import numpy as np
 from alive_progress import alive_bar
 from scipy.sparse import csr_matrix, csc_matrix
@@ -8,7 +7,6 @@ import os
 import pickle
 from argparse import ArgumentParser
 import matplotlib.pyplot as plt
-import csv
 from setup.user_input_prompts import *
 import numexpr as ne
 
@@ -36,8 +34,8 @@ class CalculateImportanceScore():
             # Fallback for dense matrices (NumPy arrays)
             self.dataset = binarized_matrix[:, self.cell_sample_indices]
         
-        self.zeros_array = np.array([[0] * self.dataset.shape[1]], dtype=np.bool)
-        self.ones_array = np.array([[1] * self.dataset.shape[1]], dtype=np.bool)
+        self.zeros_array = np.array([[0] * self.dataset.shape[1]], dtype=bool)
+        self.ones_array = np.array([[1] * self.dataset.shape[1]], dtype=bool)
     
     def evaluate_expression(self, data, expression):
         expression = expression.replace('and', '&').replace('or', '|').replace('not', '~')
@@ -306,7 +304,7 @@ def run_full_importance_score(dataset_name, network_names):
         raise Exception(f'ERROR: Pathways specific do not exist in the ruleset.pickle folder. Check spelling and try again')
 
 def importance_score(ruleset, network, folder_path, file_name):
-    importance_score_calculator = CalculateImportanceScore(network.nodes, network.dataset.astype(np.bool))
+    importance_score_calculator = CalculateImportanceScore(network.nodes, network.dataset.astype(bool))
     
     importance_score_calculator.calculate_importance_scores()
 

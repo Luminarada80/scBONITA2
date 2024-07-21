@@ -2,7 +2,6 @@ from bioservices.kegg import KEGG
 import networkx as nx
 import requests
 import re
-import string
 from bs4 import BeautifulSoup
 import itertools
 from rule_inference import *

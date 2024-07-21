@@ -9,7 +9,6 @@ from itertools import chain, repeat, product
 import operator
 from random import sample, choice, randint, random
 from collections import defaultdict
-from scipy.sparse import csr_matrix
 import logging
 from alive_progress import alive_bar
 import os

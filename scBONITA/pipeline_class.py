@@ -1,7 +1,5 @@
 from rule_inference import RuleInference
 from kegg_parser import Pathways
-from network_class import Network
-from importance_scores import CalculateImportanceScore
 from cell_class import CellPopulation
 from file_paths import file_paths
 
@@ -10,15 +8,10 @@ from setup.scbonita_banner import make_banner
 from setup.user_input_prompts import rule_inference_arguments
 
 # General packages
-import glob
 import os
 import pickle
 import logging
-from datetime import timedelta
-import pandas as pd
-from sklearn.preprocessing import MaxAbsScaler
-import numpy as np
-import matplotlib.pyplot as plt
+
 from argparse import ArgumentParser
 
 
