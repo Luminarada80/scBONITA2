@@ -20,5 +20,4 @@ class Network():
         self.filtered_attractor_indices = None
         self.cell_map = {}
         self.group_cell_indices = {}
-
         

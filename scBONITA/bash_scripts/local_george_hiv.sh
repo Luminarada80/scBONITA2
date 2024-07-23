@@ -7,12 +7,13 @@
 # Which parts do you want to run? Set True to run or False to skip
     # Rule determination must be run prior to importance score, importance score must be run prior to relative abundance
 RUN_RULE_DETERMINATION=True
-RUN_IMPORTANCE_SCORE=True
-RUN_RELATIVE_ABUNDANCE=True
-RUN_ATTRACTOR_ANALYSIS=True
+RUN_IMPORTANCE_SCORE=False
+RUN_RELATIVE_ABUNDANCE=False
+RUN_ATTRACTOR_ANALYSIS=False
 
 # General Arguments (Required for all steps)
-DATA_FILE="../input/george_data/hiv_dataset/HIV_dataset_normalized_integrated_counts.csv"
+# HIV_dataset_normalized_integrated_counts
+DATA_FILE="../input/george_data/hiv_dataset/george_04370_data.csv"
 CONDA_ENVIRONMENT_PYTHON="/home/emoeller/anaconda3/envs/scBonita/bin/python" # Path to the installation of Python for the scBonita conda environment
 DATASET_NAME="george_hiv" # Enter the name of your dataset
 DATAFILE_SEP="," # Enter the character that the values in your dataset are split by

@@ -51,7 +51,6 @@ class RuleInference(NetworkSetup):
         logging.info(f'Extracting cell expression data from "{data_file}"')
         self.cell_names, self.gene_names, self.data = self._extract_data(data_file, sep, sample_cells, node_indices)
 
-
         logging.info(f'\tFirst 2 genes: {self.gene_names[:2]}')
         logging.info(f'\tFirst 2 cells: {self.cell_names[:2]}')
         
