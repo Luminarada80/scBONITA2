@@ -165,27 +165,6 @@ class Pipeline():
         ruleset.node_list = ruleset.gene_list
         ruleset.node_positions = [ruleset.gene_list.index(node) for node in ruleset.node_list]
 
-        header = ""
-        with open(self.data_file, 'r') as data_file:
-            for i, line in enumerate(data_file):
-                if i == 0:
-                    header = line
-                    print(header)
-                else:
-                    break
-
-        with open(f'./george_{network}_data.csv', 'w') as outfile:
-            outfile.write(header)
-            
-            gene_lines = []
-            for gene_pos in ruleset.node_positions:
-                gene_lines.append(','.join([str(expression_value) for expression_value in ruleset.data[gene_pos]]))
-            
-            for i, gene in enumerate(ruleset.gene_list):
-                outfile.write(f'{gene},{gene_lines[i]}\n')
-        
-        # print(ruleset.data[0])
-
         return ruleset
 
     def infer_rules(self, network_name, processed_graphml_path, ruleset):
