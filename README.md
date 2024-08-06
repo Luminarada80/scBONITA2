@@ -1,14 +1,25 @@
 # scBONITA2
 Infers Boolean molecular signaling networks using scRNAseq data and prior knowledge networks, performs attractor analysis, and calculates the importance of each node in the network
 
-## Setup:
-
 > NOTE: scBONITA only runs on Linux environments, if you use Windows please download and install Windows Subsystem for Linux (WSL) [here](https://learn.microsoft.com/en-us/windows/wsl/install)
 
-**Cloning repository**
+## Setup:
+
+> **For BlueHive Users:**
+> * Open the terminal and run `module load anaconda3`
+> * Run `conda init`
+> * Restart the terminal
+> * Run `conda create -n myenv`
+> * Run `conda activate myenv`
+> * Run `conda install -c anaconda git`
+> * Navigate to the directory into which you would like to install scBONITA
+> * `git clone https://github.com/Luminarada80/scBONITA2.git`
+> Continue starting from **step 4** of **Setting up your conda environment**
+
+### Cloning repository
 Go the the directory where you want to install this project and enter `git clone https://github.com/Luminarada80/scBONITA2.git` and enter your username and password.
 
-**Setting up your conda environment**
+### Setting up your conda environment
 1) Install Anaconda from https://www.anaconda.com/download
 2) Run the Anaconda installer in the terminal on Linux or WSL (Windows Subsystem for Linux)
    - `bash Anaconda3-20204.09-0-Linux-x86_64.sh` (if the file you downloaded is different, use that file name)
