@@ -1,8 +1,1 @@
-*.csv filter=lfs diff=lfs merge=lfs -text
-*.txt filter=lfs diff=lfs merge=lfs -text
-*.pickle filter=lfs diff=lfs merge=lfs -text
-scBONITA/pickle_files/raven_club_pickle_files/cells_pickle_file/raven_club.cells.pickle filter=lfs diff=lfs merge=lfs -text
-scBONITA/pickle_files/raven_club_pickle_files/ruleset_pickle_files/raven_club_hsa05171.ruleset.pickle filter=lfs diff=lfs merge=lfs -text
-*.ruleset.pickle filter=lfs diff=lfs merge=lfs -text
-.ruleset.pickle filter=lfs diff=lfs merge=lfs -text
-*.cells.pickle filter=lfs diff=lfs merge=lfs -text
+
