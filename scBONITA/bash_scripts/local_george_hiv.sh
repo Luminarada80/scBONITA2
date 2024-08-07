@@ -14,7 +14,7 @@ RUN_ATTRACTOR_ANALYSIS=False
 # General Arguments (Required for all steps)
 # HIV_dataset_normalized_integrated_counts
 DATA_FILE="../input/george_data/hiv_dataset/george_04370_data.csv"
-CONDA_ENVIRONMENT_PYTHON="/home/emoeller/anaconda3/envs/scBonita/bin/python" # Path to the installation of Python for the scBonita conda environment
+CONDA_ENVIRONMENT_PYTHON=$(which python) # Path to the installation of Python for the scBonita conda environment
 DATASET_NAME="george_hiv" # Enter the name of your dataset
 DATAFILE_SEP="," # Enter the character that the values in your dataset are split by
 KEGG_PATHWAYS=("04370") # Enter KEGG pathway codes or leave blank to find all pathways with overlapping genes. Separate like: ("hsa04670" "hsa05171")

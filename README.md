@@ -26,7 +26,8 @@ Go the the directory where you want to install this project and enter `git clone
    - Follow the prompts to install
 3) Once Anaconda is installed, close and re-open your terminal. You should see `(base)` before your username
 4) To create the correct conda environment, navigate to the `scBONITA2` directory that you cloned from before in the terminal. Once at the correct directory, enter `conda env create --file spec-file.txt --name scBonita`
-5) Once conda has finished working, you can confirm that the environment was created by entering `conda activate scBonita`. This will switch you into the correct environment to work with scBONITA.
+   > You can use mamba to help solve the conda environment faster. Use `conda install mamba` to download, then use `mamba env create --file spec-file.txt --name scBonita` to create the environment
+6) Once conda has finished working, you can confirm that the environment was created by entering `conda activate scBonita`. This will switch you into the correct environment to work with scBONITA.
    - A conda environment is basically a pre-packaged python installation that has a specific python version and package list that works with the code. This makes it so that you don't have to install each required package one-by-one, and you can have different package versions by having different conda environments
 
 **Testing that scBONITA is working**
