@@ -7,9 +7,9 @@
 # Which parts do you want to run? Set True to run or False to skip
     # Rule determination must be run prior to importance score, importance score must be run prior to relative abundance
 RUN_RULE_DETERMINATION=True
-RUN_IMPORTANCE_SCORE=False
-RUN_RELATIVE_ABUNDANCE=False
-RUN_ATTRACTOR_ANALYSIS=False
+RUN_IMPORTANCE_SCORE=True
+RUN_RELATIVE_ABUNDANCE=True
+RUN_ATTRACTOR_ANALYSIS=True
 
 # General Arguments (Required for all steps)
 # HIV_dataset_normalized_integrated_counts
