@@ -42,7 +42,7 @@ def rule_inference_arguments(parser):
     parser.add_argument(
         "--datafile_sep",
         type=str,
-        help="Delimiting character in thedata file. Must be one of , (comma), \s (space) or \t (tab)",
+        help='Delimiting character in the data file. Must be one of , (comma), \\s (space) or \\t (tab)',
         default=",",
         choices=[",", r"\s", r"\t"]
     )
