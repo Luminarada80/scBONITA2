@@ -366,6 +366,10 @@ if __name__ == '__main__':
 
                         split_sparse_matrix.eliminate_zeros()
 
+                        # Replace NaN with 0 and infinity with a large finite number
+                        split_sparse_matrix.data = np.nan_to_num(split_sparse_matrix.data, nan=0.0, posinf=1e10,
+                                                                 neginf=-1e10)
+
                         if split_dataset.shape[0] > 0:
                             split_binarized_matrix = preprocessing.binarize(split_sparse_matrix, threshold=ruleset.binarize_threshold, copy=True)
                             new_network.dataset = split_binarized_matrix
