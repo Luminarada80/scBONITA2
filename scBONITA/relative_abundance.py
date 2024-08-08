@@ -11,7 +11,7 @@ from matplotlib.colors import TwoSlopeNorm
 import networkx as nx
 from scipy.sparse import csr_matrix, csc_matrix
 from scipy.stats import norm
-from network import Network
+from network_class import Network
 from sklearn import preprocessing
 import scipy.sparse as sparse
 import csv

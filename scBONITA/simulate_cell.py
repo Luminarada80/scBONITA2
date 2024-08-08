@@ -32,11 +32,9 @@ def use_cell_starting_state(file):
 def simulate_network(nodes, filename):
     steps = 20
 
-    # starting_state = get_starting_state(filename)
     starting_state = []
     for i in filename:
         starting_state.append(i[0])
-
 
     total_simulation_states = vectorized_run_simulation(nodes, starting_state, steps)
     
@@ -52,27 +50,21 @@ def evaluate_expression(data, expression):
         local_vars = {key: np.array(value) for key, value in data.items()}
     return ne.evaluate(expression, local_dict=local_vars)
 
-# logging.info(f'\tdata = {data}')
-
-
 def vectorized_run_simulation(nodes, starting_state, steps):
     total_simulation_states = []
 
     # Run the simulation
     for step in range(steps):
         step_expression = []
-        # print(f'Step {step}')
 
         # Iterate through each node in the network
         for node in nodes:
-            # print(f'\t{node.name} index {node.index}')
 
             # Initialize A, B, C to False by default (adjust according to what makes sense in context)
             A, B, C = (False,) * 3
             
             data = {}
             incoming_node_indices = [predecessor_index for predecessor_index in node.predecessors]
-            # print(f'\t\tIncoming nodes = {incoming_node_indices}')
 
             # Get the rows in the dataset for the incoming nodes
             if step == 0:
@@ -94,25 +86,13 @@ def vectorized_run_simulation(nodes, starting_state, steps):
                 if len(incoming_node_indices) > 3:
                     data['D'] = total_simulation_states[step-1][incoming_node_indices[3]]
 
-            # Apply the logic function to the data from the incoming nodes to get the predicted output
-
-            # Get the row in the dataset for the node being evaluated
-            # logging.info(f'\tNode {node.name}, Dataset index {node.index}')
-            
-            # Get the dataset row indices for the incoming nodes included in this rule
-            # logging.info(f'\tPredicted rule: {predicted_rule}')
-            # print(f'\t\tNode calculation function: {node.calculation_function}')
-            # print(f'\t\tData: {data}')
             next_step_node_expression = evaluate_expression(data, node.calculation_function)
-            # print(f'\t\tNext step node expression: {next_step_node_expression}')
 
             # Save the expression for the node for this step
             step_expression.append(next_step_node_expression)
-            # print(f'\tStep expression: {step_expression}')
-    
+
         # Save the expression 
         total_simulation_states.append(step_expression)
-        # print(f'total simulation states: {total_simulation_states}')
 
     return total_simulation_states
     
@@ -140,13 +120,7 @@ def visualize_simulation(net, time_series_data, network, show_simulation):
         node_collections.set_color(colors)  # Update colors directly
     
         frame_text.set_text(f'Frame: {frame+1}')
-    
-    # if show_simulation == "True" or show_simulation == "1":
-    #     ani = animation.FuncAnimation(fig, update_graph, frames=range(1, len(time_series_data)), interval=200)
-    #     plt.show()
-    
-    # else:
-    # update_graph(10)  # Update to the frame you want to save
+
     return fig
 
 def save_attractor_simulation(filename, network, simulated_attractor):
@@ -203,8 +177,6 @@ if __name__ == '__main__':
     with alive_bar(num_simulations) as bar:
         for i in range(num_simulations):
             # Select a random column from the network dataset
-            # cell_index = input("Select a cell index or hit enter for random index: ")
-            # if not cell_index:
             cell_index = np.random.choice(dense_dataset.shape[1])
 
             # Reads in all of the rows for that columns
@@ -228,8 +200,7 @@ if __name__ == '__main__':
             # Visualize the network simulation results
             fig = visualize_simulation(network.network, simulated_attractor, network, "False")
 
-            # # Save the attractor states to a csv file
-            # logging.info(f'Saved file to: "{file_path}"')
+            # Save the attractor states to a csv file
             save_attractor_simulation(f'{text_folder}/cell_{cell_index}_trajectory.csv', network, simulated_attractor)
             plt.close(fig)
 
