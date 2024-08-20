@@ -40,7 +40,6 @@ dependencies:
   - libtiff
   - libxslt
   - mkl
-  - python=3.11  # Removed patch version to allow flexibility
   - about-time
   - appdirs
   - brotli-python
