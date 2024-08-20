@@ -14,7 +14,6 @@ RUN_ATTRACTOR_ANALYSIS=True
 # General Arguments (Required for all steps)
 # HIV_dataset_normalized_integrated_counts
 DATA_FILE="input/george_data/hiv_dataset/george_04370_data.csv"
-CONDA_ENVIRONMENT_PYTHON=$(which python) # Path to the installation of Python for the scBonita conda environment
 DATASET_NAME="george_hiv" # Enter the name of your dataset
 DATAFILE_SEP="," # Enter the character that the values in your dataset are split by
 KEGG_PATHWAYS=("04370") # Enter KEGG pathway codes or leave blank to find all pathways with overlapping genes. Separate like: ("hsa04670" "hsa05171")
@@ -37,6 +36,55 @@ CONTROL_GROUPS=("Healthy")
 EXPERIMENTAL_GROUPS=("HIV")
 
 # -------------- End of user input, shouldn't have to change anything below here --------------
+
+# Define your Docker image name
+DOCKER_IMAGE_NAME="scbonita"
+
+# Check if running inside Docker
+if [ -f /.dockerenv ]; then
+    echo "Running inside Docker container."
+
+    # Activate conda environment
+    source /opt/conda/etc/profile.d/conda.sh
+    conda activate scBonita
+
+    # Check if conda environment is activated
+    if [ "$CONDA_DEFAULT_ENV" != "scBonita" ]; then
+        echo "Conda environment 'scBonita' is not activated. Exiting..."
+        exit 1
+    fi
+
+else
+    echo "Not running inside Docker. Checking for Docker image..."
+
+    # Check if the Docker image exists
+    if [[ "$(docker images -q $DOCKER_IMAGE_NAME 2> /dev/null)" == "" ]]; then
+        echo "Docker image $DOCKER_IMAGE_NAME not found. Building the image..."
+
+        # Build the Docker image
+        docker build -t --no-cache $DOCKER_IMAGE_NAME .
+
+        if [ $? -ne 0 ]; then
+            echo "Docker image build failed. Exiting..."
+            exit 1
+        fi
+    else
+        echo "Docker image $DOCKER_IMAGE_NAME found."
+    fi
+
+    # Run this script inside a Docker container
+    docker run -v $(pwd)/.config:/root/.config \
+               -v $(pwd)/.cache:/app/.cache \
+               -v $(pwd)/scBONITA_output:/app/scBONITA_output \
+               -v $(pwd):/app \
+               -w /app \
+               $DOCKER_IMAGE_NAME \
+               bash /app/bash_scripts/local_george_hiv.sh
+
+    exit 0
+fi
+
+CONDA_ENVIRONMENT_PYTHON=$(which python) # Path to the installation of Python for the scBonita conda environment
 
 echo "Using Python from: $CONDA_ENVIRONMENT_PYTHON"
 #  ----------------------------
