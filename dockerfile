@@ -1,5 +1,5 @@
 # Use the official Miniconda3 base image
-FROM continuumio/miniconda3
+FROM condaforge/miniforge3
 
 # Set the working directory inside the container
 WORKDIR /app
