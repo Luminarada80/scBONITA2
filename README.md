@@ -19,11 +19,6 @@ Infers Boolean molecular signaling networks using scRNAseq data and prior knowle
 ### Cloning repository
 Go the the directory where you want to install this project and enter `git clone https://github.com/Luminarada80/scBONITA2.git` and enter your username and password.
 
-### Running scBONITA2 using Docker
-1. Navigate to the `scBONITA2` directory
-1. Run `docker build --no-cache -t scbonita .`
-2. Run `sudo docker run -it scbonita`
-
 ### Setting up your conda environment
 1) Install Anaconda from https://www.anaconda.com/download
 2) Run the Anaconda installer in the terminal on Linux or WSL (Windows Subsystem for Linux)

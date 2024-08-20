@@ -1,7 +1,5 @@
 #!/bin/bash
 
-conda init
-conda activate scBonita
 # -------------- User Input --------------
 
 # IMPORTANT!!! MAKE SURE THAT THERE ARE NO SPACES IN FILE NAMES
