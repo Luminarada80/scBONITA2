@@ -8,6 +8,7 @@ from rule_inference import *
 import logging
 import os
 from alive_progress import alive_bar
+import sys
 
 from file_paths import file_paths
 
@@ -501,14 +502,30 @@ class Pathways:
         # self.add_pathways(subpath_graphs, minOverlap=25, organism=self.organism)
 
         return graph
+    
 
     def write_all_organism_xml_files(self, organism): 
         """
         Reads in all xml files for the organism, faster to do this once at the start and just use
         the cached files. They aren't that big, so I'd rather store them at the beginning.
         """
-
-        k = KEGG()  # read KEGG from bioservices
+        
+        # Function to silence KEGG initialization to the terminal
+        def silent_kegg_initialization():
+            original_stdout = sys.stdout
+            original_stderr = sys.stderr
+            try:
+                sys.stdout = open('/dev/null', 'w')
+                sys.stderr = open('/dev/null', 'w')
+                kegg = KEGG(verbose=False) 
+            finally:
+                sys.stdout.close()
+                sys.stderr.close()
+                sys.stdout = original_stdout
+                sys.stderr = original_stderr
+            return kegg
+    
+        k = silent_kegg_initialization()  # read KEGG from bioservices
         k.organism = organism     
         pathway_list = list(k.pathwayIds)              
         
