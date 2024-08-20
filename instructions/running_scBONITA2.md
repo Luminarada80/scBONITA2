@@ -1,5 +1,5 @@
 
-# Running scBONITA:
+# How scBONITA works:
 
 1. scBONITA runs using a [bash script](bash_script_instructions.md) as a wrapper to pass user arguments into the Python script.
 
