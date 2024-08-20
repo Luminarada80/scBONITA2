@@ -22,9 +22,9 @@ For Mac users with the M1 series chip, use the Docker instructions or download p
 3. **Manually install packages**: This will take a bit longer, but will get around issues with creating the environment.
 
 ### Installation guides:
-- [Docker installation guide](instructions/docker_setup.md)
-- [Conda installation guide](instructions/conda_setup.md)
-- [BlueHive installation guide](instructions/bluehive_setup.md)
+- [Docker installation guide](documentation/setup_instructions/docker_setup.md)
+- [Conda installation guide](documentation/setup_instructions/conda_setup.md)
+- [BlueHive installation guide](documentation/setup_instructions/bluehive_setup.md)
 
 ## Running scBONITA2
-Once you have followed one of these guides to set up the environment, try running the [tutorial data](instructions/running_scBONITA2.md) and read the ["How scBONITA2 works"](instructions/running_scBONITA2.md) documentation. Each step has a more detailed guide explaining how it all works.
+Once you have followed one of these guides to set up the environment, try running the [tutorial data](documentation/setup_instructions/running_scBONITA2.md) and read the ["How scBONITA2 works"](documentation/setup_instructions/running_scBONITA2.md) documentation. Each step has a more detailed guide explaining how it all works.
