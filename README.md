@@ -3,8 +3,8 @@ Infers Boolean molecular signaling networks using scRNAseq data and prior knowle
 
 ## Setup:
 
-### Cloning repository
-Go the the directory where you want to install this project and enter 
+### Cloning the scBONITA2 repository
+In your terminal, navigate to the directory where you want to install this project and enter 
 ```bash
 git clone https://github.com/Luminarada80/scBONITA2.git
 ```
@@ -27,4 +27,4 @@ For Mac users with the M1 series chip, use the Docker instructions or download p
 - [BlueHive installation guide](instructions/bluehive_setup.md)
 
 ## Running scBONITA2
-Once you have followed one of these guides to set up the environment, try running the [tutorial data](instructions/running_scBONITA2.md)
+Once you have followed one of these guides to set up the environment, try running the [tutorial data](instructions/running_scBONITA2.md) and read the ["How scBONITA2 works"](instructions/running_scBONITA2.md) documentation. Each step has a more detailed guide explaining how it all works.
