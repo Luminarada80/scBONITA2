@@ -62,7 +62,7 @@ else
         echo "Docker image $DOCKER_IMAGE_NAME not found. Building the image..."
 
         # Build the Docker image
-        docker build -t --no-cache $DOCKER_IMAGE_NAME .
+        docker build -t $DOCKER_IMAGE_NAME .
 
         if [ $? -ne 0 ]; then
             echo "Docker image build failed. Exiting..."
