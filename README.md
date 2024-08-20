@@ -26,13 +26,18 @@ Go the the directory where you want to install this project and enter `git clone
    - Follow the prompts to install
 3) Once Anaconda is installed, close and re-open your terminal. You should see `(base)` before your username
 4) To create the correct conda environment, navigate to the `scBONITA2` directory that you cloned from before in the terminal. Once at the correct directory, enter `conda env create --file spec-file.txt --name scBonita`
-   > You can use mamba to help solve the conda environment faster. Use `conda install mamba` to download, then use `mamba env create --file spec-file.txt --name scBonita` to create the environment
+
+**Important**: If you are using a mac, use the `spec-file.yml` 
+
+   > You can use mamba to help solve the conda environment faster. 
+   > - Install mamba using `conda install mamba -n base -c conda-forge`
+   > - Use  `mamba env create --file spec-file.txt --name scBonita` to create the environment
 6) Once conda has finished working, you can confirm that the environment was created by entering `conda activate scBonita`. This will switch you into the correct environment to work with scBONITA.
    - A conda environment is basically a pre-packaged python installation that has a specific python version and package list that works with the code. This makes it so that you don't have to install each required package one-by-one, and you can have different package versions by having different conda environments
 
 **Testing that scBONITA is working**
 1) Ensure that the `scBonita` conda environment is active (or enter `conda activate scBonita` to activate)
-2) Navigate to `scBONITA2/scBONITA` in your terminal
+2) Navigate to `scBONITA2` in your terminal
 3) Run the test data for the scBONITA pipeline by entering `bash bash_scripts/local_george_hiv.sh`
    - The `local_george_hiv.sh` file can be copied and modified to run different datasets / conditions
    - When running scBONITA, place bash scripts into this folder to run. scBONITA will automatically create the necessary output files in a directory called `scBONITA_output`.
