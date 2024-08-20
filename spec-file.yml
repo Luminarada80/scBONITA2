@@ -3,7 +3,6 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - blas=1.0=mkl
   - ca-certificates  # Removed specific version to allow broader compatibility
   - pybind11-abi  # Removed specific version
   - python_abi  # Removed specific version
