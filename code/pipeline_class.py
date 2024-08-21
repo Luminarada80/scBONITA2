@@ -48,7 +48,7 @@ class Pipeline():
         for path in file_paths.values():
             os.makedirs(path, exist_ok=True)
 
-        # Chooses whether or not to display the scBONTIA banner in the terminal
+        # Chooses whether to display the scBONITA banner in the terminal
         if self.display_title:
             logging.info(make_banner())
         
@@ -62,7 +62,12 @@ class Pipeline():
 
         # Create a Pathways object to store the network information
         pathways = Pathways(
-            self.dataset_name, self.cv_threshold, self.data_file, self.datafile_sep, self.write_graphml, self.organism)
+            self.dataset_name,
+            self.cv_threshold,
+            self.data_file,
+            self.datafile_sep,
+            self.write_graphml,
+            self.organism)
 
         # Use a list of KEGG pathways specified by the user
         logging.info(f'-----PARSING NETWORKS-----')
@@ -72,10 +77,11 @@ class Pipeline():
         else:
             logging.info(f'\tKEGG pathways = {self.list_of_kegg_pathways}')
 
-        # If the user specifies to look for overlapping pathways, gets all KEGG pathways matching the genes in the dataset
+        # If the user specifies to look for overlapping pathways, find all KEGG pathways matching genes in the dataset
         if self.get_kegg_pathways == True:
             logging.info(f'\tFinding and formatting KEGG Pathways...')
 
+            # Find and load the KEGG pathways
             pathways.pathway_graphs = pathways.find_kegg_pathways(
                 kegg_pathway_list=self.list_of_kegg_pathways,
                 write_graphml=self.write_graphml,
@@ -83,18 +89,32 @@ class Pipeline():
                 minimumOverlap=self.minOverlap
             )
 
-            # Add the patwhays
-            pathways.add_pathways(pathways.pathway_graphs, minOverlap=self.minOverlap, organism=self.organism)
+            # Add the pathways to the pathways object
+            pathways.add_pathways(
+                pathways.pathway_graphs,
+                minOverlap=self.minOverlap,
+                organism=self.organism
+            )
         
         # Use the pathway(s) specified by pathway_list
         else:
+            # If the pathway list is type "str"
             if isinstance(self.pathway_list, str):
                 logging.info(f'\tPathways = {self.pathway_list}')
-                pathways.add_pathways([self.pathway_list], minOverlap=self.minOverlap, organism=self.organism)
+                pathways.add_pathways(
+                    pathway_list=list(self.pathway_list),
+                    minOverlap=self.minOverlap,
+                    organism=self.organism
+                )
 
+            # If the pathway list is type "list"
             elif isinstance(self.pathway_list, list):
                 logging.info(f'\tPathways = {self.pathway_list}')
-                pathways.add_pathways(self.pathway_list, minOverlap=self.minOverlap, organism=self.organism)
+                pathways.add_pathways(
+                    pathway_list=self.pathway_list,
+                    minOverlap=self.minOverlap,
+                    organism=self.organism
+                )
 
             # Else throw an exception if no pathways are specified
             else:
@@ -102,85 +122,88 @@ class Pipeline():
                     f'If get_kegg_pathways is False, specify a list or string of pathways to use'
                 assert Exception(msg)
 
+        # Adds any custom graphml files
         if len(self.network_files) > 0:
             for i, file in enumerate(self.network_files):
                 if '/' in file:
                     self.network_files.pop(i)
                     self.network_files.append(file.split('/')[-1])
+
             logging.info(f'\tCustom pathway: {self.network_files}')
-            pathways.add_pathways(self.network_files, minOverlap=self.minOverlap, organism=self.organism)
+
+            pathways.add_pathways(
+                pathway_list=self.network_files,
+                minOverlap=self.minOverlap,
+                organism=self.organism
+            )
 
         # Get the information from each pathway and pass the network information into a ruleset object
         for pathway_num in pathways.pathway_graphs:
-            
+
+            # Pull out the graph object for the current pathway
             graph = pathways.pathway_graphs[pathway_num]
 
             # Catches if the graph does not have enough overlapping nodes after processing
             if len(graph.nodes()) >= self.minOverlap:
+                
+                # Make a list of the position of each gene
                 node_indices = []
-            
                 for node in graph.nodes():
                     node_indices.append(pathways.gene_list.index(node))
 
                 # node_indices = set(node_indices)  # Only keep unique values
                 self.node_indices = list(node_indices)  # Convert back to a list
 
-                logging.info(f'\n-----RULE INFERENCE-----')
-                logging.info(f'Pathway: {pathway_num}')
-                logging.info(f'Num nodes: {len(node_indices)}')
-
-                # Generate the rule inference object for the pathway
-                ruleset = self.generate_ruleset(graph, pathway_num, node_indices, pathways.gene_list)
-
-                processed_graphml_path = f'{file_paths["graphml_files"]}/{self.dataset_name}/{self.organism}{pathway_num}_processed.graphml'
-
-                self.infer_rules(pathway_num, processed_graphml_path, ruleset)
+                # Runs rule determination
+                self.infer_rules(pathway_num, graph, node_indices)
             
             else:
                 logging.info(f'\t\t\tNot enough overlapping nodes for {pathway_num} (min {self.minOverlap}, overlap {len(graph.nodes())})')
-    
-    def generate_ruleset(self, graph, network_name, node_indices, gene_list):
-        # Check is the data file exists
-        if os.path.isfile(self.data_file):
-            pass
-        else:
-            raise FileNotFoundError(f'File not found: {self.data_file}')
+
+    def infer_rules(self, pathway_num, graph, node_indices):
+        """
+        Runs scBONITA rule determination via the rule_inference.py script.
+
+        Saves output pickle files
+        """
+
+        logging.info(f'\n-----RULE INFERENCE-----')
+        logging.info(f'Pathway: {pathway_num}')
+        logging.info(f'Num nodes: {len(node_indices)}')
 
         # Create RuleInference object
         ruleset = RuleInference(
             self.data_file,
             graph,
             self.dataset_name,
-            network_name,
-            self.datafile_sep, 
+            pathway_num,
+            self.datafile_sep,
             node_indices,
             self.binarize_threshold,
             self.sample_cells)
 
-        return ruleset
+        # Create the ruleset pickle files
+        logging.info(f'\nRule inference complete, saving ruleset pickle file')
 
-    def infer_rules(self, network_name, processed_graphml_path, ruleset):
-
-
-        # Specify and create the folder for the dataset pickle files
+        # Specify the path to the ruleset pickle directory, ensures the directory exists
         data_pickle_folder = f'{file_paths["pickle_files"]}/{self.dataset_name}_pickle_files/ruleset_pickle_files'
         os.makedirs(data_pickle_folder, exist_ok=True)
+        data_pickle_file_path = f'{data_pickle_folder}/{self.dataset_name}_{self.organism}{pathway_num}.ruleset.pickle'
 
-        # Specify the name of the pickle file for the dataset and network ruleset object
-        data_pickle_file_path = f'{data_pickle_folder}/{self.dataset_name}_{self.organism}{network_name}.ruleset.pickle'
+        # Save the ruleset object as a binary pickle file
+        pickle.dump(ruleset, open(data_pickle_file_path, "wb"))
 
         # Write out the cells objects to a pickle file
+        logging.info(f'Saving cell population pickle file')
         cell_population = CellPopulation(ruleset.cells)
 
-        cell_pickle_file_path = f'{file_paths["pickle_files"]}/{self.dataset_name}_pickle_files/cells_pickle_file'
-        os.makedirs(cell_pickle_file_path, exist_ok=True)
-
+        # Specify the path to the cell pickle directory, ensures sure the directory exists
+        cell_pickle_dir = f'{file_paths["pickle_files"]}/{self.dataset_name}_pickle_files/cells_pickle_file'
+        os.makedirs(cell_pickle_dir, exist_ok=True)
         cells_pickle_file = f'{self.dataset_name}.cells.pickle'
-        with open(f'{cell_pickle_file_path}/{cells_pickle_file}', "wb") as file:
-            pickle.dump(cell_population, file)
-        
-        logging.info(f'\nRule inference complete, saving to {data_pickle_file_path.split("/")[-1]}')
-        pickle.dump(ruleset, open(data_pickle_file_path, "wb"))
+
+        # Save the cell population object as a pickle file (used to simulate individual cells)
+        pickle.dump(cell_population, open(f'{cell_pickle_dir}/{cells_pickle_file}', "wb"))
 
     def _convert_string_to_boolean(self, variable):
         if variable == "True" or variable is True:
