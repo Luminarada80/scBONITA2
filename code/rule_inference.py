@@ -6,39 +6,33 @@ import time
 import csv
 import networkx as nx
 import copy
+from scipy.stats.stats import spearmanr
+import logging
 
 from cell_class import Cell
 from sklearn import preprocessing
 
-from network_setup import *
+from node_class import Node
 from kegg_parser import *
 from deap_class import CustomDeap
 
 
-class RuleInference(NetworkSetup):
+class RuleInference:
 
     """Class for single-cell experiments"""
 
     def __init__(
         self,
         data_file,
+        graph,
         dataset_name,
         network_name,
         sep,
         node_indices,
-        gene_list,
-        max_nodes=15000,
         binarize_threshold=0.001,
         sample_cells=True,
     ):
-        # Check is the data file exists
-        if path.isfile(data_file):
-            pass
-        else:
-            raise FileNotFoundError(f'File not found: {data_file}')
-        
-        self.data_file = data_file
-        self.sample_cells = sample_cells
+
         self.node_indices = node_indices
         self.dataset_name = dataset_name
         self.network_name = network_name
@@ -46,21 +40,28 @@ class RuleInference(NetworkSetup):
         self.max_samples = 15000
         self.cells = []
 
+        # Initialize lists to store information about nodes and connections
+        self.predecessors_final = []
+        self.rvalues = []
+        self.predecessors = []
+        self.num_successors = []
+        self.graph = graph
+
+        # Initialize node attributes
+        self.node_list = list(graph.nodes)  # List of nodes in the graph
+        self.node_dict = {self.node_list[i]: i for i in range(len(self.node_list))}  # Dictionary for node lookup
+
+        # Initialize an empty directed graph
+        self.rule_graph = nx.empty_graph(0, create_using=nx.DiGraph)
+
         logging.info(f'\n-----EXTRACTING AND FORMATTING DATA-----')
         # Extract the data from the data file based on the separator, sample the cells if over 15,000 cells
         logging.info(f'Extracting cell expression data from "{data_file}"')
         self.cell_names, self.gene_names, self.data = self._extract_data(data_file, sep, sample_cells, node_indices)
 
-        logging.info(f'\tFirst 2 genes: {self.gene_names[:2]}')
-        logging.info(f'\tFirst 2 cells: {self.cell_names[:2]}')
-        
-        logging.info(f'\tNumber of genes: {len(self.gene_names)}')
-        logging.info(f'\tNumber of cells: {len(self.cell_names)}')
-
         self.sparse_matrix = sparse.csr_matrix(self.data)
         logging.info(f'\tCreated sparse matrix')
-        logging.debug(f'\tShape: {self.sparse_matrix.shape}')
-        
+
         self.gene_names = list(self.gene_names)
         self.cell_names = list(self.cell_names)
         self.sparse_matrix.eliminate_zeros()
@@ -76,30 +77,20 @@ class RuleInference(NetworkSetup):
         else:
             # Handle the case where no samples were selected
             raise ValueError("No samples selected for binarization")
-            
-        
-        full_matrix = self.binarized_matrix.todense()
 
-        # Create cell objects
-        for cell_index, cell_name in enumerate(self.cell_names):
-            cell = Cell(cell_index)
-            cell.name = cell_name
-            for row_num, row in enumerate(full_matrix):
-                row_array = np.array(row).flatten()
-                # print(f'Cell {cell_index}, Row {row_num}')
-                try:
-                    cell.expression[self.gene_names[row_num]] = row_array[cell_index]
-                except IndexError as e:
-                    logging.debug(f'Encountered error {e} at row {row_num}, col {cell_index}. If at the last gene position, ignore')
+        self.filterData(self.binarize_threshold)
 
-            self.cells.append(cell)
+        # Calculate the node information
+        self.calculate_node_information()
 
+        # Create Node objects containing the calculated information for each node in the network
+        self.nodes, self.deap_individual_length = self.create_nodes()
 
-        self.max_nodes = max_nodes
-        self.pathway_graphs = {}
-        self.node_list = []
-        self.node_positions = []
-        self.gene_list = gene_list
+        # Create Cell objects
+        self.create_cells()
+
+        # Runs the genetic algorithm and rule refinement
+        self.best_ruleset = self.genetic_algorithm(self.graph)
 
     def _extract_data(self, data_file, sep, sample_cells, node_indices):
         """
@@ -152,12 +143,20 @@ class RuleInference(NetworkSetup):
 
             # Convert the filtered data to a NumPy array
             logging.info("\tConverting filtered data to numpy array...")
-            # print(f'Raw data:\n\t{data}')
+
+            logging.info(f'\tFirst 2 genes: {gene_names[:2]}')
+            logging.info(f'\tFirst 2 cells: {cell_names[:2]}')
+
+            logging.info(f'\tNumber of genes: {len(gene_names)}')
+            logging.info(f'\tNumber of cells: {len(cell_names)}')
 
             return cell_names, gene_names, data
 
     def filterData(self, threshold):
-        """Filters the data to include genes with high variability (genes with a std dev / mean ratio above the cv_cutoff threshold)"""
+        """
+        Filters the data to include genes with high variability
+        (genes with a std dev / mean ratio above the cv_cutoff threshold)
+        """
         self.cv_genes = []
         if threshold is not None:
             for i in range(0, self.sparse_matrix.get_shape()[0]):
@@ -174,40 +173,17 @@ class RuleInference(NetworkSetup):
             self.network_name,
             self.dataset_name,
             self.binarized_matrix,
-            self.nodeList,
+            self.node_list,
             self.nodes,
             self.deap_individual_length,
-            self.nodeDict,
-            self.successorNums
+            self.node_dict,
+            self.num_successors
             )
 
         raw_fitnesses, population, logbook = custom_deap.genetic_algorithm()
         best_ruleset = custom_deap.find_best_individual(population, raw_fitnesses)
 
         return best_ruleset
-
-    def rule_determination(self, graph):
-        """Main function that performs rule determination and node scoring in preparation for pathway analysis"""
-
-        # Load the processed graphml file as a NetworkX object
-        start_time = time.time()
-        if path.exists(graph):
-            logging.info(f'\t\tLoading: {graph.split("/")[-1]}')
-            self.network = nx.read_graphml(graph)
-        else:
-            msg = f'File "{graph} not found"'
-            raise FileNotFoundError(msg)
-
-        # Find the network gene names
-        netGenes = [self.gene_names.index(gene) for gene in list(self.network) if gene in self.gene_names]
-
-        logging.debug(f'Network Genes: {netGenes}')
-
-        # Sets up the nodes and classes
-        self.__inherit(self.network)
-        
-        # Runs the genetic algorithm and rule refinement
-        self.best_ruleset = self.genetic_algorithm(self.network)
 
     def plot_graph_from_graphml(self, network):
         G = network
@@ -254,7 +230,212 @@ class RuleInference(NetworkSetup):
         # plt.show()
 
         return fig
-    
-    def __inherit(self, graph):
-        super().__init__(graph)
 
+    def calculate_node_information(self):
+        """
+        Calculates the information for each node in the network and stores the information as object of class Node
+        from node_class.py
+        """
+        # Iterate over all nodes to find predecessors and calculate possible connections
+        for node_num, _ in enumerate(self.node_list):
+            predecessors_final = self.find_predecessors(self.rule_graph, self.node_list, self.graph, node_num)
+            node_predecessors = [self.node_list.index(corr_tuple[0]) for corr_tuple in predecessors_final]
+            self.predecessors.append(node_predecessors)
+
+    def calculate_spearman_correlation(self, node, predecessors_temp):
+        """
+        Calculate the Spearman correlation between incoming nodes to find the top three with the
+        highest correlation, used to reduce the dimensionality of the calculations.
+        """
+        # Find correlation between the predecessors and the node
+        node_positions = [self.gene_names.index(node) for node in self.gene_names]
+
+        node_expression_data = (
+            self.binarized_matrix[node_positions[node], :].todense().tolist()[0]
+
+        )  # find binarized expression data for node "i"
+        predecessor_correlations = (
+            []
+        )  # temporarily store correlations between node "i" and all its predecessors
+
+        for predecessor_gene in predecessors_temp:
+            # find index of predecessor in the node_list from the data
+            predIndex = self.node_list.index(predecessor_gene)
+
+            # find binarized expression data for predecessor
+            predData = (self.binarized_matrix[predIndex, :].todense().tolist()[0])
+            mi, pvalue = spearmanr(node_expression_data, predData)
+
+            if np.isnan(mi):
+                predecessor_correlations.append(0)
+            else:
+                predecessor_correlations.append(mi)  # store the calculated correlation
+        return predecessor_correlations
+
+    # Finds the predecessors of each node and stores the top 3
+    def find_predecessors(self, rule_graph, node_list, graph, node_index):
+        """
+        Find the incoming nodes for each node in the graph, store the top 3 connections as calculated by a spearman
+        correlation
+        Parameters
+        ----------
+        rule_graph
+        node_list
+        graph
+        node_dict
+        node
+
+        Returns
+        -------
+
+        """
+        # --- Find the predecessors of each node ---
+        # Get NAMES of incoming nodes targeting the current node
+        predecessors_temp = list(graph.predecessors(node_list[node_index]))
+
+        # Calculate the Spearman correlation for the incoming nodes
+        predecessor_correlations = self.calculate_spearman_correlation(node_index, predecessors_temp)
+
+        # Select the top 3 predecessors of the node according to the Spearman correlation
+        predecessors_final = sorted(
+            zip(predecessors_temp, predecessor_correlations),
+            reverse=True,
+            key=lambda corrs: corrs[1], )[:3]
+
+        # Get NAMES of successors of the node
+        successors_temp = list(graph.successors(node_list[node_index]))
+        self.num_successors.append(len(successors_temp))
+
+        # Store the correlations between incoming nodes in "rvalues"
+        top_three_incoming_node_correlations = sorted(predecessor_correlations, reverse=True)[:3]
+        self.rvalues.append(top_three_incoming_node_correlations)
+
+        # Append the permanent list with the top 3 predecessors for this node
+        self.predecessors_final.append([pred[0] for pred in predecessors_final])
+
+        # Add the incoming nodes and their properties to the newly created rule_graph
+        for parent in predecessors_final:
+            if "interaction" in list(graph[parent[0]][node_list[node_index]].keys()):
+                rule_graph.add_edge(
+                    parent[0],
+                    node_list[node_index],
+                    weight=parent[1],
+                    activity=graph[parent[0]][node_list[node_index]]["interaction"],
+                )
+            if "signal" in list(graph[parent[0]][node_list[node_index]].keys()):
+                rule_graph.add_edge(
+                    parent[0],
+                    node_list[node_index],
+                    weight=parent[1],
+                    activity=graph[parent[0]][node_list[node_index]]["signal"],
+                )
+
+        return predecessors_final
+
+    # Calculates the inversion rules for each rule based on if the incoming nodes are inhibiting or activating
+    def calculate_inversion_rules(self, node_predecessors, node_index):
+        """
+        Calculates the inversion rules for a node based on the graph interactions or signal for each incoming node
+        Parameters
+        ----------
+        node
+
+        Returns
+        -------
+        inversion_rules
+        """
+
+        inversion_rules = {}
+        for incoming_node in list(node_predecessors):
+            edge_attribute = list(self.graph[self.node_list[incoming_node]][self.node_list[node_index]].keys())
+
+            # check the 'interaction' edge attribute
+            if "interaction" in edge_attribute:
+                if self.graph[self.node_list[incoming_node]][self.node_list[node_index]]["interaction"] == "i":
+                    inversion_rules[incoming_node] = True
+                else:
+                    inversion_rules[incoming_node] = False
+
+            # check the 'signal' edge attribute
+            elif "signal" in edge_attribute:
+                if self.graph[self.node_list[incoming_node]][self.node_list[node_index]]["signal"] == "i":
+                    inversion_rules[incoming_node] = True
+                else:
+                    inversion_rules[incoming_node] = False
+
+            # for some reason, when I used a modified processed graphml file as a custom graphml file I needed to use this method
+            else:
+                for _, value in self.graph[self.node_list[incoming_node]][self.node_list[node_index]].items():
+                    for attribute, value in value.items():
+                        if attribute == "signal" or "interaction":
+                            if value == "i":
+                                inversion_rules[incoming_node] = True
+                            else:
+                                inversion_rules[incoming_node] = False
+
+        return inversion_rules
+
+    # 1.6 Creates nodes containing the information calculated from the graph
+    def create_nodes(self):
+        """
+        Creates Node class objects using the information calculated in the rest of the calculate_node_information
+        function
+        """
+        gene_name_to_index = {gene_name: gene_index for gene_index, gene_name in enumerate(self.gene_names)}
+
+        nodes = []
+        rule_index = 0
+        with alive_bar(len(self.node_list)) as bar:
+            for node_index, node_name in enumerate(self.node_list):
+                name = node_name
+                # Safely retrieve predecessors and put them into a dictionary where key = node index, value = node name
+                predecessor_indices = self.predecessors[node_index] if node_index < len(self.predecessors) else []
+                predecessors = {}
+                for index in predecessor_indices:
+                    inverted_node_dict = {v: k for k, v in self.node_dict.items()}
+                    predecessors[index] = inverted_node_dict[index]
+
+                node_inversions = self.calculate_inversion_rules(predecessors, node_index)
+
+                # Create a new Node object
+                node = Node(name, node_index, predecessors, node_inversions)
+
+                # Find the dataset row index of the gene
+                node.dataset_index = gene_name_to_index.get(node_name)
+
+                node.rvalues = self.rvalues[node_index]
+
+                # Find the start and end indices for where the rule combinations start and stop for this node in the
+                rule_length = len(node.bitstring)
+                if rule_length > 0:
+                    node.rule_start_index = rule_index
+                    rule_index += rule_length
+                    node.rule_end_index = rule_index
+                else:
+                    node.rule_start_index = None
+                    node.rule_end_index = None
+                nodes.append(node)
+                bar()
+        return nodes, rule_index
+
+    def create_cells(self):
+        """
+        Creates Cell objects containing the cells gene expression value for each gene
+        """
+        full_matrix = self.binarized_matrix.todense()
+
+        # Create cell objects
+        cells = []
+        for cell_index, cell_name in enumerate(self.cell_names):
+            cell = Cell(cell_index)
+            cell.name = cell_name
+            for row_num, row in enumerate(full_matrix):
+                row_array = np.array(row).flatten()
+                try:
+                    cell.expression[self.gene_names[row_num]] = row_array[cell_index]
+                except IndexError as e:
+                    logging.debug(
+                        f'Encountered error {e} at row {row_num}, col {cell_index}. If at the last gene position, ignore')
+            cells.append(cell)
+
+        return cells

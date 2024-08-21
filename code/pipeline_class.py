@@ -111,9 +111,9 @@ class Pipeline():
             pathways.add_pathways(self.network_files, minOverlap=self.minOverlap, organism=self.organism)
 
         # Get the information from each pathway and pass the network information into a ruleset object
-        for pathway in pathways.pathway_graphs:
+        for pathway_num in pathways.pathway_graphs:
             
-            graph = pathways.pathway_graphs[pathway]
+            graph = pathways.pathway_graphs[pathway_num]
 
             # Catches if the graph does not have enough overlapping nodes after processing
             if len(graph.nodes()) >= self.minOverlap:
@@ -126,49 +126,41 @@ class Pipeline():
                 self.node_indices = list(node_indices)  # Convert back to a list
 
                 logging.info(f'\n-----RULE INFERENCE-----')
-                logging.info(f'Pathway: {pathway}')
+                logging.info(f'Pathway: {pathway_num}')
                 logging.info(f'Num nodes: {len(node_indices)}')
 
                 # Generate the rule inference object for the pathway
-                ruleset = self.generate_ruleset(pathway, node_indices, pathways.gene_list)
+                ruleset = self.generate_ruleset(graph, pathway_num, node_indices, pathways.gene_list)
 
-                processed_graphml_path = f'{file_paths["graphml_files"]}/{self.dataset_name}/{self.organism}{pathway}_processed.graphml'
+                processed_graphml_path = f'{file_paths["graphml_files"]}/{self.dataset_name}/{self.organism}{pathway_num}_processed.graphml'
 
-                self.infer_rules(pathway, processed_graphml_path, ruleset)
+                self.infer_rules(pathway_num, processed_graphml_path, ruleset)
             
             else:
-                logging.info(f'\t\t\tNot enough overlapping nodes for {pathway} (min {self.minOverlap}, overlap {len(graph.nodes())})')
+                logging.info(f'\t\t\tNot enough overlapping nodes for {pathway_num} (min {self.minOverlap}, overlap {len(graph.nodes())})')
     
-    def generate_ruleset(self, network, node_indices, gene_list):
+    def generate_ruleset(self, graph, network_name, node_indices, gene_list):
+        # Check is the data file exists
+        if os.path.isfile(self.data_file):
+            pass
+        else:
+            raise FileNotFoundError(f'File not found: {self.data_file}')
+
         # Create RuleInference object
         ruleset = RuleInference(
             self.data_file,
+            graph,
             self.dataset_name,
-            network,
+            network_name,
             self.datafile_sep, 
             node_indices,
-            gene_list,
-            self.max_nodes,
             self.binarize_threshold,
             self.sample_cells)
-
-        logging.debug(f'Pipeline: Created ruleset object')
-        
-        # Filter the data based on the cutoff value threshold
-        ruleset.filterData(threshold=self.cv_threshold)
-        
-        # Set the parameters in ruleset based on the dataset
-        logging.info(f'\tSetting ruleset parameters')
-        logging.debug(f'Pipeline: Setting up the ruleset parameters')
-        ruleset.max_samples = 15000 #max_samples
-        ruleset.gene_list = [ruleset.gene_list[node] for node in node_indices]
-        ruleset.node_list = ruleset.gene_list
-        ruleset.node_positions = [ruleset.gene_list.index(node) for node in ruleset.node_list]
 
         return ruleset
 
     def infer_rules(self, network_name, processed_graphml_path, ruleset):
-        logging.info(f'\tRunning rule inference for {network_name}')
+
 
         # Specify and create the folder for the dataset pickle files
         data_pickle_folder = f'{file_paths["pickle_files"]}/{self.dataset_name}_pickle_files/ruleset_pickle_files'
@@ -176,9 +168,6 @@ class Pipeline():
 
         # Specify the name of the pickle file for the dataset and network ruleset object
         data_pickle_file_path = f'{data_pickle_folder}/{self.dataset_name}_{self.organism}{network_name}.ruleset.pickle'
-
-        # Run the rule inference
-        ruleset.rule_determination(graph=str(processed_graphml_path))
 
         # Write out the cells objects to a pickle file
         cell_population = CellPopulation(ruleset.cells)

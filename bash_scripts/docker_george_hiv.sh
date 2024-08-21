@@ -79,7 +79,7 @@ else
                -v $(pwd):/app \
                -w /app \
                $DOCKER_IMAGE_NAME \
-               bash /app/bash_scripts/local_george_hiv.sh
+               bash /app/bash_scripts/docker_george_hiv.sh
 
     exit 0
 fi

@@ -135,7 +135,7 @@ class Pathways:
     
     def read_kegg(self, lines, graph, KEGGdict, hsaDict):
         # read all lines into a bs4 object using libXML parser
-        logging.info(f'\t\tReading KEGG xml file')
+        logging.info('\t\tReading KEGG xml file')
         soup = BeautifulSoup("".join(lines), "xml")
         groups = {}  # store group IDs and list of sub-ids
         id_to_name = {}  # map id numbers to names
@@ -652,12 +652,12 @@ class Pathways:
         kegg_dict = self.parse_kegg_dict()  # parse the dictionary of ko codes
         logging.info("\t\t\tLoaded KEGG code dictionary")
         
-        pathway_dict_path = f'{file_paths["pickle_files"]}/{organism}_dict.csv'
+        pathway_dict_path = f'{file_paths["pathway_xml_files"]}/{organism}_dict.csv'
         aliasDict = {}
         orgDict = {}
 
         # If the dictionary file exists, use that (much faster than streaming)
-        if f'{organism}_dict.csv' in os.listdir(f'{file_paths["pickle_files"]}'):
+        if f'{organism}_dict.csv' in os.listdir(f'{file_paths["pathway_xml_files"]}'):
             logging.info(f'\t\t\tReading {organism} dictionary file...')
             with open(pathway_dict_path, 'r') as kegg_dict_file:
                 for line in kegg_dict_file:

@@ -276,7 +276,7 @@ def run_full_importance_score(dataset_name, network_names):
             network = Network(name=f'{network_name}')
             network.nodes = ruleset.nodes
             network.rulesets = ruleset.best_ruleset
-            network.network = ruleset.network
+            network.network = ruleset.graph
             network.dataset = ruleset.binarized_matrix
 
             # Specify the path to the importance score folder
