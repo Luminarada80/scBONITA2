@@ -18,7 +18,7 @@ from file_paths import file_paths
 
 # -------- Genetic Algorithm Code --------
 class CustomDeap:
-    def __init__(self,network,network_name,dataset_name,binMat,nodeList,nodes,individual_length,nodeDict,successorNums):
+    def __init__(self,network,network_name,dataset_name,binarized_matrix,node_list,nodes,individual_length,node_dict,num_successors):
         # Pass in the node objects
         self.nodes = nodes
 
@@ -31,15 +31,15 @@ class CustomDeap:
         self.crossover_probability = 0.1
         self.mutation_probability = 0.9
         self.bitFlipProb = 0.5
-        self.nodeDict = nodeDict
-        self.successorNums = successorNums
+        self.node_dict = node_dict
+        self.num_successors = num_successors
 
         # General parameters
         self.network = network
         self.network_name = network_name
         self.dataset_name = dataset_name
-        self.binMat = binMat
-        self.nodeList = nodeList
+        self.binarized_matrix = binarized_matrix
+        self.node_list = node_list
         self.stats = tools.Statistics(key=self.get_fitness_values)
         self.individual_length = individual_length
         self.individualParse = [0] + [node.rule_end_index if node.rule_end_index else nodes[i-1].rule_end_index for i, node in enumerate(nodes)]
@@ -51,7 +51,7 @@ class CustomDeap:
 
         logging.basicConfig(format='%(message)s', level=logging.INFO)
 
-        _, num_columns = np.shape(self.binMat)
+        _, num_columns = np.shape(self.binarized_matrix)
 
         # Chunk the data matrix to reduce noise and put into numpy array to speed up processing
         self.num_chunks = 100
@@ -72,7 +72,7 @@ class CustomDeap:
         logbook = tools.Logbook()
 
         logging.info(f'\n-----CHUNKING DATASET-----')
-        num_rows, num_columns = np.shape(self.binMat)
+        num_rows, num_columns = np.shape(self.binarized_matrix)
         logging.info(f"\tOriginal Data Shape: {num_rows} rows, {num_columns} columns")
 
         chunked_rows, chunked_columns = np.shape(self.chunked_data_numpy)
@@ -109,13 +109,13 @@ class CustomDeap:
             [
                 [
                     (modeler[0].size),
-                    list(modeler[0].nodeList),
+                    list(modeler[0].node_list),
                     list(modeler[0].individualParse),
                     list(modeler[0].total_combinations),
                     list(modeler[0].total_inversions),
                     list(modeler[0].node_combination_length),
-                    list(modeler[0].nodeList),
-                    dict(modeler[0].nodeDict),
+                    list(modeler[0].node_list),
+                    dict(modeler[0].node_dict),
                 ]
                 for modeler in population
             ]
@@ -166,13 +166,13 @@ class CustomDeap:
                     [
                         [
                             (modeler[0].size),
-                            list(modeler[0].nodeList),
+                            list(modeler[0].node_list),
                             list(modeler[0].individualParse),
                             list(modeler[0].total_combinations),
                             list(modeler[0].total_inversions),
                             list(modeler[0].node_combination_length),
-                            list(modeler[0].nodeList),
-                            dict(modeler[0].nodeDict),
+                            list(modeler[0].node_list),
+                            dict(modeler[0].node_dict),
                         ]
                         for modeler in population
                     ]
@@ -244,15 +244,15 @@ class CustomDeap:
         os.makedirs(f'{file_paths["rules_output"]}/{self.dataset_name}_rules/', exist_ok=True)
         with open(rule_path, 'w') as rule_file:
             
-            # Reverses the nodeDict dictionary for easy node name lookup by index
-            reversed_nodeDict = {}
-            for key, value in self.nodeDict.items():   
-                reversed_nodeDict[value] = key         
+            # Reverses the node_dict dictionary for easy node name lookup by index
+            reversed_node_dict = {}
+            for key, value in self.node_dict.items():   
+                reversed_node_dict[value] = key         
 
             for rule, _, _ in ruleset:
                 rule_name = rule[0]
                 incoming_nodes = rule[1]
-                incoming_node_names = [reversed_nodeDict[node] for node in incoming_nodes]
+                incoming_node_names = [reversed_node_dict[node] for node in incoming_nodes]
                 logic = rule[2]
 
                 # Replaces ABC with the correct gene names
@@ -288,7 +288,7 @@ class CustomDeap:
             max_error = error[2]
             min_error = error[3]
             num_self_loops = error[4]
-            percent_self_loops = round(num_self_loops/len(self.nodeList)*100,0)
+            percent_self_loops = round(num_self_loops/len(self.node_list)*100,0)
 
             logging.info(f'Refined Error:\n')
             logging.info(f'\tAverage = {avg_error}')
@@ -439,7 +439,7 @@ class CustomDeap:
         Chunks the data by breaking the data into num_chunks number of chunks and taking the average value of all
         columns (cells) within the chunk for each row (genes). For each row, if the average value of all cells in
         the chunk is > 0.5, the chunk is set to 1 for that row. If the average is < 0.5, the chunk is set to 0.
-        :param binMat:
+        :param binarized_matrix:
         :param num_chunks:
         :return chunked_data:
         """
@@ -448,13 +448,13 @@ class CustomDeap:
 
         # Shuffle the columns to randomize the order of cells in the chunks
         np.random.seed(42)  # Optional: for reproducibility. Will shuffle in the same way every time
-        # chunked_data = self.binMat.todense()
+        # chunked_data = self.binarized_matrix.todense()
 
-        column_permutation = np.random.permutation(self.binMat.shape[1])
-        shuffled_binMat = self.binMat[:, column_permutation]
+        column_permutation = np.random.permutation(self.binarized_matrix.shape[1])
+        shuffled_binarized_matrix = self.binarized_matrix[:, column_permutation]
 
         # Get the shape of the data
-        num_rows, num_columns = np.shape(shuffled_binMat)
+        num_rows, num_columns = np.shape(shuffled_binarized_matrix)
 
         # Define the chunk size by the number of cells and number of chunks
         # Ensure num_chunks is not greater than num_columns
@@ -474,7 +474,7 @@ class CustomDeap:
             end_column = start_column + chunk_size  # End column defined by the start + chunk size
 
             # Find the columns between the start and end columns
-            subset = shuffled_binMat[:, start_column:end_column]
+            subset = shuffled_binarized_matrix[:, start_column:end_column]
 
             # Get the average row value for all columns in the chunk
             row_avg = np.mean(subset, axis=1)
@@ -855,7 +855,7 @@ class CustomDeap:
         Modified from deap to cross over between rules = needed to account for bistring only being one of two components of individual
         """
 
-        size = len(ind1[0].nodeList)
+        size = len(ind1[0].node_list)
         cxpointer1 = randint(1, size)
         cxpointer2 = randint(1, size - 1)
 
@@ -931,11 +931,11 @@ class CustomDeap:
         if np.sum(errors) < 0.05 * errorNodes or errorNodes == 0:
             # If errors are low, focus on nodes based on incoming and outgoing edges
             pseudoerrors = []
-            for i in range(len(model.nodeList)):
-                if model.successorNums[i] == 0:
+            for i in range(len(model.node_list)):
+                if model.num_successors[i] == 0:
                     pseudoerrors.append(len(model.total_combinations[i]))
                 else:
-                    pseudoerrors.append(len(model.total_combinations[i]) * model.successorNums[i])
+                    pseudoerrors.append(len(model.total_combinations[i]) * model.num_successors[i])
             
             # Zero out nodes that cannot be changed
             for j in range(len(pseudoerrors)):
@@ -945,7 +945,7 @@ class CustomDeap:
         else:
             # If errors are high, focus on nodes with worst fit and highest in-degree
             for i in range(len(errors)):
-                temper = model.successorNums[i]
+                temper = model.num_successors[i]
                 if temper == 0:
                     errors[i] *= len(model.total_combinations[i])
                 else:

@@ -126,7 +126,7 @@ def run_attractor_analysis(network, cells):
         # Find the cluster with the minimum Hamming distance
         min_cluster = min(clusters, key=clusters.get)
         min_hamming_cluster[cell_num] = min_cluster
-        cell_object = cells[cell_num]
+        # cell_object = cells[cell_num]
 
     network.cell_map = min_hamming_cluster
 

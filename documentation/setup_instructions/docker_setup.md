@@ -15,6 +15,7 @@
    sudo apt-get install docker.io
    sudo systemctl start docker
    sudo systemctl enable docker
+   sudo usermod -aG docker $USER
    ```
 3. Close and re-open the terminal
 

@@ -354,7 +354,7 @@ if __name__ == '__main__':
                         
                         # Extract the data from each dataset
                         sample_cells = True
-                        cell_names, gene_names, split_dataset = extract_data(dataset_path, dataset_sep, ruleset.sample_cells, ruleset.node_indices, ruleset.max_samples)
+                        cell_names, gene_names, split_dataset = extract_data(dataset_path, dataset_sep, sample_cells, ruleset.node_indices, ruleset.max_samples)
                         # Append the row index for each gene in the network to a list
                         gene_indices = []
                         for row_index, row in enumerate(split_dataset):
@@ -376,7 +376,7 @@ if __name__ == '__main__':
                         else:
                             raise ValueError("No samples selected for binarization")
                         
-                        network_folder = f'{file_paths["pickle_files"]}/pickle_files/{dataset_name}_pickle_files/network_pickle_files/{dataset_name}_{group}_pickle_files'
+                        network_folder = f'{file_paths["pickle_files"]}/{dataset_name}_pickle_files/network_pickle_files/{dataset_name}_{group}_pickle_files'
                         
                         os.makedirs(network_folder, exist_ok=True)
                         logging.info(f'\tSaving network pickle file {group} dataset for {network_name}')
