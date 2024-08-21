@@ -51,19 +51,21 @@ class RuleInference:
         self.node_list = list(graph.nodes)  # List of nodes in the graph
         self.node_dict = {self.node_list[i]: i for i in range(len(self.node_list))}  # Dictionary for node lookup
 
-        # Initialize an empty directed graph
+        # Initializes an empty directed graph
         self.rule_graph = nx.empty_graph(0, create_using=nx.DiGraph)
 
         logging.info(f'\n-----EXTRACTING AND FORMATTING DATA-----')
+
         # Extract the data from the data file based on the separator, sample the cells if over 15,000 cells
         logging.info(f'Extracting cell expression data from "{data_file}"')
         self.cell_names, self.gene_names, self.data = self._extract_data(data_file, sep, sample_cells, node_indices)
 
+        # Creating a csr sparse matrix from the dataset
         self.sparse_matrix = sparse.csr_matrix(self.data)
         logging.info(f'\tCreated sparse matrix')
 
-        self.gene_names = list(self.gene_names)
-        self.cell_names = list(self.cell_names)
+        # self.gene_names = list(self.gene_names)
+        # self.cell_names = list(self.cell_names)
         self.sparse_matrix.eliminate_zeros()
 
         # Check if there are at least 1 sample selected
@@ -167,6 +169,10 @@ class RuleInference:
             self.cv_genes = copy.deepcopy(self.gene_names)
     
     def genetic_algorithm(self, net):
+        """
+        Runs the genetic algorithm and rule refinement method to find the best ruleset for the model
+        """
+
         # Genetic algorithm
         custom_deap = CustomDeap(
             net,
