@@ -37,8 +37,8 @@ Once you run the required previous step, you dont have to run it again to run a 
 ## Rule determination arguments
 
 ```bash
-DATA_FILE="input/george_data/hiv_dataset/george_04370_data.csv"
-DATASET_NAME="george_hiv"
+DATA_FILE="input/tutorial_data/tutorial_04370_data.csv"
+DATASET_NAME="tutorial_dataset"
 DATAFILE_SEP=","
 KEGG_PATHWAYS=("04370")
 CUSTOM_PATHWAYS=()
@@ -70,7 +70,7 @@ ORGANISM_CODE="hsa"
 
 ## Relative abundance arguments
 ```bash
-METADATA_FILE="input/george_data/hiv_dataset/hiv_meta.txt"
+METADATA_FILE="input/tutorial_data/tutorial_metadata.txt"
 METADATA_SEP=" "
 HEADER="n"
 OVERWRITE="y"
