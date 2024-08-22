@@ -73,7 +73,7 @@ else
     fi
 
     # Run this script inside a Docker container
-    docker run --rm -v $(pwd)/.config:/root/.config \
+    docker run -it --rm -v $(pwd)/.config:/root/.config \
                -v $(pwd)/.cache:/app/.cache \
                -v $(pwd)/scBONITA_output:/app/scBONITA_output \
                -v $(pwd):/app \
@@ -101,7 +101,7 @@ if [ "$RUN_RULE_DETERMINATION" = "True" ]; then
         # Using a list of KEGG pathways:
         KEGG_PATHWAYS_ARGS="${KEGG_PATHWAYS[@]}"
 
-        $CONDA_ENVIRONMENT_PYTHON code/pipeline_class.py \
+        $CONDA_ENVIRONMENT_PYTHON -u code/pipeline_class.py \
             --data_file "$DATA_FILE" \
             --dataset_name "$DATASET_NAME" \
             --datafile_sep "$DATAFILE_SEP" \
@@ -111,7 +111,7 @@ if [ "$RUN_RULE_DETERMINATION" = "True" ]; then
             --minimum_overlap $MINIMUM_OVERLAP
     else
         echo "No KEGG pathways specified, finding kegg pathways with overlapping genes..."
-        $CONDA_ENVIRONMENT_PYTHON code/pipeline_class.py \
+        $CONDA_ENVIRONMENT_PYTHON -u code/pipeline_class.py \
         --data_file "$DATA_FILE" \
         --dataset_name "$DATASET_NAME" \
         --datafile_sep "$DATAFILE_SEP" \
@@ -132,7 +132,7 @@ if [ "$RUN_RULE_DETERMINATION" = "True" ]; then
             CUSTOM_PATHWAYS_ARGS+="--network_files $pathway "
         done
 
-        $CONDA_ENVIRONMENT_PYTHON pipeline_class.py \
+        $CONDA_ENVIRONMENT_PYTHON -u pipeline_class.py \
         --data_file "$DATA_FILE" \
         --dataset_name "$DATASET_NAME" \
         --datafile_sep "$DATAFILE_SEP" \
@@ -157,7 +157,7 @@ if [ "$RUN_IMPORTANCE_SCORE" = "True" ]; then
         # Using a list of KEGG pathways:
         KEGG_PATHWAYS_ARGS="${KEGG_PATHWAYS[@]}"
 
-        $CONDA_ENVIRONMENT_PYTHON code/importance_scores.py \
+        $CONDA_ENVIRONMENT_PYTHON -u code/importance_scores.py \
             --dataset_name "$DATASET_NAME" \
             --list_of_kegg_pathways $KEGG_PATHWAYS_ARGS
     else
@@ -196,7 +196,7 @@ if [ "$RUN_RELATIVE_ABUNDANCE" = "True" ]; then
         EXPERIMENTAL_GROUP=${EXPERIMENTAL_GROUPS[$i]}
 
         # Execute the command with the current pair of control and experimental group
-        $CONDA_ENVIRONMENT_PYTHON code/relative_abundance.py \
+        $CONDA_ENVIRONMENT_PYTHON -u code/relative_abundance.py \
             --dataset_name "$DATASET_NAME" \
             --dataset_file "$DATA_FILE" \
             --metadata_file "$METADATA_FILE" \
@@ -221,7 +221,7 @@ fi
 if [ "$RUN_ATTRACTOR_ANALYSIS" = "True" ]; then
     echo "Running Attractor Analysis..."
 
-    $CONDA_ENVIRONMENT_PYTHON code/attractor_analysis.py \
+    $CONDA_ENVIRONMENT_PYTHON -u code/attractor_analysis.py \
         --dataset_name "$DATASET_NAME"
 fi
 
