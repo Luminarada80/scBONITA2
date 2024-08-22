@@ -27,7 +27,7 @@ def run_attractor_analysis(network, cells):
     logging.info(f'\tGenerating attractors...')
 
     network_attractors, simulated_dataset = generate_attractors(network.nodes, network.dataset)
-    attractors_start = [attractor[:, 0] for cell, attractor in network_attractors.items()]
+    attractors_start = [attractor[:, 0] for _, attractor in network_attractors.items()]
 
     # Convert the sparse dataset to a dense one
     if isinstance(simulated_dataset, spmatrix):
