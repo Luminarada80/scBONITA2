@@ -27,4 +27,4 @@ For Mac users with the M1 series chip, use the Docker instructions or download p
 - [BlueHive installation guide](documentation/setup_instructions/bluehive_setup.md)
 
 ## Running scBONITA2
-Once you have followed one of these guides to set up the environment, try running the [tutorial data](documentation/running_scBONITA2.md) and read the ["How scBONITA2 works"](documentation/running_scBONITA2.md) documentation. Each step has a more detailed guide explaining how it all works.
+Once you have followed one of these guides to set up the environment, try running the [tutorial data](documentation/tutorial.md) and read the ["How scBONITA2 works"](documentation/running_scBONITA2.md) documentation. Each step has a more detailed guide explaining how it all works.
