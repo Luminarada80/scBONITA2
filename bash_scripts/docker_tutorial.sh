@@ -13,8 +13,8 @@ RUN_ATTRACTOR_ANALYSIS=True
 
 # General Arguments (Required for all steps)
 # HIV_dataset_normalized_integrated_counts
-DATA_FILE="input/george_data/hiv_dataset/george_04370_data.csv"
-DATASET_NAME="george_hiv" # Enter the name of your dataset
+DATA_FILE="input/tutorial_data/tutorial_04370_data.csv"
+DATASET_NAME="tutorial_dataset" # Enter the name of your dataset
 DATAFILE_SEP="," # Enter the character that the values in your dataset are split by
 KEGG_PATHWAYS=("04370") # Enter KEGG pathway codes or leave blank to find all pathways with overlapping genes. Separate like: ("hsa04670" "hsa05171")
 CUSTOM_PATHWAYS=() #("modified_network.graphml") #Put custom networks in the input folder
@@ -23,7 +23,7 @@ MINIMUM_OVERLAP=1 # Specifies how many genes you want to ensure overlap with the
 ORGANISM_CODE="hsa" # Organism code in front of KEGG pathway numbers
 
 # Relative Abundance arguments
-METADATA_FILE="input/george_data/hiv_dataset/hiv_meta.txt"
+METADATA_FILE="input/tutorial_data/tutorial_metadata.txt"
 METADATA_SEP=" "
 HEADER="n" # Does the metadata file contain a header before the entries start?
 OVERWRITE="y" # Do you want to overwrite the files generated for each of your different experimental groups?
@@ -36,6 +36,53 @@ CONTROL_GROUPS=("Healthy")
 EXPERIMENTAL_GROUPS=("HIV")
 
 # -------------- End of user input, shouldn't have to change anything below here --------------
+
+# Define your Docker image name
+DOCKER_IMAGE_NAME="scbonita"
+
+# Check if running inside Docker
+if [ -f /.dockerenv ]; then
+    echo "Running inside Docker container."
+
+    # Activate conda environment
+    source /opt/conda/etc/profile.d/conda.sh
+    conda activate scBonita
+
+    # Check if conda environment is activated
+    if [ "$CONDA_DEFAULT_ENV" != "scBonita" ]; then
+        echo "Conda environment 'scBonita' is not activated. Exiting..."
+        exit 1
+    fi
+
+else
+    echo "Not running inside Docker. Checking for Docker image..."
+
+    # Check if the Docker image exists
+    if [[ "$(docker images -q $DOCKER_IMAGE_NAME 2> /dev/null)" == "" ]]; then
+        echo "Docker image $DOCKER_IMAGE_NAME not found. Building the image..."
+
+        # Build the Docker image
+        docker build -t $DOCKER_IMAGE_NAME .
+
+        if [ $? -ne 0 ]; then
+            echo "Docker image build failed. Exiting..."
+            exit 1
+        fi
+    else
+        echo "Docker image $DOCKER_IMAGE_NAME found."
+    fi
+
+    # Run this script inside a Docker container
+    docker run --rm -v $(pwd)/.config:/root/.config \
+               -v $(pwd)/.cache:/app/.cache \
+               -v $(pwd)/scBONITA_output:/app/scBONITA_output \
+               -v $(pwd):/app \
+               -w /app \
+               $DOCKER_IMAGE_NAME \
+               bash /app/$0
+
+    exit 0
+fi
 
 CONDA_ENVIRONMENT_PYTHON=$(which python) # Path to the installation of Python for the scBonita conda environment
 
@@ -176,4 +223,11 @@ if [ "$RUN_ATTRACTOR_ANALYSIS" = "True" ]; then
 
     $CONDA_ENVIRONMENT_PYTHON code/attractor_analysis.py \
         --dataset_name "$DATASET_NAME"
+fi
+
+# Stop and remove the Docker container if it was started by this script
+if [ ! -f /.dockerenv ]; then
+    echo "Stopping and removing the Docker container..."
+    docker stop $(docker ps -q --filter "ancestor=$DOCKER_IMAGE_NAME")
+    docker rm $(docker ps -a -q --filter "ancestor=$DOCKER_IMAGE_NAME")
 fi
