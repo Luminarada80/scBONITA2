@@ -81,7 +81,7 @@ else
         -v $(pwd):/app \
         -w /app \
         $DOCKER_IMAGE_NAME \
-        bash /app/$0
+        bash -c "bash /app/$0; chmod -R 777 /app/scBONITA_output"
 
     exit 0
 fi
