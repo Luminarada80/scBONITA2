@@ -1,7 +1,7 @@
 
 # How scBONITA2 works:
 ### 1. Running the BASH script
-scBONITA runs using a [bash script](bash_script_instructions.md) as a wrapper to pass user arguments into the Python script.
+scBONITA runs using a [bash script](setup_instructions/bash_script_instructions.md) as a wrapper to pass user arguments into the Python script.
 
 ### 2. Processing the KEGG networks
 The [networks are downloaded and processed](how_it_works/how_network_processing_works.md) to create graphml files containing the genes that are also in the scRNA-seq dataset, their connections to other genes, and whether that connection is activating or inhibiting.
