@@ -39,6 +39,6 @@
 ## Running scBONITA2 with Docker
 Use the `docker_george_hiv.sh` file to run scBONITA2 with Docker. This file will automatically configure the Docker environment and run the bash file in the environment.
 ```bash
-bash bash_scripts/docker_george_hiv.sh
+sudo bash bash_scripts/docker_george_hiv.sh
 ```
 
