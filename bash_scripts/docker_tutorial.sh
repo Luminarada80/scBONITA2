@@ -73,13 +73,15 @@ else
     fi
 
     # Run this script inside a Docker container
-    docker run -it --rm -v $(pwd)/.config:/root/.config \
-               -v $(pwd)/.cache:/app/.cache \
-               -v $(pwd)/scBONITA_output:/app/scBONITA_output \
-               -v $(pwd):/app \
-               -w /app \
-               $DOCKER_IMAGE_NAME \
-               bash /app/$0
+    docker run -it --rm \
+        --user $(id -u):$(id -g) \
+        -v $(pwd)/.config:/root/.config \
+        -v $(pwd)/.cache:/app/.cache \
+        -v $(pwd)/scBONITA_output:/app/scBONITA_output \
+        -v $(pwd):/app \
+        -w /app \
+        $DOCKER_IMAGE_NAME \
+        bash /app/$0
 
     exit 0
 fi
