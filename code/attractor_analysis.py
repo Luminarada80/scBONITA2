@@ -541,6 +541,7 @@ def find_similar_files(dtw_distances):
         cells.add(cell1.split('_trajectory')[0])
         cells.add(cell2.split('_trajectory')[0])
     cells = sorted(cells)
+    print(cells)
 
     # Create a distance matrix
     distance_matrix = pd.DataFrame(np.inf, index=cells, columns=cells)
@@ -555,7 +556,6 @@ def find_similar_files(dtw_distances):
     distance_array = distance_matrix.values[np.triu_indices_from(distance_matrix, k=1)]
     Z = linkage(distance_array, method='ward')
 
-
     # Plot the dendrogram
     plt.figure(figsize=(8, 10))
     dendrogram(Z, labels=distance_matrix.index, orientation='top')
@@ -566,7 +566,9 @@ def find_similar_files(dtw_distances):
     plt.ylabel('Distance', fontsize=8)
     plt.tight_layout()
 
-    plt.show()
+    logging.info(f'Please open "scBONITA_output/trajectories/{dataset_name}_{network_name}/dendrogram.png"')
+    plt.savefig(f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/dendrogram.png')
+    
 
     # Set a threshold and get the clusters
     num_clusters = int(input('How many clusters?: '))
@@ -578,6 +580,8 @@ def find_similar_files(dtw_distances):
         if cluster_id not in cluster_dict:
             cluster_dict[cluster_id] = []
         cluster_dict[cluster_id].append(cell)
+
+    plt.close()
 
     return cluster_dict
 
@@ -635,7 +639,9 @@ def summarize_clusters(directory, cell_names, cluster):
     plt.yticks(fontsize=8)
     plt.xticks(fontsize=8)
     plt.tight_layout()
-    plt.show()
+    plt.savefig(f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/cluster_{cluster}_summary')
+    plt.close()
+
 
 
 def plot_heatmap(distance_matrix, file_names):
@@ -660,6 +666,8 @@ def plot_heatmap(distance_matrix, file_names):
     plt.title("DTW Distance Heatmap")
     plt.tight_layout()
     plt.show()
+    plt.savefig(f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/distance_heatmap')
+    plt.close()
 
 
 
