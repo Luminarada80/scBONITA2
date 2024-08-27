@@ -15,7 +15,7 @@ import argparse
 import pickle
 import random
 
-# from fastdtw import fastdtw
+from fastdtw import fastdtw
 from scipy.spatial.distance import euclidean
 import os
 from argparse import ArgumentParser
@@ -461,9 +461,7 @@ def read_data_from_directory(directory):
     Reads in the cell trajectory files and creates a dictionary of dataframes with the file
     name as the key and the dataframe as the falue
     """
-    print(f'Reading data from the files')
     dataframes = {}
-    print(directory)
 
     for filename in os.listdir(directory):
         # Extract the cell number from the filename
@@ -472,7 +470,6 @@ def read_data_from_directory(directory):
             df = pd.read_csv(filepath, header=None)
             df.columns = ['Gene'] + [f'Time{i}' for i in range(1, df.shape[1])]
             df.set_index('Gene', inplace=True)
-            print(f"Index for {filename}: {df.index}")
             
             dataframes[filename] = df
 
@@ -482,30 +479,17 @@ def extract_time_series(dataframes):
     """
     Extracts the time series data for the given filename
     """
-    print('Extracting time series data')
     return {filename: {gene: df.loc[gene].values for gene in df.index} for filename, df in dataframes.items()}
 
 def compute_dtw_distance_pair(file1, file2, time_series_data):
     distances = {}
-    print(f"Keys for {file1}: {list(time_series_data[file1].keys())}")
-    print(f"Keys for {file2}: {list(time_series_data[file2].keys())}")
 
     for gene in time_series_data[file1].keys():
-        # print(gene)
         if gene in time_series_data[file2].keys():
-            # ts1 = time_series_data[file1][gene]
-            # ts2 = time_series_data[file2][gene]
-            # print(f'Gene: {gene}, ts1: {ts1}, ts2: {ts2}')
-            # print(f"Gene: {gene}, ts1 shape: {ts1.shape}, ts2 shape: {ts2.shape}")
-            # print(f"ts1 dtype: {ts1.dtype}, ts2 dtype: {ts2.dtype}")
-            ts1 = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], dtype=np.float64)
-            ts2 = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], dtype=np.float64)
-            print(f'scipy version: {scipy.__version__}')
-            import fastdtw
-            print(f'python version: {python.__version__}')
-            # distance, _ = fastdtw(ts1, ts2, radius=1, dist=euclidean)
-            print(f"Distance: {distance}")
-            # distance, _ = fastdtw(ts1, ts2, radius=1, dist=euclidean)
+            ts1 = time_series_data[file1][gene]
+            ts2 = time_series_data[file2][gene]
+            
+            distance, _ = fastdtw(ts1, ts2, radius=1, dist=2)
             
             distances[gene] = distance
     total_distance = sum(distances.values()) if distances else float('inf')
@@ -522,14 +506,12 @@ def compute_dtw_distances(time_series_data, output_directory):
             for j in range(i + 1, len(file_names)):
                 file1 = file_names[i]
                 file2 = file_names[j]
-                file1, file2, total_distance = compute_dtw_distance_pair(file1, file2, time_series_data)
-                dtw_distances[(file1, file2)] = total_distance
-                # tasks.append(executor.submit(compute_dtw_distance_pair, file1, file2, time_series_data))
-                bar()
-        # for future in as_completed(tasks):
-        #     file1, file2, total_distance = future.result()
-        #     dtw_distances[(file1, file2)] = total_distance
-        #     bar()
+                tasks.append(executor.submit(compute_dtw_distance_pair, file1, file2, time_series_data))
+
+        for future in as_completed(tasks):
+            file1, file2, total_distance = future.result()
+            dtw_distances[(file1, file2)] = total_distance
+            bar()
 
     with open(f'{output_directory}/distances.csv', 'w') as outfile:
         for (file1, file2), total_distance in dtw_distances.items():
