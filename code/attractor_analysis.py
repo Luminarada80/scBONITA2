@@ -456,24 +456,28 @@ def create_heatmap(path, title):
 
     return plot
 
-def read_data_from_directory(directory):
+def read_data_from_directory(directory, trajectory_files_parsed):
     """
     Reads in the cell trajectory files and creates a dictionary of dataframes with the file
     name as the key and the dataframe as the falue
     """
     dataframes = {}
 
+    num_cells_parsed = 0
     for filename in os.listdir(directory):
-        # Extract the cell number from the filename
-        if filename.endswith("_trajectory.csv"):
+        
+        if num_cells_parsed <= 50 and filename.endswith("_trajectory.csv") and filename not in trajectory_files_parsed:
+            trajectory_files_parsed.append(filename)
+            # Extract the cell number from the filename
             filepath = os.path.join(directory, filename)
             df = pd.read_csv(filepath, header=None)
             df.columns = ['Gene'] + [f'Time{i}' for i in range(1, df.shape[1])]
             df.set_index('Gene', inplace=True)
             
             dataframes[filename] = df
+            num_cells_parsed += 1
 
-    return dataframes
+    return dataframes, trajectory_files_parsed
 
 def extract_time_series(dataframes):
     """
@@ -533,7 +537,7 @@ def create_distance_matrix(dtw_distances, file_names):
     
     return distance_matrix
 
-def find_similar_files(dtw_distances):
+def hierarchical_clustering(dtw_distances, num_clusters):
 
     # Extract unique cell names
     cells = set()
@@ -541,7 +545,6 @@ def find_similar_files(dtw_distances):
         cells.add(cell1.split('_trajectory')[0])
         cells.add(cell2.split('_trajectory')[0])
     cells = sorted(cells)
-    print(cells)
 
     # Create a distance matrix
     distance_matrix = pd.DataFrame(np.inf, index=cells, columns=cells)
@@ -571,7 +574,8 @@ def find_similar_files(dtw_distances):
     
 
     # Set a threshold and get the clusters
-    num_clusters = int(input('How many clusters?: '))
+    if num_clusters == 0:
+        num_clusters = int(input('How many clusters?: '))
     clusters = fcluster(Z, num_clusters, criterion='maxclust')
 
     # Organize cells by clusters
@@ -583,10 +587,10 @@ def find_similar_files(dtw_distances):
 
     plt.close()
 
-    return cluster_dict
+    return cluster_dict, num_clusters
 
 
-def summarize_clusters(directory, cell_names, cluster):
+def summarize_clusters(directory, cell_names, cluster, chunk):
     gene_expr_dict = {}
 
     trajectory_files = []
@@ -630,18 +634,7 @@ def summarize_clusters(directory, cell_names, cluster):
     # Transpose the DataFrame
     df = df.transpose()
 
-    # Create the heatmap
-    plt.figure(figsize=(8, 10))
-    sns.heatmap(df, cmap='Greys', yticklabels=True)
-    plt.title(f'Average Gene Expression Heatmap for Cluster {cluster}', fontsize=12)
-    plt.xlabel(xlabel='Simulation Time Steps', fontsize=12)
-    plt.ylabel(ylabel='Gene', fontsize=12)
-    plt.yticks(fontsize=8)
-    plt.xticks(fontsize=8)
-    plt.tight_layout()
-    plt.savefig(f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/cluster_{cluster}_summary')
-    plt.close()
-
+    return df
 
 
 def plot_heatmap(distance_matrix, file_names):
@@ -677,6 +670,109 @@ def save_attractor_simulation(filename, network, simulated_attractor):
         simulated_attractor = np.array(simulated_attractor).T
         for gene_num, expression in enumerate(simulated_attractor):
             file.write(f'{network.nodes[gene_num].name},{",".join([str(i) for i in list(expression)])}\n')
+
+def simulate_cells(dense_dataset, num_simulations):
+    # Simulate cell trajectories
+    logging.info(f'\tSimulating {num_simulations} cell trajectories')
+    simulated_cells = []
+    with alive_bar(num_simulations) as bar:
+        for i in range(num_simulations):
+            # Select a random column from the network dataset
+            cell_index = np.random.choice(dense_dataset.shape[1])
+
+            # Reads in all of the rows for that columns
+            selected_column = np.array([random.choice([0,1]) for _ in dense_dataset[:, cell_index]])
+
+            simulated_cells.append(cell_index)
+
+            # Transposes the list of gene expression into a column
+            transposed_random_column = selected_column.reshape(-1,1)
+
+            # Specify outfile path for the simulation results
+            outfile_folder = f'{file_paths["trajectories"]}/{dataset_name}_{network_name}'
+            png_folder = f'{outfile_folder}/png_files'
+            text_folder = f'{outfile_folder}/text_files'
+
+            os.makedirs(outfile_folder, exist_ok=True)
+            os.makedirs(png_folder, exist_ok=True)
+            os.makedirs(text_folder, exist_ok=True)
+            
+            # Simulate the network
+            simulated_attractor = simulate_network(network.nodes, transposed_random_column)
+
+            # Visualize the network simulation results
+            fig = visualize_simulation(network.network, simulated_attractor, network, "False")
+
+            # Save the attractor states to a csv file
+            save_attractor_simulation(f'{text_folder}/cell_{cell_index}_trajectory.csv', network, simulated_attractor)
+            plt.close(fig)
+
+            # Create a heatmap of the expression for easier attractor visualization
+            heatmap = create_heatmap(f'{text_folder}/cell_{cell_index}_trajectory.csv', f'Simulation for {dataset_name} {network_name} cell {cell_index} pathway ')
+            # heatmap.show()
+
+            # Saves a png of the results
+            heatmap.savefig(f'{png_folder}/cell_{cell_index}_trajectory.png', format='png')
+            plt.close(heatmap)
+            bar()
+
+def calculate_dtw(num_files, directory):
+    trajectory_files_parsed = []
+    num_clusters = 0
+    num_chunks = round(num_files / 50)
+
+    # Ensures there is always one chunk
+    if num_chunks == 0:
+        num_chunks = 1
+
+    # Chunk the data down to create smaller averaged trajectory clusters
+    for chunk in range(num_chunks):
+
+        print(f'Chunk {chunk}')
+        # Reads in the cell trajectories from the simulations and creates a dataframe from them
+        dataframes, trajectory_files_parsed = read_data_from_directory(directory, trajectory_files_parsed)
+
+        # Extracts the time series data from the cell trajectory files
+        time_series_data = extract_time_series(dataframes)
+
+        # Computes the pairwise DTW distances between cells
+        dtw_distances = compute_dtw_distances(time_series_data, directory)
+        
+        # Calculates pairwise distance matrix between the cells
+        file_names = list(dataframes.keys())
+        distance_matrix = create_distance_matrix(dtw_distances, file_names)
+
+        # Performs hierarchical clustering to find the number of clusters
+        cluster_dict, num_clusters = hierarchical_clustering(dtw_distances, num_clusters)
+    
+        for cluster, cell_list in cluster_dict.items():
+            print(f'Summarizing cluster {cluster}')
+            df = summarize_clusters(directory, cell_list, cluster, chunk)
+
+            # Create average trajectory directory
+            os.makedirs(f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/avg_chunks', exist_ok=True)
+
+            # Create the heatmap
+            plt.figure(figsize=(8, 10))
+            sns.heatmap(df, cmap='Greys', yticklabels=True)
+            plt.title(f'Average Gene Expression Heatmap for Cluster {cluster}', fontsize=12)
+            plt.xlabel(xlabel='Simulation Time Steps', fontsize=12)
+            plt.ylabel(ylabel='Gene', fontsize=12)
+            plt.yticks(fontsize=8)
+            plt.xticks(fontsize=8)
+            plt.tight_layout()
+            plt.savefig(f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/avg_chunks/chunk_{chunk}{cluster}_summary')
+            plt.close()
+
+            # Binarize the DataFrame
+            df_binarized = pd.DataFrame(np.where(df < 0.5, 0, 1), index=df.index, columns=df.columns)
+
+            # Write the DataFrame to a CSV file
+            
+            output_file_path = f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/avg_chunks/chunk_{chunk}{cluster}_average_trajectory.csv'
+            df_binarized.to_csv(output_file_path, header=False)
+        
+        plot_heatmap(distance_matrix, file_names)
 
 
 # If you want to run the attractor analysis by itself
@@ -730,73 +826,31 @@ if __name__ == '__main__':
         # Directory containing the trajectory files
         directory = f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/text_files'
 
+        # Finds the number of cell trajectory files
+        num_files = len([file for file in os.listdir(directory) if file.endswith('_trajectory.csv')])
+        print(f'Found {num_files} trajectory files')
+
         # Limit the number of cell trajectories simulated for testing purposes
-        if len(os.listdir(directory)) > 36:
-            num_simulations = 0
+        if num_files <= 100:
+            num_simulations = 100 - num_files
         else:
             num_simulations = 0 #int(round(len(dense_dataset[1]) / 100, 0)) 
-        print(len(os.listdir(directory)))
 
-
-        logging.info(f'\tSimulating {num_simulations} cell trajectories')
-        simulated_cells = []
-        with alive_bar(num_simulations) as bar:
-            for i in range(num_simulations):
-                # Select a random column from the network dataset
-                cell_index = np.random.choice(dense_dataset.shape[1])
-
-                # Reads in all of the rows for that columns
-                selected_column = np.array([random.choice([0,1]) for _ in dense_dataset[:, cell_index]])
-
-                simulated_cells.append(cell_index)
-
-                # Transposes the list of gene expression into a column
-                transposed_random_column = selected_column.reshape(-1,1)
-
-                # Specify outfile path for the simulation results
-                outfile_folder = f'{file_paths["trajectories"]}/{dataset_name}_{network_name}'
-                png_folder = f'{outfile_folder}/png_files'
-                text_folder = f'{outfile_folder}/text_files'
-
-                os.makedirs(outfile_folder, exist_ok=True)
-                os.makedirs(png_folder, exist_ok=True)
-                os.makedirs(text_folder, exist_ok=True)
-                
-                # Simulate the network
-                simulated_attractor = simulate_network(network.nodes, transposed_random_column)
-
-                # Visualize the network simulation results
-                fig = visualize_simulation(network.network, simulated_attractor, network, "False")
-
-                # Save the attractor states to a csv file
-                save_attractor_simulation(f'{text_folder}/cell_{cell_index}_trajectory.csv', network, simulated_attractor)
-                plt.close(fig)
-
-                # Create a heatmap of the expression for easier attractor visualization
-                heatmap = create_heatmap(f'{text_folder}/cell_{cell_index}_trajectory.csv', f'Simulation for {dataset_name} {network_name} cell {cell_index} pathway ')
-                # heatmap.show()
-
-                # Saves a png of the results
-                heatmap.savefig(f'{png_folder}/cell_{cell_index}_trajectory.png', format='png')
-                plt.close(heatmap)
-                bar()
-
-        dataframes = read_data_from_directory(directory)
-
-        logging.info('\tExtracting time series data and computing dynamic time warping distances')
-        time_series_data = extract_time_series(dataframes)
-        dtw_distances = compute_dtw_distances(time_series_data, directory)
+        # Simulates cells to create the cell trajectories
+        simulate_cells(dense_dataset, num_simulations)
         
-        file_names = list(dataframes.keys())
-        distance_matrix = create_distance_matrix(dtw_distances, file_names)
+        # Create group average cell trajectories
+        logging.info(f'Calculating cell trajectory clusters and averaging the cluster trajectories')
+        calculate_dtw(num_files, directory)
 
-        cluster_dict = find_similar_files(dtw_distances)
-
-        for cluster, cell_list in cluster_dict.items():
-            print(f'Summarizing cluster {cluster}')
-            summarize_clusters(directory, cell_list, cluster)
+        num_avg_traj_files = len([file for file in os.listdir(f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/avg_chunks') if file.endswith('_trajectory.csv')])
         
-        plot_heatmap(distance_matrix, file_names)
+        logging.info(f'Calculating DTW between the averaged chunks')
+        # Group the average trajectories into larger groups
+        calculate_dtw(num_avg_traj_files, f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/avg_chunks')
+        
+
+        # ----- End of DTW -----
 
         cluster_fig = run_attractor_analysis(network, cells)
         cluster_path = f'{file_paths["attractor_analysis_output"]}/{dataset_name}_attractors'
