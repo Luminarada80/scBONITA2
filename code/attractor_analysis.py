@@ -2,6 +2,7 @@ from importance_scores import CalculateImportanceScore
 import logging
 import pandas as pd
 import numpy as np
+import scipy
 import scipy.cluster.hierarchy as sch
 import scipy.spatial.distance as ssd
 from scipy.sparse import spmatrix, issparse
@@ -14,7 +15,7 @@ import argparse
 import pickle
 import random
 
-from fastdtw import fastdtw
+# from fastdtw import fastdtw
 from scipy.spatial.distance import euclidean
 import os
 from argparse import ArgumentParser
@@ -455,33 +456,57 @@ def create_heatmap(path, title):
 
     return plot
 
-def read_data_from_directory(directory, simulated_cells):
+def read_data_from_directory(directory):
+    """
+    Reads in the cell trajectory files and creates a dictionary of dataframes with the file
+    name as the key and the dataframe as the falue
+    """
     print(f'Reading data from the files')
     dataframes = {}
+    print(directory)
 
     for filename in os.listdir(directory):
         # Extract the cell number from the filename
-        cell_num = int(''.join(filename.split('_trajectory.csv')[0].split('cell_')[1]))
-
-        if cell_num in simulated_cells and filename.endswith("_trajectory.csv"):
+        if filename.endswith("_trajectory.csv"):
             filepath = os.path.join(directory, filename)
             df = pd.read_csv(filepath, header=None)
             df.columns = ['Gene'] + [f'Time{i}' for i in range(1, df.shape[1])]
             df.set_index('Gene', inplace=True)
+            print(f"Index for {filename}: {df.index}")
+            
             dataframes[filename] = df
 
     return dataframes
+
 def extract_time_series(dataframes):
+    """
+    Extracts the time series data for the given filename
+    """
     print('Extracting time series data')
     return {filename: {gene: df.loc[gene].values for gene in df.index} for filename, df in dataframes.items()}
 
 def compute_dtw_distance_pair(file1, file2, time_series_data):
     distances = {}
+    print(f"Keys for {file1}: {list(time_series_data[file1].keys())}")
+    print(f"Keys for {file2}: {list(time_series_data[file2].keys())}")
+
     for gene in time_series_data[file1].keys():
-        if gene in time_series_data[file2]:
-            ts1 = time_series_data[file1][gene]
-            ts2 = time_series_data[file2][gene]
-            distance, _ = fastdtw(ts1, ts2, radius=1, dist=euclidean)
+        # print(gene)
+        if gene in time_series_data[file2].keys():
+            # ts1 = time_series_data[file1][gene]
+            # ts2 = time_series_data[file2][gene]
+            # print(f'Gene: {gene}, ts1: {ts1}, ts2: {ts2}')
+            # print(f"Gene: {gene}, ts1 shape: {ts1.shape}, ts2 shape: {ts2.shape}")
+            # print(f"ts1 dtype: {ts1.dtype}, ts2 dtype: {ts2.dtype}")
+            ts1 = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], dtype=np.float64)
+            ts2 = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], dtype=np.float64)
+            print(f'scipy version: {scipy.__version__}')
+            import fastdtw
+            print(f'python version: {python.__version__}')
+            # distance, _ = fastdtw(ts1, ts2, radius=1, dist=euclidean)
+            print(f"Distance: {distance}")
+            # distance, _ = fastdtw(ts1, ts2, radius=1, dist=euclidean)
+            
             distances[gene] = distance
     total_distance = sum(distances.values()) if distances else float('inf')
     return (file1, file2, total_distance)
@@ -497,12 +522,14 @@ def compute_dtw_distances(time_series_data, output_directory):
             for j in range(i + 1, len(file_names)):
                 file1 = file_names[i]
                 file2 = file_names[j]
-                tasks.append(executor.submit(compute_dtw_distance_pair, file1, file2, time_series_data))
-                
-        for future in as_completed(tasks):
-            file1, file2, total_distance = future.result()
-            dtw_distances[(file1, file2)] = total_distance
-            bar()
+                file1, file2, total_distance = compute_dtw_distance_pair(file1, file2, time_series_data)
+                dtw_distances[(file1, file2)] = total_distance
+                # tasks.append(executor.submit(compute_dtw_distance_pair, file1, file2, time_series_data))
+                bar()
+        # for future in as_completed(tasks):
+        #     file1, file2, total_distance = future.result()
+        #     dtw_distances[(file1, file2)] = total_distance
+        #     bar()
 
     with open(f'{output_directory}/distances.csv', 'w') as outfile:
         for (file1, file2), total_distance in dtw_distances.items():
@@ -710,9 +737,18 @@ if __name__ == '__main__':
         dense_dataset = np.array(dataset.todense())
         network_name = network.name
 
-        # Run simulations for 1% of the cells (change to something like 10% in the future)
-        logging.info('\tSimulating cell trajectories')
-        num_simulations = int(round(len(dense_dataset[1]) / 100, 0)) 
+        # Directory containing the trajectory files
+        directory = f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/text_files'
+
+        # Limit the number of cell trajectories simulated for testing purposes
+        if len(os.listdir(directory)) > 36:
+            num_simulations = 0
+        else:
+            num_simulations = 0 #int(round(len(dense_dataset[1]) / 100, 0)) 
+        print(len(os.listdir(directory)))
+
+
+        logging.info(f'\tSimulating {num_simulations} cell trajectories')
         simulated_cells = []
         with alive_bar(num_simulations) as bar:
             for i in range(num_simulations):
@@ -755,10 +791,7 @@ if __name__ == '__main__':
                 plt.close(heatmap)
                 bar()
 
-        # Directory containing the trajectory files
-        directory = f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/text_files'
-
-        dataframes = read_data_from_directory(directory, simulated_cells)
+        dataframes = read_data_from_directory(directory)
 
         logging.info('\tExtracting time series data and computing dynamic time warping distances')
         time_series_data = extract_time_series(dataframes)
