@@ -36,6 +36,11 @@
    cd scBONITA2
    ```
 
+If you need to re-install the docker image without using a cached version, use:
+```bash
+docker build --no-cache -t scbonita .
+```
+
 ## Running scBONITA2 with Docker
 Use the `docker_george_hiv.sh` file to run scBONITA2 with Docker. This file will automatically configure the Docker environment and run the bash file in the environment.
 ```bash

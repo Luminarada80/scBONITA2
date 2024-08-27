@@ -6,9 +6,9 @@
 
 # Which parts do you want to run? Set True to run or False to skip
     # Rule determination must be run prior to importance score, importance score must be run prior to relative abundance
-RUN_RULE_DETERMINATION=True
-RUN_IMPORTANCE_SCORE=True
-RUN_RELATIVE_ABUNDANCE=True
+RUN_RULE_DETERMINATION=False
+RUN_IMPORTANCE_SCORE=False
+RUN_RELATIVE_ABUNDANCE=False
 RUN_ATTRACTOR_ANALYSIS=True
 
 # General Arguments (Required for all steps)
@@ -81,7 +81,7 @@ else
         -v $(pwd):/app \
         -w /app \
         $DOCKER_IMAGE_NAME \
-        bash -c "bash /app/$0; chmod -R 777 /app/scBONITA_output"
+        
 
     exit 0
 fi
@@ -184,7 +184,7 @@ if [ "$RUN_RELATIVE_ABUNDANCE" = "True" ]; then
 
     if [ ${#KEGG_PATHWAYS[@]} -gt 0 ]; then
         echo "Running with KEGG pathways"
-        # Using a list of KEGG pathways:
+        # Using a list of KEGG pathways:f
         KEGG_PATHWAYS_ARGS="${KEGG_PATHWAYS[@]}"
     else
         echo "No KEGG Pathways specified"
