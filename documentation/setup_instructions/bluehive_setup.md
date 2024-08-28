@@ -10,6 +10,7 @@ BlueHive is the HPC at the University of Rochster. These instructions will only 
 6. Run `conda install -c anaconda git`
 7. Install mamba using `conda install mamba`
     - Note: This can take a significant amount of time, be patient
+8. Run `conda install git`
 8. Navigate to the directory into which you would like to install scBONITA
 9. Clone the repository using `git clone https://github.com/Luminarada80/scBONITA2.git`
 10. Use `mamba env create --file spec-file.txt --name scBonita`
