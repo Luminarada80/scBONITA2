@@ -23,7 +23,7 @@ COPY . /app
 # Set the working directory inside the container
 WORKDIR /app
 
-RUN echo "sudo chmod 777 /app/scBONITA_output"
+RUN chmod 777 /app
 
 # Run the default command inside the activated conda environment
 CMD ["bash", "-c", "source /opt/conda/etc/profile.d/conda.sh && conda activate scBonita && bash bash_scripts/docker_tutorial.sh"]

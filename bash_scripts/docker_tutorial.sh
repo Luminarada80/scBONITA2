@@ -81,7 +81,6 @@ else
         -v $(pwd):/app \
         -w /app \
         $DOCKER_IMAGE_NAME \
-        
 
     exit 0
 fi
@@ -230,6 +229,7 @@ fi
 # Stop and remove the Docker container if it was started by this script
 if [ ! -f /.dockerenv ]; then
     echo "Stopping and removing the Docker container..."
+    chmod -R 777 app/
     docker stop $(docker ps -q --filter "ancestor=$DOCKER_IMAGE_NAME")
     docker rm $(docker ps -a -q --filter "ancestor=$DOCKER_IMAGE_NAME")
 fi
