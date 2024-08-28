@@ -7,13 +7,13 @@ BlueHive is the HPC at the University of Rochster. These instructions will only 
 3. Restart the terminal
 4. Run `conda create -n myenv`
 5. Run `conda activate myenv`
-6. Run `conda update`
-7. Run `conda install -c anaconda git`
-8. Install mamba using `conda install -c conda-forge mamba`
-9. Navigate to the directory into which you would like to install scBONITA
-10. Clone the repository using `git clone https://github.com/Luminarada80/scBONITA2.git`
-11. Use `mamba env create --file spec-file.txt --name scBonita`
-12. Activate the environment using `conda activate scBonita`
+6. Run `conda install -c anaconda git`
+7. Install mamba using `conda install mamba`
+    - Note: This can take a significant amount of time, be patient
+8. Navigate to the directory into which you would like to install scBONITA
+9. Clone the repository using `git clone https://github.com/Luminarada80/scBONITA2.git`
+10. Use `mamba env create --file spec-file.txt --name scBonita`
+11. Activate the environment using `conda activate scBonita`
     - This will switch you into the correct environment to work with scBONITA.
     - A conda environment is basically a pre-packaged python installation that has a specific python version and package list that works with the code. This makes it so that you don't have to install each required package one-by-one, and you can have different package versions by having different conda environments
 
