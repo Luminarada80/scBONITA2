@@ -25,6 +25,11 @@ BlueHive is the HPC at the University of Rochster. These instructions will only 
 3. Run the test data for the scBONITA pipeline:
     - `bash bash_scripts/local_tutorial.sh`
 
+The first time you run scBONITA2, it will download the KEGG pathway xml files from KEGG. This takes a while to download, but makes the runtime of the rule determination step much faster.
+
 The `local_tutorial.sh` file can be copied and modified to run different datasets / conditions. When running scBONITA, place bash scripts into this folder to run. scBONITA will automatically create the necessary output files in a directory called `scBONITA_output`.
 
 > If a package is missing, download it using the command `mamba install <PACKAGE_NAME>` or `mamba install -c conda-forge <PACKAGE_NAME>`
+
+## Notes:
+This method installs `git` and `mamba` in the `myenv` environment. If you need to use `git`, you can either try installing it to your `scBonita` environment or you can use your `myenv` environment using `conda activate myenv`.
