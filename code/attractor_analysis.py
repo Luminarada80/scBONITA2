@@ -74,7 +74,7 @@ def run_attractor_analysis(network, cells):
 
     # Cluster the attractors using hierarchical agglomerative clustering
     logging.info(f'\tClustering the attractors...')
-    clusters, cluster_fig = hierarchical_clustering(attractor_distance_matrix, len(network.nodes), show_plot=False)
+    clusters, cluster_fig = hierarchical_clustering(attractor_distance_matrix, len(network.nodes))
 
     clustered_attractors = {}
     for i, cluster_num in enumerate(clusters):
@@ -265,43 +265,43 @@ def filter_attractors(dataframe):
 
     return filtered_attractor_indices
 
-def hierarchical_clustering(distance_matrix, num_nodes, show_plot):
-    """
-    Clusters the distance matrix of the attractors using Hierarchical Agglomerative Clustering.
-    The cutoff for the clusters is set as <=25% the number of genes in the network. Returns the
-    clusters and allows for a dendrogram to be displayed.
-    """
+# def hierarchical_clustering(distance_matrix, num_nodes):
+#     """
+#     Clusters the distance matrix of the attractors using Hierarchical Agglomerative Clustering.
+#     The cutoff for the clusters is set as <=25% the number of genes in the network. Returns the
+#     clusters and allows for a dendrogram to be displayed.
+#     """
 
-    # Cluster the attractors using Hierarchical Agglomerative Clustering
-    # Convert the distance matrix to a numpy array
-    distance_matrix = distance_matrix.to_numpy()
+#     # Cluster the attractors using Hierarchical Agglomerative Clustering
+#     # Convert the distance matrix to a numpy array
+#     distance_matrix = distance_matrix.to_numpy()
 
-    # Convert the square form distance matrix to a condensed form
-    condensed_distance_matrix = ssd.squareform(distance_matrix)
+#     # Convert the square form distance matrix to a condensed form
+#     condensed_distance_matrix = ssd.squareform(distance_matrix)
 
-    # Perform Hierarchical Agglomerative Clustering
-    # 'ward' is one of the methods for calculating the distance between the newly formed cluster
-    Z = sch.linkage(condensed_distance_matrix, method='ward')
+#     # Perform Hierarchical Agglomerative Clustering
+#     # 'ward' is one of the methods for calculating the distance between the newly formed cluster
+#     Z = sch.linkage(condensed_distance_matrix, method='ward')
 
-    cutoff = 0.25 * num_nodes
-    clusters = sch.fcluster(Z, t=cutoff, criterion='distance')
+#     cutoff = 0.25 * num_nodes
+#     clusters = sch.fcluster(Z, t=cutoff, criterion='distance')
 
-    logging.info(f'\t\tClustering cutoff value = {round(cutoff, 2)} (<=20% * number of genes {num_nodes})')
+#     logging.info(f'\t\tClustering cutoff value = {round(cutoff, 2)} (<=20% * number of genes {num_nodes})')
     
-    # Plotting the dendrogram
-    fig = plt.figure(figsize=(10, 7))
-    plt.title("Attractors Hierarchical Clustering Dendrogram")
+#     # Plotting the dendrogram
+#     fig = plt.figure(figsize=(10, 7))
+#     plt.title("Attractors Hierarchical Clustering Dendrogram")
     
-    dendrogram = sch.dendrogram(Z)
-    plt.axhline(y=cutoff, color = 'r', linestyle='--')
+#     dendrogram = sch.dendrogram(Z)
+#     plt.axhline(y=cutoff, color = 'r', linestyle='--')
 
-    plt.ylabel('Distance')
-    plt.xlabel('Attractors')
+#     plt.ylabel('Distance')
+#     plt.xlabel('Attractors')
 
-    if show_plot:
-        plt.show()
+#     if show_plot:
+#         plt.show()
     
-    return clusters, fig
+#     return clusters, fig
 
 def get_starting_state(file):
     starting_state = []
@@ -466,24 +466,21 @@ def read_data_from_directory(directory, trajectory_files_parsed):
     num_cells_parsed = 0
     for filename in os.listdir(directory):
         
-        if num_cells_parsed <= 50 and filename.endswith("_trajectory.csv") and filename not in trajectory_files_parsed:
+        # Keep track of how many files are parsed in this batch and which cells trajectories were analyzed
+        if num_cells_parsed <= 24 and filename.endswith("_trajectory.csv") and filename not in trajectory_files_parsed:
             trajectory_files_parsed.append(filename)
+            
             # Extract the cell number from the filename
             filepath = os.path.join(directory, filename)
             df = pd.read_csv(filepath, header=None)
             df.columns = ['Gene'] + [f'Time{i}' for i in range(1, df.shape[1])]
             df.set_index('Gene', inplace=True)
             
-            dataframes[filename] = df
+            # Extract the gene values from the dataset and append them to a dictionary with the gene name as key
+            dataframes[filename] = {gene: df.loc[gene].values for gene in df.index}
             num_cells_parsed += 1
 
     return dataframes, trajectory_files_parsed
-
-def extract_time_series(dataframes):
-    """
-    Extracts the time series data for the given filename
-    """
-    return {filename: {gene: df.loc[gene].values for gene in df.index} for filename, df in dataframes.items()}
 
 def compute_dtw_distance_pair(file1, file2, time_series_data):
     distances = {}
@@ -528,7 +525,6 @@ def compute_dtw_distances(time_series_data, output_directory):
 def create_distance_matrix(dtw_distances, file_names):
     # Create a distance matrix
     distance_matrix = np.zeros((len(file_names), len(file_names)))
-    
     for (file1, file2), total_distance in dtw_distances.items():
         i = file_names.index(file1)
         j = file_names.index(file2)
@@ -569,12 +565,12 @@ def hierarchical_clustering(dtw_distances, num_clusters):
     plt.ylabel('Distance', fontsize=8)
     plt.tight_layout()
 
-    logging.info(f'Please open "scBONITA_output/trajectories/{dataset_name}_{network_name}/dendrogram.png"')
+    
     plt.savefig(f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/dendrogram.png')
     
-
     # Set a threshold and get the clusters
     if num_clusters == 0:
+        logging.info(f'Please open "scBONITA_output/trajectories/{dataset_name}_{network_name}/dendrogram.png"')
         num_clusters = int(input('How many clusters?: '))
     clusters = fcluster(Z, num_clusters, criterion='maxclust')
 
@@ -590,20 +586,23 @@ def hierarchical_clustering(dtw_distances, num_clusters):
     return cluster_dict, num_clusters
 
 
-def summarize_clusters(directory, cell_names, cluster, chunk):
+def summarize_clusters(directory, cell_names):
     gene_expr_dict = {}
 
+    # Finds the path to all of the trajectory csv files
     trajectory_files = []
     for filename in os.listdir(directory):
         if filename.endswith("_trajectory.csv"):
             trajectory_files.append(os.path.join(directory, filename))
 
+    # finds the files of the cells in the cluster
     files_to_open = []
     for cell in cell_names:
         for file_name in trajectory_files:
             if cell in file_name:
                 files_to_open.append(file_name)
 
+    # Reads in the gene expression values from the simulation file
     for file_path in files_to_open:
         with open(file_path, 'r') as sim_file:
             for line in sim_file:
@@ -615,9 +614,10 @@ def summarize_clusters(directory, cell_names, cluster, chunk):
                     gene_expr_dict[gene_name] = []
                 
                 gene_expr_dict[gene_name].append(gene_expression)
+    
+    print(f'Opening {len(files_to_open)} trajectory files')
 
     gene_avg_expr = {}
-
     for gene, simulation_results in gene_expr_dict.items():
 
         if gene not in gene_avg_expr:
@@ -625,10 +625,11 @@ def summarize_clusters(directory, cell_names, cluster, chunk):
 
         transposed_data = list(map(list, zip(*simulation_results)))
 
+        # Finds the average gene expression at each point along the simulation
         for i in transposed_data:
             gene_avg_expr[gene].append(statistics.mean(i))
     
-    # Convert the dictionary to a DataFrame
+    # Convert the average gene expression dictionary to a DataFrame
     df = pd.DataFrame(gene_avg_expr)
 
     # Transpose the DataFrame
@@ -637,7 +638,7 @@ def summarize_clusters(directory, cell_names, cluster, chunk):
     return df
 
 
-def plot_heatmap(distance_matrix, file_names):
+def plot_distance_matrix(distance_matrix, file_names):
     # Convert the square distance matrix to a condensed distance matrix
     condensed_distance_matrix = squareform(distance_matrix)
     
@@ -650,7 +651,7 @@ def plot_heatmap(distance_matrix, file_names):
     
     # Reorder the distance matrix
     reordered_matrix = distance_matrix[np.ix_(order, order)]
-    reordered_file_names = [file_names[i].split('_trajectory')[0] for i in order]
+    reordered_file_names = [i for i in order]
     
     plt.figure(figsize=(8, 9))
     sns.heatmap(reordered_matrix, xticklabels=reordered_file_names, yticklabels=reordered_file_names, cmap='Greys', annot=False)
@@ -683,96 +684,144 @@ def simulate_cells(dense_dataset, num_simulations):
             # Reads in all of the rows for that columns
             selected_column = np.array([random.choice([0,1]) for _ in dense_dataset[:, cell_index]])
 
+            # Record which cells were simulated
             simulated_cells.append(cell_index)
 
             # Transposes the list of gene expression into a column
             transposed_random_column = selected_column.reshape(-1,1)
-
-            # Specify outfile path for the simulation results
-            outfile_folder = f'{file_paths["trajectories"]}/{dataset_name}_{network_name}'
-            png_folder = f'{outfile_folder}/png_files'
-            text_folder = f'{outfile_folder}/text_files'
-
-            os.makedirs(outfile_folder, exist_ok=True)
-            os.makedirs(png_folder, exist_ok=True)
-            os.makedirs(text_folder, exist_ok=True)
             
             # Simulate the network
-            simulated_attractor = simulate_network(network.nodes, transposed_random_column)
+            trajectory = simulate_network(network.nodes, transposed_random_column)
 
             # Visualize the network simulation results
-            fig = visualize_simulation(network.network, simulated_attractor, network, "False")
+            fig = visualize_simulation(network.network, trajectory, network, "False")
 
             # Save the attractor states to a csv file
-            save_attractor_simulation(f'{text_folder}/cell_{cell_index}_trajectory.csv', network, simulated_attractor)
+            save_attractor_simulation(f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/text_files/cell_{cell_index}_trajectory.csv',
+                                        network,
+                                        trajectory)
             plt.close(fig)
 
-            # Create a heatmap of the expression for easier attractor visualization
-            heatmap = create_heatmap(f'{text_folder}/cell_{cell_index}_trajectory.csv', f'Simulation for {dataset_name} {network_name} cell {cell_index} pathway ')
-            # heatmap.show()
+            # Create a heatmap to visualize the trajectories
+            heatmap = create_heatmap(f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/text_files/cell_{cell_index}_trajectory.csv',
+                                     f'Simulation for {dataset_name} {network_name} cell {cell_index} pathway ')
 
             # Saves a png of the results
-            heatmap.savefig(f'{png_folder}/cell_{cell_index}_trajectory.png', format='png')
+            heatmap.savefig(f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/png_files/cell_{cell_index}_trajectory.png', format='png')
             plt.close(heatmap)
             bar()
 
-def calculate_dtw(num_files, directory):
+def plot_average_trajectory(df, cluster):        
+    # Create average trajectory directory
+    os.makedirs(f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/avg_chunks', exist_ok=True)
+
+    # Create the heatmap
+    plt.figure(figsize=(8, 10))
+    sns.heatmap(df, cmap='Greys', yticklabels=True, vmin=0, vmax=1)
+    plt.title(f'Average Gene Expression Heatmap for Cluster {cluster}', fontsize=12)
+    plt.xlabel(xlabel='Simulation Time Steps', fontsize=12)
+    plt.ylabel(ylabel='Gene', fontsize=12)
+    plt.yticks(fontsize=8)
+    plt.xticks(fontsize=8)
+    plt.tight_layout()
+    plt.savefig(f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/avg_chunks/cluster_{cluster}_summary')
+    plt.close()
+
+def calculate_dtw(num_files, output_directory):
     trajectory_files_parsed = []
     num_clusters = 0
-    num_chunks = round(num_files / 50)
+    num_chunks = round(num_files / 25)
+    logging.info(f'Creating {num_chunks} chunks ({num_files} files / 25)')
 
     # Ensures there is always one chunk
     if num_chunks == 0:
         num_chunks = 1
 
     # Chunk the data down to create smaller averaged trajectory clusters
+    cluster_chunks = {}
+    cells_in_chunks = {}
     for chunk in range(num_chunks):
 
-        print(f'Chunk {chunk}')
+        logging.info(f'Creating chunk {chunk}:')
         # Reads in the cell trajectories from the simulations and creates a dataframe from them
-        dataframes, trajectory_files_parsed = read_data_from_directory(directory, trajectory_files_parsed)
-
-        # Extracts the time series data from the cell trajectory files
-        time_series_data = extract_time_series(dataframes)
+        time_series_data, trajectory_files_parsed = read_data_from_directory(output_directory, trajectory_files_parsed)
 
         # Computes the pairwise DTW distances between cells
-        dtw_distances = compute_dtw_distances(time_series_data, directory)
-        
+        dtw_distances = compute_dtw_distances(time_series_data, output_directory)
+
         # Calculates pairwise distance matrix between the cells
-        file_names = list(dataframes.keys())
+        file_names = list(time_series_data.keys())
         distance_matrix = create_distance_matrix(dtw_distances, file_names)
 
         # Performs hierarchical clustering to find the number of clusters
         cluster_dict, num_clusters = hierarchical_clustering(dtw_distances, num_clusters)
-    
+
         for cluster, cell_list in cluster_dict.items():
-            print(f'Summarizing cluster {cluster}')
-            df = summarize_clusters(directory, cell_list, cluster, chunk)
-
-            # Create average trajectory directory
-            os.makedirs(f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/avg_chunks', exist_ok=True)
-
-            # Create the heatmap
-            plt.figure(figsize=(8, 10))
-            sns.heatmap(df, cmap='Greys', yticklabels=True)
-            plt.title(f'Average Gene Expression Heatmap for Cluster {cluster}', fontsize=12)
-            plt.xlabel(xlabel='Simulation Time Steps', fontsize=12)
-            plt.ylabel(ylabel='Gene', fontsize=12)
-            plt.yticks(fontsize=8)
-            plt.xticks(fontsize=8)
-            plt.tight_layout()
-            plt.savefig(f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/avg_chunks/chunk_{chunk}{cluster}_summary')
-            plt.close()
+            df = summarize_clusters(output_directory, cell_list)
 
             # Binarize the DataFrame
             df_binarized = pd.DataFrame(np.where(df < 0.5, 0, 1), index=df.index, columns=df.columns)
 
-            # Write the DataFrame to a CSV file
+            # Save the cluster chunk to a dictionary
+            cluster_chunks[f'{chunk}:{cluster}']  = df_binarized
+
+            if chunk not in cells_in_chunks:
+                cells_in_chunks[chunk] = {}
+
+            cells_in_chunks[chunk][cluster] = cell_list
+
+
+    logging.info(f'{len(trajectory_files_parsed)} cell trajectories compared, split into {num_chunks} chunks and {num_clusters} clusters')
+
+    logging.info(f'\nComparing chunks')
+    chunk_dtw_distances = compute_dtw_distances(cluster_chunks, output_directory)
+
+    # Calculates pairwise distance matrix between the cells
+    chunk_names = list(cluster_chunks.keys())
+    distance_matrix = create_distance_matrix(chunk_dtw_distances, chunk_names)
+
+    # Performs hierarchical clustering to find the number of clusters
+    group_cluster_dict, num_clusters = hierarchical_clustering(chunk_dtw_distances, num_clusters)
+
+    # for chunk, cluster in cells_in_chunks.items():
+    #     print(f'Chunk {chunk}')
+    #     for clust_num, cells in cluster.items():
+    #         print(f'\tCluster {clust_num}')
+    #         print(f'\t\tFirst 5 cells: {cells[0:5]}')
+
+    cells_in_cluster = {}
+    for cluster, cell_list in group_cluster_dict.items():
+        num_cells_in_cluster = 0
+        print(cell_list)
+        for chunk_cluster in cell_list:
             
-            output_file_path = f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/avg_chunks/chunk_{chunk}{cluster}_average_trajectory.csv'
-            df_binarized.to_csv(output_file_path, header=False)
+            chunk = chunk_cluster.split(':')[0]
+            cluster = chunk_cluster.split(':')[1]
+            
+            # print(f'\tChunk {chunk}\n\t\t cluster {cluster}\n\t\t\t cells = {cells_in_chunks[int(chunk)][int(cluster)][0:5]}')
+            print(f'Chunk {chunk} cluster {cluster}')
+            num_cells_in_cluster += len(cells_in_chunks[int(chunk)][int(cluster)])
+
+            if cluster not in cells_in_cluster:
+                cells_in_cluster[cluster] = []
+            
+            cells_in_cluster[cluster].extend(cells_in_chunks[int(chunk)][int(cluster)])
         
-        plot_heatmap(distance_matrix, file_names)
+
+        print(f'Total number of cells in Cluster {cluster} = {num_cells_in_cluster}')
+    print(f'Cells in cluster\n{cells_in_cluster}')
+
+    for cluster, cluster_group in group_cluster_dict.items():
+        logging.info(f'Summarizing cluster {cluster}')
+
+        df = summarize_clusters(output_directory, cells_in_cluster[str(cluster)])
+
+        # Create average trajectory directory
+        os.makedirs(f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/avg_chunks', exist_ok=True)
+        
+        plot_average_trajectory(df, cluster)
+
+    plot_distance_matrix(distance_matrix, group_cluster_dict.keys())
 
 
 # If you want to run the attractor analysis by itself
@@ -784,16 +833,15 @@ if __name__ == '__main__':
     # Allow the user to either add in the dataset name and network name from the command line or as a prompt
     parser = argparse.ArgumentParser()
 
+    # Read in the user arguments from the command line or bash script
     dataset_name, show_simulation = attractor_analysis_arguments(parser)
-
-    # Load the network pickle files
-    all_networks = []
 
     # Load the cell and network objects for the dataset
     cell_population = pickle.load(open(f'{file_paths["pickle_files"]}/{dataset_name}_pickle_files/cells_pickle_file/{dataset_name}.cells.pickle', "rb"))
-    
     cells = cell_population.cells
 
+    # Load the network pickle files
+    all_networks = []
     logging.info(f'\nRunning attractor analysis for all networks...')
     pickle_file_path = f'{file_paths["pickle_files"]}/{dataset_name}_pickle_files/network_pickle_files/'
     for pickle_file in glob.glob(pickle_file_path + str(dataset_name) + "_" + "*" + ".network.pickle"):
@@ -804,17 +852,17 @@ if __name__ == '__main__':
         else:
             assert FileNotFoundError("Network pickle file not found")
     
+    # Catch exceptions where no networks are loaded
     try:
-        dataset_found = all_networks[0].name
+        successfully_loaded = all_networks[0].name
         logging.info(f'\nFound dataset!')
-
     except IndexError:
         error_message = "No networks loaded, check to make sure network pickle files exist in 'pickle_files/'"
         logging.error(error_message)
         raise Exception(error_message)
     
+    # Run the pathway analysis for each of the networks
     for network in all_networks:
-        # Run the pathway analysis for each of the networks
 
         logging.info(f'\n----- ATTRACTOR ANALYSIS -----')
 
@@ -823,99 +871,108 @@ if __name__ == '__main__':
         dense_dataset = np.array(dataset.todense())
         network_name = network.name
 
-        # Directory containing the trajectory files
-        directory = f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/text_files'
+        # Specify outfile path for the simulation results
+        outfile_dir = f'{file_paths["trajectories"]}/{dataset_name}_{network_name}'
+        png_dir = f'{outfile_dir}/png_files'
+        text_dir = f'{outfile_dir}/text_files'
 
-        # Finds the number of cell trajectory files
-        num_files = len([file for file in os.listdir(directory) if file.endswith('_trajectory.csv')])
-        print(f'Found {num_files} trajectory files')
+        # Make all of the outfile folders
+        os.makedirs(outfile_dir, exist_ok=True)
+        os.makedirs(png_dir, exist_ok=True)
+        os.makedirs(text_dir, exist_ok=True)
+
+        # Finds the number of trajectory files
+        num_files = len([file for file in os.listdir(text_dir) if file.endswith('_trajectory.csv')])
+        logging.info(f'Found {num_files} trajectory files')
 
         # Limit the number of cell trajectories simulated for testing purposes
-        if num_files <= 100:
-            num_simulations = 100 - num_files
+        if num_files <= 300:
+            num_simulations = 300 - num_files
         else:
             num_simulations = 0 #int(round(len(dense_dataset[1]) / 100, 0)) 
+
+        num_files += num_simulations
 
         # Simulates cells to create the cell trajectories
         simulate_cells(dense_dataset, num_simulations)
         
         # Create group average cell trajectories
         logging.info(f'Calculating cell trajectory clusters and averaging the cluster trajectories')
-        calculate_dtw(num_files, directory)
+        calculate_dtw(num_files, text_dir)
 
-        num_avg_traj_files = len([file for file in os.listdir(f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/avg_chunks') if file.endswith('_trajectory.csv')])
+        # num_avg_traj_files = len([file for file in os.listdir(f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/avg_chunks') if file.endswith('_trajectory.csv')])
         
-        logging.info(f'Calculating DTW between the averaged chunks')
-        # Group the average trajectories into larger groups
-        calculate_dtw(num_avg_traj_files, f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/avg_chunks')
+        # logging.info(f'Calculating DTW between the averaged chunks')
+        # # Group the average trajectories into larger groups
+        # calculate_dtw(num_avg_traj_files, f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/avg_chunks')
         
 
         # ----- End of DTW -----
 
-        cluster_fig = run_attractor_analysis(network, cells)
-        cluster_path = f'{file_paths["attractor_analysis_output"]}/{dataset_name}_attractors'
-        os.makedirs(cluster_path, exist_ok=True)
+        # cluster_fig = run_attractor_analysis(network, cells)
+        # cluster_path = f'{file_paths["attractor_analysis_output"]}/{dataset_name}_attractors'
+        # os.makedirs(cluster_path, exist_ok=True)
 
-        cluster_filename = f'{cluster_path}/{network.name}_cluster.png'
+        # cluster_filename = f'{cluster_path}/{network.name}_cluster.png'
 
-        cluster_fig.savefig(cluster_filename, bbox_inches='tight')
-        plt.close(cluster_fig)  # Close the figure after saving
+        # cluster_fig.savefig(cluster_filename, bbox_inches='tight')
+        # plt.close(cluster_fig)  # Close the figure after saving
 
 
-        logging.info(f'\n-----PATHWAY ANALYSIS RESULTS -----')
-        logging.info(f'\nNETWORK {network.name.upper()}')
+        # logging.info(f'\n-----PATHWAY ANALYSIS RESULTS -----')
+        # logging.info(f'\nNETWORK {network.name.upper()}')
 
-        attractor_counts = {}
-        total_cells = 0
-        for cell in network.cell_map.keys():
-            attractor = network.cell_map[cell]
-            if attractor not in attractor_counts:
-                attractor_counts[attractor] = 1
-            else:
-                attractor_counts[attractor] += 1
-            total_cells += 1
+        # attractor_counts = {}
+        # total_cells = 0
+        # for cell in network.cell_map.keys():
+        #     attractor = network.cell_map[cell]
+        #     if attractor not in attractor_counts:
+        #         attractor_counts[attractor] = 1
+        #     else:
+        #         attractor_counts[attractor] += 1
+        #     total_cells += 1
 
-        for attractor_num, num_cells in attractor_counts.items():
-            logging.info(f'\tAttractor {attractor_num} contains {num_cells} cells ({round(num_cells / total_cells * 100, 3)}%)')
+        # for attractor_num, num_cells in attractor_counts.items():
+        #     logging.info(f'\tAttractor {attractor_num} contains {num_cells} cells ({round(num_cells / total_cells * 100, 3)}%)')
 
-        for attractor_num, representative_attractor in network.representative_attractors.items():
-            if attractor_num in attractor_counts:
+        # for attractor_num, representative_attractor in network.representative_attractors.items():
+        #     if attractor_num in attractor_counts:
 
-                # Create a dataset- and network-specific directory for the output
-                output_directory = f'{file_paths["attractor_analysis_output"]}/{dataset_name}_attractors/{network.name}_attractors/attractor_{str(attractor_num)}'
-                os.makedirs(output_directory, exist_ok=True)
+        #         # Create a dataset- and network-specific directory for the output
+        #         output_directory = f'{file_paths["attractor_analysis_output"]}/{dataset_name}_attractors/{network.name}_attractors/attractor_{str(attractor_num)}'
+        #         os.makedirs(output_directory, exist_ok=True)
 
-                filename = f'{dataset_name}_{network.name}_attractor_{attractor_num}.txt'
-                np.savetxt(output_directory + "/" + filename, representative_attractor.T, fmt='%d')
+        #         filename = f'{dataset_name}_{network.name}_attractor_{attractor_num}.txt'
+        #         np.savetxt(output_directory + "/" + filename, representative_attractor.T, fmt='%d')
 
-                logging.info(f'\tSaved representative attractor {attractor_num}')
-                logging.debug(f'\t{representative_attractor}')
+        #         logging.info(f'\tSaved representative attractor {attractor_num}')
+        #         logging.debug(f'\t{representative_attractor}')
                 
-                simulation_results = simulate_network(network.nodes, output_directory + "/" + filename)
+        #         simulation_results = simulate_network(network.nodes, output_directory + "/" + filename)
 
-                svg_output_path = f'{output_directory}/attractor_{attractor_num}_simulation_results.svg'
-                png_output_path = f'{output_directory}/attractor_{attractor_num}_simulation_results.png'
+        #         svg_output_path = f'{output_directory}/attractor_{attractor_num}_simulation_results.svg'
+        #         png_output_path = f'{output_directory}/attractor_{attractor_num}_simulation_results.png'
 
-                fig = visualize_simulation(network.network, simulation_results, network, show_simulation)
+        #         fig = visualize_simulation(network.network, simulation_results, network, show_simulation)
 
-                plt.savefig(svg_output_path, format='svg')
-                plt.savefig(png_output_path, format='png')
-                plt.close(fig)  # Close the figure after saving
+        #         plt.savefig(svg_output_path, format='svg')
+        #         plt.savefig(png_output_path, format='png')
+        #         plt.close(fig)  # Close the figure after saving
 
-        logging.info(f'\n\tSaved attractor analysis results to "attractor_analysis_output/{dataset_name}_attractors/{network.name}_attractors')
+        # logging.info(f'\n\tSaved attractor analysis results to "attractor_analysis_output/{dataset_name}_attractors/{network.name}_attractors')
 
 
-        logging.info(f'\nAdding representative attractor map to network pickle files:')
-        network_directory_path = f'{file_paths["pickle_files"]}/{dataset_name}_pickle_files/network_pickle_files'
-        os.makedirs(network_directory_path, exist_ok=True)
+        # logging.info(f'\nAdding representative attractor map to network pickle files:')
+        # network_directory_path = f'{file_paths["pickle_files"]}/{dataset_name}_pickle_files/network_pickle_files'
+        # os.makedirs(network_directory_path, exist_ok=True)
 
-        network_pickle_file_path = f'{network_directory_path}/{dataset_name}_{network.name}.network.pickle'
-        logging.info(f'\tFile: {dataset_name}_{network.name}.network.pickle')
-        pickle.dump(network, open(network_pickle_file_path, "wb"))
+        # network_pickle_file_path = f'{network_directory_path}/{dataset_name}_{network.name}.network.pickle'
+        # logging.info(f'\tFile: {dataset_name}_{network.name}.network.pickle')
+        # pickle.dump(network, open(network_pickle_file_path, "wb"))
 
-        cell_pickle_file_path = f'{file_paths["pickle_files"]}/{dataset_name}_pickle_files/cells_pickle_file'
-        os.makedirs(cell_pickle_file_path, exist_ok=True)
+        # cell_pickle_file_path = f'{file_paths["pickle_files"]}/{dataset_name}_pickle_files/cells_pickle_file'
+        # os.makedirs(cell_pickle_file_path, exist_ok=True)
 
-        cells_pickle_file = f'{dataset_name}.cells.pickle'
-        with open(f'{cell_pickle_file_path}/{cells_pickle_file}', "wb") as file:
-            pickle.dump(cell_population, file)
+        # cells_pickle_file = f'{dataset_name}.cells.pickle'
+        # with open(f'{cell_pickle_file_path}/{cells_pickle_file}', "wb") as file:
+        #     pickle.dump(cell_population, file)
