@@ -454,7 +454,8 @@ def compute_dtw_distance_pair(cell1, cell2, cell_trajectory_dict):
         cell_trajectory_dict: A dictionary with cell names as keys and a gene name: trajectory dict as values
 
     Returns: 
-        cell1, cell2, total_distance
+        cell1, cell2: Each of the cells names
+        total_distance: The summed DTW distances between the trajectory of each gene
     """
     distances = {}
 
