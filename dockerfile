@@ -16,14 +16,18 @@ RUN conda install mamba -n base -c conda-forge \
 RUN echo "source /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc
 RUN echo "conda activate scBonita" >> ~/.bashrc
 
+RUN useradd -ms /bin/bash admin
 
 # Copy the scBONITA code into the container
 COPY . /app
+COPY --chown=admin:admin app /app
 
 # Set the working directory inside the container
 WORKDIR /app
 
 RUN chmod 777 /app
+
+USER admin
 
 # Run the default command inside the activated conda environment
 CMD ["bash", "-c", "source /opt/conda/etc/profile.d/conda.sh && conda activate scBonita && bash bash_scripts/docker_tutorial.sh"]
