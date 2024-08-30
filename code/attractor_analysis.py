@@ -28,21 +28,18 @@ import statistics
 from user_input_prompts import attractor_analysis_arguments
 from file_paths import file_paths
 
-def simulate_network(nodes, filename):
+def simulate_network(nodes, cell_column):
+    """
+    Simulates signal flow through a Boolean network starting from a cell expression state
+    """
     steps = 20
 
+    # Create a starting state by looking at the expression of each network gene for the cell's column
     starting_state = []
-    for i in filename:
-        starting_state.append(i[0])
+    for gene_expression in cell_column:
+        # print(gene_expression)
+        starting_state.append(gene_expression)
 
-    total_simulation_states = vectorized_run_simulation(nodes, starting_state, steps)
-    
-    simulation_results = [[int(item) for item in sublist] for sublist in total_simulation_states]
-
-    return simulation_results
-
-
-def vectorized_run_simulation(nodes, starting_state, steps):
     total_simulation_states = []
 
     def evaluate_expression(data, expression):
@@ -93,8 +90,13 @@ def vectorized_run_simulation(nodes, starting_state, steps):
 
         # Save the expression 
         total_simulation_states.append(step_expression)
+    
+    simulation_results = [[int(item) for item in sublist] for sublist in total_simulation_states]
 
-    return total_simulation_states
+    return simulation_results
+
+
+
 
 def create_heatmap(path, title):
     data = []
@@ -366,15 +368,6 @@ def plot_distance_matrix(distance_matrix, file_names):
     plt.close()
 
 
-
-def save_attractor_simulation(filename, network, simulated_attractor):
-    # Save the attractor simulation to a file
-    with open(filename, 'w') as file:
-        simulated_attractor = np.array(simulated_attractor).T
-        for gene_num, expression in enumerate(simulated_attractor):
-            file.write(f'{network.nodes[gene_num].name},{",".join([str(i) for i in list(expression)])}\n')
-
-
 def simulate_cells(dense_dataset, num_simulations):
     # Simulate cell trajectories
     logging.info(f'\tSimulating {num_simulations} cell trajectories')
@@ -382,7 +375,7 @@ def simulate_cells(dense_dataset, num_simulations):
     with alive_bar(num_simulations) as bar:
         for i in range(num_simulations):
 
-            # Get the list of existing files in the cell simulation directory
+            # Get the list of cells that have already been simulated
             existing_files = os.listdir(f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/text_files')
             existing_indices = set()
             for filename in existing_files:
@@ -395,41 +388,14 @@ def simulate_cells(dense_dataset, num_simulations):
             while cell_index in existing_indices:
                 cell_index = np.random.choice(dense_dataset.shape[1])
 
-            # Reads in all rows for that columns
-            selected_column = np.array([random.choice([0,1]) for _ in dense_dataset[:, cell_index]])
+            # Reads in the network gene expression for the chosen cell column
+            cell_starting_state = np.array([int(gene_expr) for gene_expr in dense_dataset[:, cell_index]])
 
             # Record which cells were simulated
             simulated_cells.append(cell_index)
-
-            # Transposes the list of gene expression into a column
-            transposed_random_column = selected_column.reshape(-1,1)
             
-            # Simulate the network
-            trajectory = simulate_network(network.nodes, transposed_random_column)
-
-            # Create a 
-            node_indices = [node.index for node in network.nodes]
-            pos = nx.spring_layout(network.network, k=1, iterations=100)  # Pre-compute layout
-            fig, ax = plt.subplots(figsize=(12, 8))
-            ax.set_title(f"Network: {network.name}")
-            
-            # Initial drawing of the graph
-            nx.draw(network.network, pos, ax=ax, with_labels=True)
-            node_collections = ax.collections[0]  # Get the collection of nodes
-            frame_text = ax.text(0.02, 0.95, '', transform=ax.transAxes)
-
-            def update_graph(frame):
-                # Update node colors without redrawing everything
-                colors = []
-                for i in node_indices:
-                    if trajectory[frame-1][i] != trajectory[frame][i]:
-                        colors.append('gold' if trajectory[frame][i] == 1 else 'red')
-                    else:
-                        colors.append('green' if trajectory[frame][i] == 1 else 'red')
-
-                node_collections.set_color(colors)  # Update colors directly
-            
-                frame_text.set_text(f'Frame: {frame+1}')
+            # Simulate the network using the expression in the selected column as the starting state
+            trajectory = simulate_network(network.nodes, cell_starting_state)
 
             # Save the attractor simulation to a csv file
             attractor_sim_path = f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/text_files/cell_{cell_index}_trajectory.csv'
@@ -437,8 +403,6 @@ def simulate_cells(dense_dataset, num_simulations):
                     trajectory = np.array(trajectory).T
                     for gene_num, expression in enumerate(trajectory):
                         file.write(f'{network.nodes[gene_num].name},{",".join([str(i) for i in list(expression)])}\n')
-
-            plt.close(fig)
 
             # Create a heatmap to visualize the trajectories
             heatmap = create_heatmap(f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/text_files/cell_{cell_index}_trajectory.csv',
@@ -539,8 +503,32 @@ def calculate_dtw(num_files, output_directory, num_cells_per_chunk):
     #         print(f'\tCluster {clust_num}')
     #         print(f'\t\tFirst 5 cells: {cells[0:5]}')
 
-    plot_distance_matrix(distance_matrix, group_cluster_dict.keys())
+    # plot_distance_matrix(distance_matrix, group_cluster_dict.keys())
+    # Convert the square distance matrix to a condensed distance matrix
+    condensed_distance_matrix = squareform(distance_matrix)
+    
+    # Perform hierarchical clustering
+    linkage_matrix = linkage(condensed_distance_matrix, method='average')
+    
+    # Create a dendrogram to get the order of the leaves
+    dendro = dendrogram(linkage_matrix, no_plot=True)
+    order = dendro['leaves']
+    
+    # Reorder the distance matrix
+    reordered_matrix = distance_matrix[np.ix_(order, order)]
+    reordered_file_names = [i for i in order]
+    
+    plt.figure(figsize=(8, 9))
+    sns.heatmap(reordered_matrix, xticklabels=reordered_file_names, yticklabels=reordered_file_names, cmap='Greys', annot=False)
+    plt.yticks(fontsize=8)
+    plt.xticks(fontsize=8)
+    plt.title("DTW Distance Heatmap")
+    plt.tight_layout()
+    plt.show()
+    plt.savefig(f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/distance_heatmap')
+    plt.close()
 
+    # Keeps track of the identity of the cells and number of cells in each cluster and chunk so they can be compiled later
     cells_in_cluster = {}
     for cluster, cell_list in group_cluster_dict.items():
         num_cells_in_cluster = 0
