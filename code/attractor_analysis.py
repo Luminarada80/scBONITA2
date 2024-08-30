@@ -198,7 +198,7 @@ def compute_dtw_distance_pair(cell1: str, cell2: str, cell_trajectory_dict: dict
     return (cell1, cell2, total_distance)
 
 
-def compute_dtw_distances(cell_trajectory_dict, output_directory):
+def compute_dtw_distances(cell_trajectory_dict: dict, output_directory: str):
     """
     Handles parallel processing of the dynamic time warping calculations.
 
@@ -244,7 +244,7 @@ def compute_dtw_distances(cell_trajectory_dict, output_directory):
     return dtw_distances
 
 
-def create_distance_matrix(dtw_distances, file_names):
+def create_distance_matrix(dtw_distances: dict, file_names: list):
     # Create a distance matrix
     distance_matrix = np.zeros((len(file_names), len(file_names)))
     for (file1, file2), total_distance in dtw_distances.items():
@@ -256,7 +256,7 @@ def create_distance_matrix(dtw_distances, file_names):
     return distance_matrix
 
 
-def hierarchical_clustering(dtw_distances, num_clusters):
+def hierarchical_clustering(dtw_distances: dict, num_clusters: int):
 
     # Extract unique cell names
     cells = set()
@@ -309,7 +309,7 @@ def hierarchical_clustering(dtw_distances, num_clusters):
     return cluster_dict, num_clusters
 
 
-def summarize_clusters(directory, cell_names):
+def summarize_clusters(directory: str, cell_names: list):
     gene_expr_dict = {}
 
     # Finds the path to all of the trajectory csv files
@@ -361,33 +361,7 @@ def summarize_clusters(directory, cell_names):
     return df
 
 
-def plot_distance_matrix(distance_matrix, file_names):
-    # Convert the square distance matrix to a condensed distance matrix
-    condensed_distance_matrix = squareform(distance_matrix)
-    
-    # Perform hierarchical clustering
-    linkage_matrix = linkage(condensed_distance_matrix, method='average')
-    
-    # Create a dendrogram to get the order of the leaves
-    dendro = dendrogram(linkage_matrix, no_plot=True)
-    order = dendro['leaves']
-    
-    # Reorder the distance matrix
-    reordered_matrix = distance_matrix[np.ix_(order, order)]
-    reordered_file_names = [i for i in order]
-    
-    plt.figure(figsize=(8, 9))
-    sns.heatmap(reordered_matrix, xticklabels=reordered_file_names, yticklabels=reordered_file_names, cmap='Greys', annot=False)
-    plt.yticks(fontsize=8)
-    plt.xticks(fontsize=8)
-    plt.title("DTW Distance Heatmap")
-    plt.tight_layout()
-    plt.show()
-    plt.savefig(f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/distance_heatmap')
-    plt.close()
-
-
-def simulate_cells(dense_dataset, num_simulations):
+def simulate_cells(dense_dataset: list, num_simulations: int):
     # Simulate cell trajectories
     logging.info(f'\tSimulating {num_simulations} cell trajectories')
     simulated_cells = []
