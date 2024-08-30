@@ -28,38 +28,58 @@ import statistics
 from user_input_prompts import attractor_analysis_arguments
 from file_paths import file_paths
 
-def simulate_network(nodes, cell_column):
+def simulate_network(nodes: object, cell_column: list):
     """
-    Simulates signal flow through a Boolean network starting from a cell expression state
+    Simulates signal flow through a Boolean network starting from a cell's gene expression.
+
+    Parameters
+    -----------
+    nodes : object
+        node_class objects for the genes in the network
+    cell_column : list
+        A list containing the gene expression for the cell to be simulated
+
+    Returns
+    -----------
+    simulation_results : list
+        A matrix containing the simulation results. Rows = genes, columns = simulation step
     """
     steps = 20
 
-    # Create a starting state by looking at the expression of each network gene for the cell's column
+    # Set the starting state using the gene expression for the cell
     starting_state = []
     for gene_expression in cell_column:
-        # print(gene_expression)
         starting_state.append(gene_expression)
 
     total_simulation_states = []
 
     def evaluate_expression(data, expression):
+        """
+        Evaluates the next expression state for a node using the incoming nodes and the logic rules
+        """
+        # Replace the Boolean rules with thier operation symbols so that ne.evaluate can parse them
         expression = expression.replace('and', '&').replace('or', '|').replace('not', '~')
+
+        # Change the expression to a boolean value if there are logic rules for efficeint calculation
         if any(op in expression for op in ['&', '|', '~']):
             local_vars = {key: np.array(value).astype(bool) for key, value in data.items()}
         else:
             local_vars = {key: np.array(value) for key, value in data.items()}
+
+        # Evaluate the state of the current node based on the expression and logic function of incoming nodes
         return ne.evaluate(expression, local_dict=local_vars)
 
-    # Run the simulation
+    # Run the simulation for `steps` simulation steps
     for step in range(steps):
         step_expression = []
 
         # Iterate through each node in the network
         for node in nodes:
 
-            # Initialize A, B, C to False by default (adjust according to what makes sense in context)
+            # Initialize A, B, C
             A, B, C = (False,) * 3
             
+            # Get the indices for the incoming nodes
             data = {}
             incoming_node_indices = [predecessor_index for predecessor_index in node.predecessors]
 
@@ -83,27 +103,30 @@ def simulate_network(nodes, cell_column):
                 if len(incoming_node_indices) > 3:
                     data['D'] = total_simulation_states[step-1][incoming_node_indices[3]]
 
+            # Evaluate the next step based on the current state of the incoming nodes and the rules
             next_step_node_expression = evaluate_expression(data, node.calculation_function)
 
             # Save the expression for the node for this step
             step_expression.append(next_step_node_expression)
 
-        # Save the expression 
+        # Save the expression of each genes next step to the total simulation steps
         total_simulation_states.append(step_expression)
     
+    # Return a matrix of simulation steps where the rows are genes and columns are simulation steps
     simulation_results = [[int(item) for item in sublist] for sublist in total_simulation_states]
 
     return simulation_results
 
 
-
-
-def create_heatmap(path, title):
+def create_heatmap(trajectory_path: str, title: str):
+    """
+    Creates a trajectory figure using a sns heatmap
+    """
     data = []
     gene_names = []
 
-    with open(path, 'r') as file:
-        for line in file:
+    with open(trajectory_path, 'r') as trajectory_file:
+        for line in trajectory_file:
             line = line.strip().split(',')
             gene_name = line[0]
             time_data = [int(i) for i in line[1:]]
@@ -143,45 +166,25 @@ def create_heatmap(path, title):
     return plot
 
 
-def read_data_from_directory(directory, trajectory_files_parsed, num_cells_to_parse):
-    """
-    Reads in the cell trajectory files and creates a dictionary of dataframes with the file
-    name as the key and the dataframe as the falue
-    """
-    dataframes = {}
-
-    num_cells_parsed = 0
-    for filename in os.listdir(directory):
-        
-        # Keep track of how many files are parsed in this batch and which cells trajectories were analyzed
-        if num_cells_parsed <= num_cells_to_parse-1 and filename.endswith("_trajectory.csv") and filename not in trajectory_files_parsed:
-            trajectory_files_parsed.append(filename)
-            
-            # Extract the cell number from the filename
-            filepath = os.path.join(directory, filename)
-            df = pd.read_csv(filepath, header=None)
-            df.columns = ['Gene'] + [f'Time{i}' for i in range(1, df.shape[1])]
-            df.set_index('Gene', inplace=True)
-            
-            # Extract the gene values from the dataset and append them to a dictionary with the gene name as key
-            dataframes[filename] = {gene: df.loc[gene].values for gene in df.index}
-            num_cells_parsed += 1
-
-    return dataframes, trajectory_files_parsed
-
-
-def compute_dtw_distance_pair(cell1, cell2, cell_trajectory_dict):
+def compute_dtw_distance_pair(cell1: str, cell2: str, cell_trajectory_dict: dict):
     """
     Computes the dynamic time warping distance between two cell trajectories for each gene.
     
-    Parameters:
-        cell1: The name of the first cell to be compared
-        cell2: The name of the second cell to be compared
-        cell_trajectory_dict: A dictionary with cell names as keys and a gene name: trajectory dict as values
+    Parameters
+    ----------
+    cell1: str
+        The name of the first cell to be compared
+    cell2: str
+        The name of the second cell to be compared
+    cell_trajectory_dict: dict
+        A dictionary with cell names as keys and a dictionary of gene names with trajectories as values
 
-    Returns: 
-        cell1, cell2: Each of the cells names
-        total_distance: The summed DTW distances between the trajectory of each gene
+    Returns
+    -------
+    cell1, cell2 : Str, Str
+        Cell names
+    total_distance : int | float
+        The summed DTW distances between the trajectory of each gene
     """
     distances = {}
 
@@ -196,6 +199,22 @@ def compute_dtw_distance_pair(cell1, cell2, cell_trajectory_dict):
 
 
 def compute_dtw_distances(cell_trajectory_dict, output_directory):
+    """
+    Handles parallel processing of the dynamic time warping calculations.
+
+    Parameters
+    ----------
+    cell_trajectory_dict: dict
+        A dictionary containing the cell names as keys and a dictionary of genes paired to trajectories
+        as the values
+    output_directory: str
+        Path to write the DTW distances between each cell pair
+
+    Returns
+    -------
+    dtw_distances: dict
+        A dictionary with cell pair tuples as keys and the DTW distance as values
+    """
     dtw_distances = {}
     cell_names = list(cell_trajectory_dict.keys())
     total_combinations = len(cell_names) * (len(cell_names) - 1) // 2
@@ -414,24 +433,31 @@ def simulate_cells(dense_dataset, num_simulations):
             bar()
 
 
-def plot_average_trajectory(df, cluster):        
+def plot_average_trajectory(df: pd.DataFrame, cluster_num: str):        
+    """
+    Creates an average trajectory figure for a cluster.
+
+    Creates a trajectory simulation figure where the gene expression darkness at each step
+    corresponds with the how many of the cells in that cluster were expressing the gene at
+    that step.
+    """
     # Create average trajectory directory
     os.makedirs(f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/avg_chunks', exist_ok=True)
 
     # Create the heatmap
     plt.figure(figsize=(8, 10))
     sns.heatmap(df, cmap='Greys', yticklabels=True, vmin=0, vmax=1)
-    plt.title(f'Average Gene Expression Heatmap for Cluster {cluster}', fontsize=12)
+    plt.title(f'Average Gene Expression Heatmap for Cluster {cluster_num}', fontsize=12)
     plt.xlabel(xlabel='Simulation Time Steps', fontsize=12)
     plt.ylabel(ylabel='Gene', fontsize=12)
     plt.yticks(fontsize=8)
     plt.xticks(fontsize=8)
     plt.tight_layout()
-    plt.savefig(f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/avg_chunks/cluster_{cluster}_summary')
+    plt.savefig(f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/avg_chunks/cluster_{cluster_num}_summary')
     plt.close()
 
 
-def create_trajectory_chunks(num_chunks, num_clusters, output_directory):
+def create_trajectory_chunks(num_chunks: int, num_clusters: int, output_directory: str):
     trajectory_files_parsed = []
 
     # Chunk the data down to create smaller averaged trajectory clusters
@@ -441,8 +467,24 @@ def create_trajectory_chunks(num_chunks, num_clusters, output_directory):
 
         logging.info(f'Creating chunk {chunk+1}:')
         # Reads in the cell trajectories from the simulations and creates a dataframe from them
-        cell_trajectory_dict, trajectory_files_parsed = read_data_from_directory(output_directory, trajectory_files_parsed,
-                                                                             num_cells_per_chunk)
+        cell_trajectory_dict = {}
+
+        num_cells_parsed = 0
+        for filename in os.listdir(output_directory):
+            
+            # Keep track of how many files are parsed in this batch and which cells trajectories were analyzed
+            if num_cells_parsed <= num_cells_per_chunk-1 and filename.endswith("_trajectory.csv") and filename not in trajectory_files_parsed:
+                trajectory_files_parsed.append(filename)
+                
+                # Extract the cell number from the filename
+                filepath = os.path.join(output_directory, filename)
+                df = pd.read_csv(filepath, header=None)
+                df.columns = ['Gene'] + [f'Time{i}' for i in range(1, df.shape[1])]
+                df.set_index('Gene', inplace=True)
+                
+                # Extract the gene values from the dataset and append them to a dictionary with the gene name as key
+                cell_trajectory_dict[filename] = {gene: df.loc[gene].values for gene in df.index}
+                num_cells_parsed += 1
 
         # Computes the pairwise DTW distances between cells
         dtw_distances = compute_dtw_distances(cell_trajectory_dict, output_directory)
@@ -461,7 +503,7 @@ def create_trajectory_chunks(num_chunks, num_clusters, output_directory):
             df_binarized = pd.DataFrame(np.where(df < 0.5, 0, 1), index=df.index, columns=df.columns)
 
             # Save the cluster chunk to a dictionary
-            cluster_chunks[f'{chunk}:{cluster}'] = df  # df_binarized
+            cluster_chunks[f'{chunk}:{cluster}'] = df_binarized
 
             # Keep track of which cells are in which chunks for later
             if chunk not in cells_in_chunks:
@@ -472,7 +514,7 @@ def create_trajectory_chunks(num_chunks, num_clusters, output_directory):
     return cluster_chunks, cells_in_chunks, num_clusters
 
 
-def calculate_dtw(num_files, output_directory, num_cells_per_chunk):
+def calculate_dtw(num_files: int, output_directory: str, num_cells_per_chunk: int):
     trajectory_files_parsed = []
     num_clusters = 0
     num_chunks = round(num_files / (num_cells_per_chunk))
@@ -497,13 +539,6 @@ def calculate_dtw(num_files, output_directory, num_cells_per_chunk):
     # Performs hierarchical clustering to find the number of clusters
     group_cluster_dict, num_clusters = hierarchical_clustering(chunk_dtw_distances, num_clusters)
 
-    # for chunk, cluster in cells_in_chunks.items():
-    #     print(f'Chunk {chunk}')
-    #     for clust_num, cells in cluster.items():
-    #         print(f'\tCluster {clust_num}')
-    #         print(f'\t\tFirst 5 cells: {cells[0:5]}')
-
-    # plot_distance_matrix(distance_matrix, group_cluster_dict.keys())
     # Convert the square distance matrix to a condensed distance matrix
     condensed_distance_matrix = squareform(distance_matrix)
     
@@ -518,14 +553,15 @@ def calculate_dtw(num_files, output_directory, num_cells_per_chunk):
     reordered_matrix = distance_matrix[np.ix_(order, order)]
     reordered_file_names = [i for i in order]
     
+    # Plot the distance heatmap
     plt.figure(figsize=(8, 9))
     sns.heatmap(reordered_matrix, xticklabels=reordered_file_names, yticklabels=reordered_file_names, cmap='Greys', annot=False)
     plt.yticks(fontsize=8)
     plt.xticks(fontsize=8)
     plt.title("DTW Distance Heatmap")
     plt.tight_layout()
-    plt.show()
     plt.savefig(f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/distance_heatmap')
+    plt.show()
     plt.close()
 
     # Keeps track of the identity of the cells and number of cells in each cluster and chunk so they can be compiled later
@@ -603,8 +639,8 @@ if __name__ == '__main__':
 
         logging.info(f'\n----- ATTRACTOR ANALYSIS -----')
 
-        num_cells_per_chunk = 25
-        num_cells_to_analyze = 100
+        num_cells_per_chunk = 50
+        num_cells_to_analyze = 1000
 
         # Convert the network's sparse dataset to a dense one
         dataset = network.dataset
