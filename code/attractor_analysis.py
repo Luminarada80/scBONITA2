@@ -28,258 +28,6 @@ import statistics
 from user_input_prompts import attractor_analysis_arguments
 from file_paths import file_paths
 
-# def run_attractor_analysis(network, cells):
-#     """
-#     Runs the attractor analysis for the dataset and all of the networks.
-#     """
-#     # Set up the attractor analysis with the dataset and the parsed networks
-#
-#     logging.info(f'\nNetwork: {network.name}')
-#     # Generate attractor
-#     logging.info(f'\tGenerating attractors...')
-#
-#         # Specifies the path to the correct network pickle file
-#     network_pickle_file = f'{file_paths["pickle_files"]}/{dataset_name}_pickle_files/network_pickle_files/{dataset_name}_{network_name}.network.pickle'
-#
-#     network_attractors, simulated_dataset = generate_attractors(network.nodes, network.dataset)
-#     attractors_start = [attractor[:, 0] for _, attractor in network_attractors.items()]
-#
-#     # Convert the sparse dataset to a dense one
-#     if isinstance(simulated_dataset, spmatrix):
-#         dense_dataset = simulated_dataset.todense()
-#     else:
-#         dense_dataset = simulated_dataset
-#
-#     # Generate Hamming distance matrix between cells and attractors
-#     logging.info(f'\tCalculating hamming distance between cells and attractors')
-#     logging.info(f'\tTransposed dataset shape: {dense_dataset.shape}')
-#     transposed_dataset = transpose_dataset(dense_dataset)
-#     num_nodes = len(network.nodes)
-#     num_cells = range(transposed_dataset.shape[0])
-#     num_attractors = range(len(attractors_start))
-#
-#     logging.info(f'\t\tNodes: {num_nodes}')
-#     logging.info(f'\t\tCells: {transposed_dataset.shape[0]}')
-#     logging.info(f'\t\tAttractors: {len(attractors_start)}')
-#     cell_attractor_hamming_df = calculate_hamming_distance(num_attractors, num_cells, transposed_dataset, attractors_start)
-#
-#     # Filter the attractors to only keep those that most closely match the expression of at least one cell
-#     filtered_attractor_indices = filter_attractors(cell_attractor_hamming_df)
-#     filtered_attractors = [attractors_start[i] for i in filtered_attractor_indices]
-#     num_filtered_attractors = range(len(filtered_attractors))
-#
-#     # Create a distance matrix between each of the attractors
-#     logging.info(f'\tGenerating attractor distance matrix...')
-#     attractor_distance_matrix = calculate_hamming_distance(num_filtered_attractors, num_filtered_attractors, filtered_attractors, filtered_attractors)
-#
-#     # Cluster the attractors using hierarchical agglomerative clustering
-#     logging.info(f'\tClustering the attractors...')
-#     clusters, cluster_fig = hierarchical_clustering(attractor_distance_matrix, len(network.nodes))
-#
-#     clustered_attractors = {}
-#     for i, cluster_num in enumerate(clusters):
-#         if cluster_num not in clustered_attractors:
-#             clustered_attractors[cluster_num] = {}
-#         clustered_attractors[cluster_num][filtered_attractor_indices[i]] = filtered_attractors[i]
-#
-#     # Find the Hamming Distance between the cells and the attractors within the clusters
-#     logging.info(f'\tCalculating Hamming distance between cells and clustered attractors')
-#
-#     # For each of the cells, find the hamming distance to the best cell
-#     logging.info(f'Number of cells in the full dataset: {network.dataset.shape[1]}')
-#     if issparse(network.dataset):
-#         full_dataset = network.dataset.toarray().T
-#     else:
-#         full_dataset = network.dataset.T
-#
-#     cell_map = {}
-#     for cell_num, cell in enumerate(full_dataset):
-#         cell_map[cell_num] = {}
-#
-#     for cluster, attractors in clustered_attractors.items():
-#         logging.debug(f'\nCluster {cluster}')
-#
-#         num_filtered_attractors = range(len(attractors.values()))
-#
-#         mapped_cluster_attractors = calculate_hamming_distance(num_filtered_attractors, num_cells, attractors.values(), transposed_dataset)
-#
-#         # transposed_mapped_cluster_attractors = transpose_dataset(mapped_cluster_attractors)
-#         logging.debug(f'Mapped cluster attractors:\n {mapped_cluster_attractors}')
-#
-#         # Map the cells to the attractors within the clusters
-#         filtered_attractor_indices = list(clustered_attractors[cluster].keys())
-#         logging.debug(f'Filtered attractor indices: {filtered_attractor_indices}')
-#         mapped_cluster_attractors.index = filtered_attractor_indices # type: ignore
-#         logging.debug(f'Cluster {cluster} mapped attractors')
-#         logging.debug(mapped_cluster_attractors)
-#
-#         # Find the total Hamming distance between each attractor and all of the cells
-#         total_hamming_distance = mapped_cluster_attractors.sum(axis=1)
-#         min_sum_index = total_hamming_distance.idxmin()
-#
-#         representative_attractor = attractors[min_sum_index]
-#
-#         # Find the hamming distance for each cell for each cluster
-#         for cell_num, cell in enumerate(full_dataset):
-#             hamming_distance = 0
-#             for gene_num, gene in enumerate(cell):
-#                 if cell[gene_num] != representative_attractor[gene_num]:
-#                    hamming_distance += 1
-#
-#             cell_map[cell_num][cluster] = hamming_distance
-#
-#
-#         logging.debug(f'Representative attractor for cluster {cluster} (index {min_sum_index}):')
-#         logging.debug(f'\n{attractors[min_sum_index]}')
-#
-#         network.representative_attractors[cluster] = representative_attractor
-#
-#     # Calculate which cluster each cell should map to
-#     min_hamming_cluster = {}
-#     for cell_num, clusters in cell_map.items():
-#
-#         # Find the cluster with the minimum Hamming distance
-#         min_cluster = min(clusters, key=clusters.get)
-#         min_hamming_cluster[cell_num] = min_cluster
-#         # cell_object = cells[cell_num]
-#
-#     network.cell_map = min_hamming_cluster
-#
-#     for cell_object in cells:
-#         # Add the best attractor for each cell to that cell object
-#         cell_object.attractor_dict[network.name] = min_hamming_cluster[cell_object.index]
-#
-#     return cluster_fig
-
-# def generate_attractors(nodes, dataset):
-#     """
-#     Uses the vectorized simulation function from the importance score calculations to find
-#     the attractors for the network.
-#     """
-#
-#     calculate_importance_score = CalculateImportanceScore(nodes, dataset)
-#
-#     simulated_dataset = calculate_importance_score.dataset
-#     network_attractors = calculate_importance_score.vectorized_run_simulation()
-#
-#     return network_attractors, simulated_dataset
-
-
-# def extract_node_rows(dataset, nodes):
-#     """
-#     Create a dense dataset only containing the nodes that are present in the network from a
-#     sparse dataset
-#     """
-#
-#     # Convert the sparse dataset to a dense one
-#     if isinstance(dataset, spmatrix):
-#         dense_dataset = dataset.todense()
-#     else:
-#         dense_dataset = dataset
-#
-#     # Find the row indices in the dataset for the nodes in the network
-#     node_indices = []
-#     for node in nodes:
-#         if node.dataset_index not in node_indices:
-#             node_indices.append(node.dataset_index)
-#
-#     return dense_dataset[node_indices]
-
-# def transpose_dataset(dataset):
-#     """
-#     Converts a dataset to a numpy array and transposes it. Used to order the nodes as columns and
-#     the cells as rows.
-#     """
-#
-#     try:
-#         numpy_dataset = np.array(dataset).squeeze() # Get rid of extra dimensions
-#         logging.info(f'\t\tExtra dimension in dataset, squeezing...')
-#     except:
-#         numpy_dataset = np.array(dataset)
-#
-#     transposed_dataset = np.transpose(numpy_dataset)
-#
-#     logging.info(f'\t\tTransposed dataset shape: {transposed_dataset.shape}')
-#
-#     return transposed_dataset
-
-# def calculate_hamming_distance(df_index, df_columns, list_1, list_2):
-#     """
-#     Iterate through two lists and calculate the Hamming distance between the items, returns
-#     a matrix of the Hamming distances with list_1 as the columns and list_2 as the rows.
-#     """
-#
-#     # Convert lists to numpy arrays for vectorized operations
-#     array1 = np.array([list(item) for item in list_1])
-#     array2 = np.array([list(item) for item in list_2])
-#
-#     # Calculate the hamming distances using broadcasting and vectorization
-#     # The distances array will be a 2D array where the element at [i, j] is the
-#     # Hamming distance between array1[i] and array2[j]
-#     distances = np.sum(array1[:, None, :] != array2[None, :, :], axis=2)
-#
-#     # Create the DataFrame from the distances array
-#     passed = False
-#
-#     reduced_dimension = -1
-#     try:
-#         df = pd.DataFrame(distances, index=df_index, columns=df_columns)
-#
-#     # This fixed and issue where the index and columns were not the same dimension, I'm not sure how but I'm leaving it
-#     except ValueError:
-#         while passed == False:
-#             try:
-#                 df_columns_adjusted = df_columns[:reduced_dimension]
-#                 logging.info(f'df_columns_adjusted = {df_columns_adjusted}')
-#                 df = pd.DataFrame(distances, index=df_index, columns=df_columns_adjusted)
-#                 passed = True
-#             except:
-#                 reduced_dimension -= 1
-#
-#     return df
-#
-# def filter_attractors(dataframe):
-#     """
-#     Filters a Hamming distance dataframe to extract only the attractors with a minimum
-#     value for at least one cell, excludes attractors that do not best explain any cells.
-#     """
-#
-#     # Ensure that each fo the columns contain numeric values
-#     for column in dataframe.columns:
-#         dataframe[column] = pd.to_numeric(dataframe[column], errors='coerce')
-#
-#     # Exclude the first row and first column
-#     dataframe_sliced = dataframe.iloc[1:, 1:]
-#
-#     # Find the row indices with the minimum Hammin distance for each column
-#     min_indices = dataframe_sliced.idxmin()
-#
-#     # Keep only unique row indices
-#     unique_min_indices = min_indices.unique()
-#
-#     # Filter out rows that do not contain a minimum Hamming distance for any cell
-#     filtered_df = dataframe.loc[unique_min_indices]
-#
-#     # Find the attractor indices for these rows
-#     filtered_attractor_indices = filtered_df.index.tolist()
-#
-#     return filtered_attractor_indices
-#
-# def get_starting_state(file):
-#     starting_state = []
-#
-#     with open(file, 'r') as network_attractor:
-#         for line in network_attractor:
-#             node_starting_state = int([random.choice([0,1]) for i in line])
-#             starting_state.append(node_starting_state)
-#
-#     return starting_state
-#
-# def use_cell_starting_state(file):
-#     with open(file, 'rb') as f:
-#         network_object = pickle.load(f)
-#         return network_object
-
 def simulate_network(nodes, filename):
     steps = 20
 
@@ -293,16 +41,17 @@ def simulate_network(nodes, filename):
 
     return simulation_results
 
-def evaluate_expression(data, expression):
-    expression = expression.replace('and', '&').replace('or', '|').replace('not', '~')
-    if any(op in expression for op in ['&', '|', '~']):
-        local_vars = {key: np.array(value).astype(bool) for key, value in data.items()}
-    else:
-        local_vars = {key: np.array(value) for key, value in data.items()}
-    return ne.evaluate(expression, local_dict=local_vars)
 
 def vectorized_run_simulation(nodes, starting_state, steps):
     total_simulation_states = []
+
+    def evaluate_expression(data, expression):
+        expression = expression.replace('and', '&').replace('or', '|').replace('not', '~')
+        if any(op in expression for op in ['&', '|', '~']):
+            local_vars = {key: np.array(value).astype(bool) for key, value in data.items()}
+        else:
+            local_vars = {key: np.array(value) for key, value in data.items()}
+        return ne.evaluate(expression, local_dict=local_vars)
 
     # Run the simulation
     for step in range(steps):
@@ -346,33 +95,6 @@ def vectorized_run_simulation(nodes, starting_state, steps):
         total_simulation_states.append(step_expression)
 
     return total_simulation_states
-    
-
-def visualize_simulation(net, cell_trajectory_dict, network, show_simulation):
-    node_indices = [node.index for node in network.nodes]
-    pos = nx.spring_layout(net, k=1, iterations=100)  # Pre-compute layout
-    fig, ax = plt.subplots(figsize=(12, 8))
-    ax.set_title(f"Network: {network.name}")
-    
-    # Initial drawing of the graph
-    nx.draw(net, pos, ax=ax, with_labels=True)
-    node_collections = ax.collections[0]  # Get the collection of nodes
-    frame_text = ax.text(0.02, 0.95, '', transform=ax.transAxes)
-
-    def update_graph(frame):
-        # Update node colors without redrawing everything
-        colors = []
-        for i in node_indices:
-            if cell_trajectory_dict[frame-1][i] != cell_trajectory_dict[frame][i]:
-                colors.append('gold' if cell_trajectory_dict[frame][i] == 1 else 'red')
-            else:
-                colors.append('green' if cell_trajectory_dict[frame][i] == 1 else 'red')
-
-        node_collections.set_color(colors)  # Update colors directly
-    
-        frame_text.set_text(f'Frame: {frame+1}')
-
-    return fig
 
 def create_heatmap(path, title):
     data = []
@@ -418,6 +140,7 @@ def create_heatmap(path, title):
 
     return plot
 
+
 def read_data_from_directory(directory, trajectory_files_parsed, num_cells_to_parse):
     """
     Reads in the cell trajectory files and creates a dictionary of dataframes with the file
@@ -444,6 +167,7 @@ def read_data_from_directory(directory, trajectory_files_parsed, num_cells_to_pa
 
     return dataframes, trajectory_files_parsed
 
+
 def compute_dtw_distance_pair(cell1, cell2, cell_trajectory_dict):
     """
     Computes the dynamic time warping distance between two cell trajectories for each gene.
@@ -467,6 +191,7 @@ def compute_dtw_distance_pair(cell1, cell2, cell_trajectory_dict):
             distances[gene] = distance
     total_distance = sum(distances.values()) if distances else float('inf')
     return (cell1, cell2, total_distance)
+
 
 def compute_dtw_distances(cell_trajectory_dict, output_directory):
     dtw_distances = {}
@@ -497,6 +222,7 @@ def compute_dtw_distances(cell_trajectory_dict, output_directory):
 
     return dtw_distances
 
+
 def create_distance_matrix(dtw_distances, file_names):
     # Create a distance matrix
     distance_matrix = np.zeros((len(file_names), len(file_names)))
@@ -507,6 +233,7 @@ def create_distance_matrix(dtw_distances, file_names):
         distance_matrix[j, i] = total_distance
     
     return distance_matrix
+
 
 def hierarchical_clustering(dtw_distances, num_clusters):
 
@@ -680,13 +407,37 @@ def simulate_cells(dense_dataset, num_simulations):
             # Simulate the network
             trajectory = simulate_network(network.nodes, transposed_random_column)
 
-            # Visualize the network simulation results
-            fig = visualize_simulation(network.network, trajectory, network, "False")
+            # Create a 
+            node_indices = [node.index for node in network.nodes]
+            pos = nx.spring_layout(network.network, k=1, iterations=100)  # Pre-compute layout
+            fig, ax = plt.subplots(figsize=(12, 8))
+            ax.set_title(f"Network: {network.name}")
+            
+            # Initial drawing of the graph
+            nx.draw(network.network, pos, ax=ax, with_labels=True)
+            node_collections = ax.collections[0]  # Get the collection of nodes
+            frame_text = ax.text(0.02, 0.95, '', transform=ax.transAxes)
 
-            # Save the attractor states to a csv file
-            save_attractor_simulation(f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/text_files/cell_{cell_index}_trajectory.csv',
-                                        network,
-                                        trajectory)
+            def update_graph(frame):
+                # Update node colors without redrawing everything
+                colors = []
+                for i in node_indices:
+                    if trajectory[frame-1][i] != trajectory[frame][i]:
+                        colors.append('gold' if trajectory[frame][i] == 1 else 'red')
+                    else:
+                        colors.append('green' if trajectory[frame][i] == 1 else 'red')
+
+                node_collections.set_color(colors)  # Update colors directly
+            
+                frame_text.set_text(f'Frame: {frame+1}')
+
+            # Save the attractor simulation to a csv file
+            attractor_sim_path = f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/text_files/cell_{cell_index}_trajectory.csv'
+            with open(attractor_sim_path, 'w') as file:
+                    trajectory = np.array(trajectory).T
+                    for gene_num, expression in enumerate(trajectory):
+                        file.write(f'{network.nodes[gene_num].name},{",".join([str(i) for i in list(expression)])}\n')
+
             plt.close(fig)
 
             # Create a heatmap to visualize the trajectories
@@ -756,6 +507,7 @@ def create_trajectory_chunks(num_chunks, num_clusters, output_directory):
 
     return cluster_chunks, cells_in_chunks, num_clusters
 
+
 def calculate_dtw(num_files, output_directory, num_cells_per_chunk):
     trajectory_files_parsed = []
     num_clusters = 0
@@ -819,8 +571,6 @@ def calculate_dtw(num_files, output_directory, num_cells_per_chunk):
         os.makedirs(f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/avg_chunks', exist_ok=True)
         
         plot_average_trajectory(df, cluster)
-
-
 
 
 # If you want to run the attractor analysis by itself
