@@ -1,4 +1,3 @@
-from importance_scores import CalculateImportanceScore
 import logging
 import pandas as pd
 import numpy as np
@@ -10,13 +9,14 @@ import matplotlib.pyplot as plt
 import pickle
 import os
 import glob
-from simulate_attractor import *
 import argparse
 import pickle
-import random
-
+import numexpr as ne
+import seaborn as sns
+import matplotlib.colors as mcolors
+import matplotlib.pyplot as plt
+from matplotlib.patches import Patch
 from fastdtw import fastdtw
-from scipy.spatial.distance import euclidean
 import os
 from argparse import ArgumentParser
 from concurrent.futures import ProcessPoolExecutor, as_completed
@@ -27,6 +27,64 @@ import statistics
 
 from user_input_prompts import attractor_analysis_arguments
 from file_paths import file_paths
+
+
+def evaluate_expression(data, expression):
+    expression = expression.replace('and', '&').replace('or', '|').replace('not', '~')
+    if any(op in expression for op in ['&', '|', '~']):
+        local_vars = {key: np.array(value).astype(bool) for key, value in data.items()}
+    else:
+        local_vars = {key: np.array(value) for key, value in data.items()}
+    return ne.evaluate(expression, local_dict=local_vars)
+
+
+def vectorized_run_simulation(nodes, starting_state, steps):
+    total_simulation_states = []
+
+    # Run the simulation
+    for step in range(steps):
+        step_expression = []
+        # print(f'Step {step}')
+
+        # Iterate through each node in the network
+        for node in nodes:
+
+            # Initialize A, B, C to False by default (adjust according to what makes sense in context)
+            A, B, C = (False,) * 3
+
+            data = {}
+            incoming_node_indices = [predecessor_index for predecessor_index in node.predecessors]
+
+            # Get the rows in the dataset for the incoming nodes
+            if step == 0:
+                if len(incoming_node_indices) > 0:
+                    data['A'] = starting_state[incoming_node_indices[0]]
+                if len(incoming_node_indices) > 1:
+                    data['B'] = starting_state[incoming_node_indices[1]]
+                if len(incoming_node_indices) > 2:
+                    data['C'] = starting_state[incoming_node_indices[2]]
+                if len(incoming_node_indices) > 3:
+                    data['D'] = starting_state[incoming_node_indices[3]]
+            else:
+                if len(incoming_node_indices) > 0:
+                    data['A'] = total_simulation_states[step - 1][incoming_node_indices[0]]
+                if len(incoming_node_indices) > 1:
+                    data['B'] = total_simulation_states[step - 1][incoming_node_indices[1]]
+                if len(incoming_node_indices) > 2:
+                    data['C'] = total_simulation_states[step - 1][incoming_node_indices[2]]
+                if len(incoming_node_indices) > 3:
+                    data['D'] = total_simulation_states[step - 1][incoming_node_indices[3]]
+
+            next_step_node_expression = evaluate_expression(data, node.calculation_function)
+
+            # Save the expression for the node for this step
+            step_expression.append(next_step_node_expression)
+
+        # Save the expression
+        total_simulation_states.append(step_expression)
+
+    return total_simulation_states
+
 
 def simulate_network(nodes: object, cell_column: list):
     """
@@ -51,66 +109,8 @@ def simulate_network(nodes: object, cell_column: list):
     for gene_expression in cell_column:
         starting_state.append(gene_expression)
 
-    total_simulation_states = []
-
-    def evaluate_expression(data, expression):
-        """
-        Evaluates the next expression state for a node using the incoming nodes and the logic rules
-        """
-        # Replace the Boolean rules with thier operation symbols so that ne.evaluate can parse them
-        expression = expression.replace('and', '&').replace('or', '|').replace('not', '~')
-
-        # Change the expression to a boolean value if there are logic rules for efficeint calculation
-        if any(op in expression for op in ['&', '|', '~']):
-            local_vars = {key: np.array(value).astype(bool) for key, value in data.items()}
-        else:
-            local_vars = {key: np.array(value) for key, value in data.items()}
-
-        # Evaluate the state of the current node based on the expression and logic function of incoming nodes
-        return ne.evaluate(expression, local_dict=local_vars)
-
-    # Run the simulation for `steps` simulation steps
-    for step in range(steps):
-        step_expression = []
-
-        # Iterate through each node in the network
-        for node in nodes:
-
-            # Initialize A, B, C
-            A, B, C = (False,) * 3
-            
-            # Get the indices for the incoming nodes
-            data = {}
-            incoming_node_indices = [predecessor_index for predecessor_index in node.predecessors]
-
-            # Get the rows in the dataset for the incoming nodes
-            if step == 0:
-                if len(incoming_node_indices) > 0:
-                    data['A'] = starting_state[incoming_node_indices[0]]
-                if len(incoming_node_indices) > 1:
-                    data['B'] = starting_state[incoming_node_indices[1]]
-                if len(incoming_node_indices) > 2:
-                    data['C'] = starting_state[incoming_node_indices[2]]
-                if len(incoming_node_indices) > 3:
-                    data['D'] = starting_state[incoming_node_indices[3]]
-            else:
-                if len(incoming_node_indices) > 0:
-                    data['A'] = total_simulation_states[step-1][incoming_node_indices[0]]
-                if len(incoming_node_indices) > 1:
-                    data['B'] = total_simulation_states[step-1][incoming_node_indices[1]]
-                if len(incoming_node_indices) > 2:
-                    data['C'] = total_simulation_states[step-1][incoming_node_indices[2]]
-                if len(incoming_node_indices) > 3:
-                    data['D'] = total_simulation_states[step-1][incoming_node_indices[3]]
-
-            # Evaluate the next step based on the current state of the incoming nodes and the rules
-            next_step_node_expression = evaluate_expression(data, node.calculation_function)
-
-            # Save the expression for the node for this step
-            step_expression.append(next_step_node_expression)
-
-        # Save the expression of each genes next step to the total simulation steps
-        total_simulation_states.append(step_expression)
+    # Simulates the network model starting from the cell's gene expression values
+    total_simulation_states = vectorized_run_simulation(nodes, starting_state, steps)
     
     # Return a matrix of simulation steps where the rows are genes and columns are simulation steps
     simulation_results = [[int(item) for item in sublist] for sublist in total_simulation_states]
