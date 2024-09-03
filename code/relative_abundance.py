@@ -330,9 +330,6 @@ if __name__ == '__main__':
                 ruleset = pickle.load(open(ruleset_pickle_file_path, "rb"))
                 network = pickle.load(open(network_pickle_file_path, "rb"))
 
-                # Save the cell indices that map to each group to the full network (used for chi-square analysis of attractors)
-                network.group_cell_indices = cell_indices_per_group
-
                 # Find the importance score for each of the split datasets
                 for group_num, dataset_path in enumerate(split_datasets):
 

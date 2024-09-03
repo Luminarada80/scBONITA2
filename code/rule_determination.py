@@ -134,23 +134,6 @@ class RuleDetermination:
 
 
     def refine_rules(self):
-        """
-        Refines the rulesets from the population
-        1) Finds the individuals with the minimum error
-        2) Iterates through each node in the individuals
-            a) Handles nodes that have self-loops or no incoming nodes
-            b) Finds all possible rule combinations for the node
-            c) Calculates the error for each rule based on chunked_dataset
-            d) Finds the rules with the minimum error
-            e) Finds the simplest rules with the minimum error (fewest incoming nodes)
-            f) Finds the simplest rules with the greatest number of 'or' connections
-        3) Appends the minimum error rules to best_rules and stores equivalent rules
-        4) Stores summary statistics in `ruleset_error`
-            a) average error, stdev, max error, min error
-
-        return (all_best_rules, ruleset_error)
-        """
-
         logging.info(f'\n-----RULE REFINEMENT-----')
         ruleset_error = []
 
