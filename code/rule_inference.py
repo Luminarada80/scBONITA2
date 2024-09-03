@@ -7,6 +7,7 @@ import copy
 from scipy.stats.stats import spearmanr
 import logging
 from sklearn import preprocessing
+from alive_progress import alive_bar
 
 from cell_class import Cell
 from node_class import Node
@@ -89,7 +90,16 @@ class RuleInference:
         self.create_cells()
 
         # Runs the rule refinement
-        self.ruleset = self.create_ruleset(self.graph)
+        rule_determination = RuleDetermination(
+            self.graph,
+            self.network_name,
+            self.dataset_name,
+            self.binarized_matrix,
+            self.nodes,
+            self.node_dict
+        )
+
+        self.ruleset = rule_determination.infer_ruleset()
 
     def _extract_data(self, data_file, sep, sample_cells, node_indices):
         """
@@ -164,25 +174,6 @@ class RuleInference:
                     self.cv_genes.append(self.gene_names[i])
         else:
             self.cv_genes = copy.deepcopy(self.gene_names)
-    
-    def create_ruleset(self, net):
-        """
-        Runs the genetic algorithm and rule refinement method to find the best ruleset for the model
-        """
-
-        # Genetic algorithm
-        rule_determination = RuleDetermination(
-            net,
-            self.network_name,
-            self.dataset_name,
-            self.binarized_matrix,
-            self.nodes,
-            self.node_dict
-            )
-
-        ruleset = rule_determination.infer_ruleset()
-
-        return ruleset
 
     def plot_graph_from_graphml(self, network):
         G = network

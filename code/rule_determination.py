@@ -22,11 +22,9 @@ class RuleDetermination:
 
         _, num_columns = np.shape(self.binarized_matrix)
 
-        # Chunk the data matrix to reduce noise and put into numpy array to speed up processing
-        self.num_chunks = round(num_columns / 10)
-
-        # Chunk if there are more cells than chunks, otherwise just use the columns
+        # Chunk to reduce noise if there are a lot of cells, otherwise just use the columns
         if num_columns > 10000:
+            self.num_chunks = round(num_columns / 10)
             self.chunked_data_numpy = np.array(self.chunk_data(num_chunks=self.num_chunks))
             self.coarse_chunked_dataset = np.array(self.chunk_data(num_chunks=round(self.num_chunks / 2, 1)))
         else:
@@ -126,13 +124,6 @@ class RuleDetermination:
             rule_file.write(f'Refined_error:\tavg={avg_error}|stdev={stdev_error}|max={max_error}|min={min_error}')
 
 
-    def get_fitness_values(self, ind):
-        """
-        Gets around needing to use a lambda function in tools.Statistics so that the ruleset object can be pickled
-        """
-        return ind.fitness.values
-
-
     def refine_rules(self):
         logging.info(f'\n-----RULE REFINEMENT-----')
         ruleset_error = []
@@ -227,8 +218,8 @@ class RuleDetermination:
 
         return chunked_data
 
-
-    def handle_self_loop(self, node):
+    @staticmethod
+    def handle_self_loop(node):
         """
         Handles instances when a node only connects to itself or has
         no incoming nodes
@@ -237,8 +228,6 @@ class RuleDetermination:
         """
         # If the node has only an incoming connection from itself, skip the rule refinement
         # Add in self signaling for the node
-        # logging.info(f'\tNode {node.name} signals only to itself')
-        # logging.info(f'\t[{node.name}, [{node.index}]')
         node.node_rules = [node.name, [node.index], 'A']
         node.predecessors[node.index] = node.name
         node.inversions[node.index] = False
@@ -248,8 +237,8 @@ class RuleDetermination:
 
         return best_rule
 
-
-    def generate_not_combinations(self, rule):
+    @staticmethod
+    def generate_not_combinations(rule):
         """
         Finds all possible combinations of rules with and without "not" (input rules in ABC format)
 
@@ -272,7 +261,6 @@ class RuleDetermination:
 
         # Generate all possible combinations of the variables and their negations
         combinations = list(product(*[(var, f'not {var}') for var in variables]))
-        # logging.info(f'\t\t\tNode combinations: {combinations}')
 
         all_not_combinations = []
         for combo in combinations:
@@ -285,8 +273,8 @@ class RuleDetermination:
 
         return all_not_combinations
 
-
-    def prioritize_pkn_inversion_rules(self, node, rules, prediction_errors):
+    @staticmethod
+    def prioritize_pkn_inversion_rules(node, rules, prediction_errors):
         """
         Prioritizes the rules that follow the inversion rules from the PKN (found in node.inversions). However, if the
         average error for all of the rules in the PKN is too high, then all possible rules are considered
@@ -295,10 +283,6 @@ class RuleDetermination:
         """
 
         # Prioritize the rules that follow the node's inversion rules
-        # logging.info(f'\n\t\tHANDLING INVERSION RULES')
-        # logging.info(f'\t\t\tNode {node.name} inversion rules:')
-        # for key, value in node.inversions.items():
-        #     logging.info(f'\t\t\t\t{node.predecessors[key]}: {value}')
         follows_inversion_rules = []
         does_not_follow_inversion_rules = []
 
@@ -308,14 +292,8 @@ class RuleDetermination:
             logic = rule[2]
             inversion_rules = node.inversions
 
-            # logging.info(f'\t\t\tRule = {logic}; Error = {error}')
-
-            # logging.info(f'\t\t\tIncoming node indices: {incoming_node_indices}')
-            # logging.info(f'\t\t\tInversion Rules: {inversion_rules}')
-
             def not_in_inversion_rules():
                 if (rule, error) not in does_not_follow_inversion_rules:
-                    # logging.info(f'\t\t\t\t\t{[i for i in inversion_rules.values()]} Logic does not follow inversion')
                     does_not_follow_inversion_rules.append((rule, error))
 
             possible_nodes = ['A', 'B', 'C']
@@ -327,48 +305,41 @@ class RuleDetermination:
                     incoming_node_indices[i]] == True: not_in_inversion_rules()
 
             if (rule, error) not in does_not_follow_inversion_rules:
-                # logging.info(f'\t\t\t\t\t{[i for i in inversion_rules.values()]} Logic rule DOES follow inversion')
                 follows_inversion_rules.append((rule, error))
 
         # Finds the average error for the rules that follow the PKN inversion rules
         try:
             average_error = sum([i[1] + 1e-5 for i in follows_inversion_rules]) / len(follows_inversion_rules)
-            # logging.info(f'\n\t\t\tAvg error following PKN inversion rules = {average_error}')
         except ZeroDivisionError:
             logging.warning(f'\n\n\t\t\tERROR: No rules follow the inversion rules for node {node.name}')
 
         # If the average error is less than 85% for the rules that follow the inversion rules, use those
         if average_error < 0.85:
-            # logging.info(f'\t\t\t\tError is less than 85% for rules that follow the PKN inversion rules, only considering those {len(follows_inversion_rules)}')
             rules = [i[0] for i in follows_inversion_rules]
             prediction_errors = [i[1] for i in follows_inversion_rules]
-        # else:
-        # logging.info(f'\t\t\t\tError is greater than 85% for rules that follow the PKN inversion rules, considering all rules {len(follows_inversion_rules) + len(does_not_follow_inversion_rules)}')
 
         return rules, prediction_errors
 
-
-    def find_min_error_indices(self, prediction_errors):
+    @staticmethod
+    def find_min_error_indices(prediction_errors):
         """
         Finds the indices of the predicted rules with the minimum error
 
         return min_error_indices, min_error
         """
-        # logging.info(f'\t\t\tPrediction errors: {prediction_errors}')
         min_error = min(prediction_errors)
         min_error_indices = [index for index, value in enumerate(prediction_errors) if
                              value == min_error]
 
         return min_error_indices, min_error
 
-
-    def maximize_incoming_connections(self, min_error_indices, rules, prediction_errors):
+    @staticmethod
+    def maximize_incoming_connections(min_error_indices, rules, prediction_errors):
         """
         For each of the rules with a minimum error, finds the rules with the greatest incoming node connections
 
         return max_incoming_node_rules, best_rule_indices, best_rule_errors
         """
-        # logging.info(f'\n\t\tMAXIMIZING INCOMING CONNECTIONS')
         max_incoming_node_rules = []
         best_rule_errors = []
         best_rule_indices = []
@@ -384,7 +355,6 @@ class RuleDetermination:
             if 'C' in rules[index][2]:
                 num_incoming_nodes += 1
             num_incoming_nodes_list.append(num_incoming_nodes)
-        # logging.info(f'\t\t\tNum incoming nodes list: {num_incoming_nodes_list}')
 
         # Find the maximum number of incoming nodes
         max_incoming_nodes = max(num_incoming_nodes_list)
@@ -394,13 +364,7 @@ class RuleDetermination:
 
             num_incoming_nodes = num_incoming_nodes_list[i]
 
-            # logging.info(f'\n\t\t\tRule: {rules[index]}')
-            # logging.info(f'\t\t\tminimum error index: {index}')
-            # logging.info(f'\t\t\t\tmax_incoming_nodes = {max_incoming_nodes}')
-            # logging.info(f'\t\t\t\tnum_incoming_nodes = {num_incoming_nodes}')
-
             def append_best_rule(index):
-                # logging.info(f'\t\t\t\tbest_rule: {rules[index]}, Index: {index}, error: {prediction_errors[index]}')
                 max_incoming_node_rules.append(rules[index])
                 best_rule_indices.append(index)
                 best_rule_errors.append(prediction_errors[index])
@@ -472,8 +436,8 @@ class RuleDetermination:
 
         return best_rules
 
-
-    def calculate_error(self, node, predicted_rule, dataset):
+    @staticmethod
+    def calculate_error(node, predicted_rule, dataset):
         """
         Calculates the error for the node across the dataset using the predicted rule.
 
