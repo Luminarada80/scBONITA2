@@ -548,13 +548,13 @@ def create_trajectory_chunks(num_chunks: int, num_clusters: int, output_director
 
             cells_in_chunks[chunk][cluster] = cell_list
 
-            # Create average trajectory directory
-            os.makedirs(f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/raw_chunks', exist_ok=True)
-
-            title: str = f'Average Gene Expression Heatmap for Cluster {cluster}'
-            path: str = f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/raw_chunks/chunk_{chunk}_cluster{cluster}_summary'
-
-            plot_average_trajectory(df_binarized, title, path)
+            # # Plots the average trajectory graphs for each cluster in each chunk
+            # os.makedirs(f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/raw_chunks', exist_ok=True)
+            #
+            # title: str = f'Average Gene Expression Heatmap for Cluster {cluster}'
+            # path: str = f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/raw_chunks/chunk_{chunk}_cluster{cluster}_summary'
+            #
+            # plot_average_trajectory(df_binarized, title, path)
 
 
     return cluster_chunks, cells_in_chunks, num_clusters
@@ -692,7 +692,7 @@ if __name__ == '__main__':
         logging.info(f'\n----- ATTRACTOR ANALYSIS -----')
 
         num_cells_per_chunk: int = 50
-        num_cells_to_analyze: int = 250
+        num_cells_to_analyze: int = 1000
 
         # Convert the network's sparse dataset to a dense one
         dataset = network.dataset
