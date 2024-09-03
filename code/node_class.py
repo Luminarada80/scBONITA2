@@ -146,10 +146,8 @@ class Node:
     
     def find_multiple_rule_predictions(self, individual_bitstring):
         rule_predictions = []
-
         # Extract the bitstring for this node from the individual
         bitstring_length = self.rule_end_index - self.rule_start_index
-
         if bitstring_length >= 1:
             bitstring = np.array(individual_bitstring[self.rule_start_index:self.rule_end_index])
 
