@@ -14,7 +14,7 @@ from sklearn import preprocessing
 
 from node_class import Node
 from kegg_parser import *
-from deap_class import CustomDeap
+from rule_determination import RuleDetermination
 
 
 class RuleInference:
@@ -174,20 +174,16 @@ class RuleInference:
         """
 
         # Genetic algorithm
-        custom_deap = CustomDeap(
+        custom_deap = RuleDetermination(
             net,
             self.network_name,
             self.dataset_name,
             self.binarized_matrix,
-            self.node_list,
             self.nodes,
-            self.deap_individual_length,
-            self.node_dict,
-            self.num_successors
+            self.node_dict
             )
 
-        raw_fitnesses, population, logbook = custom_deap.genetic_algorithm()
-        best_ruleset = custom_deap.find_best_individual(population, raw_fitnesses)
+        best_ruleset = custom_deap.rule_determination()
 
         return best_ruleset
 
@@ -422,6 +418,7 @@ class RuleInference:
                     node.rule_end_index = None
                 nodes.append(node)
                 bar()
+
         return nodes, rule_index
 
     def create_cells(self):
