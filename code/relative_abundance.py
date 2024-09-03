@@ -349,7 +349,7 @@ if __name__ == '__main__':
                         # Store the network information in a pickle file for each group
                         new_network = Network(name=f'{network_name}_{group}')
                         new_network.nodes = network.nodes
-                        new_network.rulesets = ruleset.best_ruleset
+                        new_network.rulesets = ruleset.ruleset
                         new_network.network = network.network
                         
                         # Extract the data from each dataset

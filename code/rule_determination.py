@@ -23,10 +23,10 @@ class RuleDetermination:
         _, num_columns = np.shape(self.binarized_matrix)
 
         # Chunk the data matrix to reduce noise and put into numpy array to speed up processing
-        self.num_chunks = 100
+        self.num_chunks = round(num_columns / 10)
 
-        # Chunk if there are more cells than columns, otherwise just use the columns
-        if num_columns > self.num_chunks:
+        # Chunk if there are more cells than chunks, otherwise just use the columns
+        if num_columns > 10000:
             self.chunked_data_numpy = np.array(self.chunk_data(num_chunks=self.num_chunks))
             self.coarse_chunked_dataset = np.array(self.chunk_data(num_chunks=round(self.num_chunks / 2, 1)))
         else:
@@ -34,53 +34,27 @@ class RuleDetermination:
             self.chunked_data_numpy = np.array(self.chunk_data(num_chunks=num_columns))
             self.coarse_chunked_dataset = np.array(self.chunk_data(num_chunks=num_columns))
 
-        logging.debug(f'self.chunked_data_numpy: {self.chunked_data_numpy}')
-
-    def rule_determination(self):
-        logging.info(f'\n-----CHUNKING DATASET-----')
+    def infer_ruleset(self):
         num_rows, num_columns = np.shape(self.binarized_matrix)
-        logging.info(f"\tOriginal Data Shape: {num_rows} rows, {num_columns} columns")
-
         chunked_rows, chunked_columns = np.shape(self.chunked_data_numpy)
-        logging.info(f"\tChunked Data Shape: {chunked_rows} rows, {chunked_columns} columns")
 
-        coarse_chunked_rows, coarse_chunked_columns = np.shape(self.coarse_chunked_dataset)
-        logging.info(f"\tCoarse Chunked Data Shape: {coarse_chunked_rows} rows, {coarse_chunked_columns} columns")
+        if chunked_columns < num_columns:
+            logging.info(f'\n-----CHUNKING DATASET-----')
+            logging.info(f"\tOriginal Data Shape: {num_rows} rows, {num_columns} columns")
+            logging.info(f"\tChunked Data Shape: {chunked_rows} rows, {chunked_columns} columns")
 
-        total_possible_rules = 0
+        # Find all possible rule predictions for each node
         for node in self.nodes:
-            total_possible_rules += len(node.possibilities)
-
-        for node in self.nodes:
-            # Reset the state of the node
-            node.reset_state()
-
-            individual_bitstring = [1] * total_possible_rules
-
-            node.find_multiple_rule_predictions(individual_bitstring)
+            node.find_all_rule_predictions()
 
         # Refine the rules
-        best_rulesets, ruleset_errors = self.refine_rules()
+        best_ruleset, ruleset_errors = self.refine_rules()
 
-        logging.debug(f'ruleset errors: {ruleset_errors}')
-
-        # If there is more than one ruleset, sort the list by the minimum error
-        if len(best_rulesets) > 1:
-            sorted_rulesets, sorted_ruleset_errors = zip(*sorted(zip(best_rulesets, ruleset_errors)))     
-
-            logging.debug(f'sorted ruleset errors: {sorted_ruleset_errors}')
-        else:
-            sorted_rulesets, sorted_ruleset_errors = best_rulesets, ruleset_errors
-        
-        # Write out the rulesets to the output file and terminal
-        individual_num = 1
-        for ruleset in sorted_rulesets:
-            logging.info(f'\nEquivalent Ruleset {individual_num}')
-            self.write_ruleset(ruleset, sorted_ruleset_errors[individual_num-1], individual_num)
-            individual_num += 1
+        # Write the ruleset out to a file
+        logging.info(f'\n-----RULESET-----')
+        self.write_ruleset(best_ruleset, ruleset_errors[0])
         
         # Set the best rules for the nodes based on which ruleset has the lowest error
-        best_ruleset = sorted_rulesets[0]
         for node_index, node in enumerate(self.nodes):
             node_best_rule = best_ruleset[node_index][0]
             node_best_rule_index = best_ruleset[node_index][1]
@@ -93,9 +67,10 @@ class RuleDetermination:
         
         return best_ruleset
 
-    def write_ruleset(self, ruleset, error, individual_num):
+
+    def write_ruleset(self, ruleset, error):
         # Write out the rules to an output file
-        rule_path = f'{file_paths["rules_output"]}/{self.dataset_name}_rules/{self.network_name}_{self.dataset_name}_ind_{individual_num}_rules.txt'
+        rule_path = f'{file_paths["rules_output"]}/{self.dataset_name}_rules/{self.network_name}_{self.dataset_name}_rules.txt'
         os.makedirs(f'{file_paths["rules_output"]}/{self.dataset_name}_rules/', exist_ok=True)
         with open(rule_path, 'w') as rule_file:
             
@@ -142,7 +117,6 @@ class RuleDetermination:
             stdev_error = error[1]
             max_error = error[2]
             min_error = error[3]
-            num_self_loops = error[4]
 
             logging.info(f'Refined Error:\n')
             logging.info(f'\tAverage = {avg_error}')
@@ -151,12 +125,14 @@ class RuleDetermination:
             logging.info(f'\tMin = {min_error}')
             rule_file.write(f'Refined_error:\tavg={avg_error}|stdev={stdev_error}|max={max_error}|min={min_error}')
 
+
     def get_fitness_values(self, ind):
         """
         Gets around needing to use a lambda function in tools.Statistics so that the ruleset object can be pickled
         """
         return ind.fitness.values
-    
+
+
     def refine_rules(self):
         """
         Refines the rulesets from the population
@@ -176,42 +152,31 @@ class RuleDetermination:
         """
 
         logging.info(f'\n-----RULE REFINEMENT-----')
-        all_best_rules = []
         ruleset_error = []
 
         best_rules = []
-        equivalent_ruleset = {}
         num_self_loops = 0
 
         with alive_bar(len(self.nodes)) as bar:
             for node in self.nodes:
-                equivalent_rules = []
-
                 # If the node signals to itself, create that rule
                 if node.node_rules[0][1][0] == node.index:
                     best_rule = self.handle_self_loop(node)
-                    equivalent_rules.append(best_rule) # Add the rule to the list of equivalent rules
                     best_rules.append(best_rule) # Add the rule to the list of best rules
                     num_self_loops += 1
 
                 # If there are no incoming nodes, set the node to signal to itself
                 elif len(node.node_rules) == 0:
                     best_rule = self.handle_self_loop(node)
-                    equivalent_rules.append(best_rule) # Add the rule to the list of equivalent rules
                     best_rules.append(best_rule) # Add the rule to the list of best rules
                     num_self_loops += 1
 
                 # If the rule has multiple incoming nodes, calculate the minimum error rule
                 else:
                     equivalent_best_rules = self.calculate_refined_errors(node, self.chunked_data_numpy)
-                    equivalent_rules.append(equivalent_best_rules) # Add all equivalent rules to a list
                     best_rules.append(equivalent_best_rules[0]) # Add the first equivalent rule to the best_rules
-
-                # Add the equivalent rules to the node
-                equivalent_ruleset[node.name] = equivalent_rules[0]
                 bar()
 
-            all_best_rules.append(best_rules)
 
             # Calculates summary stats for the rules
             errors = [error for _, _, error in best_rules]
@@ -222,51 +187,8 @@ class RuleDetermination:
             ruleset_error.append([average_error, stdev_error, max_error, min_error, num_self_loops])
             
 
-        return (all_best_rules, ruleset_error)
- 
-    def calculate_error(self, node, predicted_rule, dataset):
-        # Get the row in the dataset for the node being evaluated
-        node_evaluated = dataset[node.index]
+        return (best_rules, ruleset_error)
 
-        # Get the dataset row indices for the incoming nodes included in this rule
-        incoming_node_indices = [predecessor_index for predecessor_index in node.predecessors]
-
-        # Initialize A, B, C to False by default (adjust according to what makes sense in context)
-        A, B, C = (False,) * 3
-        
-        data = {}
-
-        # Map dataset values to A, B, C based on their indices
-        if len(incoming_node_indices) > 0:
-            data['A'] = dataset[incoming_node_indices[0]]
-        if len(incoming_node_indices) > 1:
-            data['B'] = dataset[incoming_node_indices[1]]
-        if len(incoming_node_indices) > 2:
-            data['C'] = dataset[incoming_node_indices[2]]
-        if len(incoming_node_indices) > 3:
-            data['D'] = dataset[incoming_node_indices[3]]
-
-        def evaluate_expression(var_data, expression):
-
-            def eval_func(*args):
-                local_vars = {name: arg for name, arg in zip(var_data.keys(), args)}
-                return eval(expression, {}, local_vars)
-            
-            vectorized_eval = np.vectorize(eval_func)
-
-            # Prepare the argument list in the correct order, corresponding to the keys in var_data
-            arg_list = [var_data[key] for key in var_data.keys()]
-            return vectorized_eval(*arg_list)
-
-        # Find the predicted values of the target node given the expression of the incoming nodes
-        predicted = evaluate_expression(data, predicted_rule)
-
-        # Calculate the number of times the target node expression is different from expected
-        difference = np.sum(predicted != node_evaluated)
-
-        count = len(predicted)
-
-        return difference, count
 
     def chunk_data(self, num_chunks):
         """
@@ -322,6 +244,7 @@ class RuleDetermination:
 
         return chunked_data
 
+
     def handle_self_loop(self, node):
         """
         Handles instances when a node only connects to itself or has
@@ -341,6 +264,7 @@ class RuleDetermination:
         best_rule = ([node.name, [node.index], 'A'], 0, 0)
 
         return best_rule
+
 
     def generate_not_combinations(self, rule):
         """
@@ -377,6 +301,7 @@ class RuleDetermination:
             all_not_combinations.append(temp_rule)
 
         return all_not_combinations
+
 
     def prioritize_pkn_inversion_rules(self, node, rules, prediction_errors):
         """
@@ -439,6 +364,7 @@ class RuleDetermination:
 
         return rules, prediction_errors
 
+
     def find_min_error_indices(self, prediction_errors):
         """
         Finds the indices of the predicted rules with the minimum error
@@ -451,6 +377,7 @@ class RuleDetermination:
                              value == min_error]
 
         return min_error_indices, min_error
+
 
     def maximize_incoming_connections(self, min_error_indices, rules, prediction_errors):
         """
@@ -507,6 +434,7 @@ class RuleDetermination:
 
         return max_incoming_node_rules, best_rule_indices, best_rule_errors
 
+
     def calculate_refined_errors(self, node, chunked_dataset):
         """
         1) Finds all possible rule combinations for the node
@@ -523,7 +451,7 @@ class RuleDetermination:
         best_rules = []
 
         # Calculates the error for each possible rule for the node
-        rules = node.find_all_rule_predictions()
+        rules = node.node_rules
 
         # Generate all 'not' combinations for each rule
         not_combinations = [self.generate_not_combinations(rule[2]) for rule in rules]
@@ -560,6 +488,7 @@ class RuleDetermination:
 
 
         return best_rules
+
 
     def calculate_error(self, node, predicted_rule, dataset):
         """
