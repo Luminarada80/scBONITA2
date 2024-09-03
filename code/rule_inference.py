@@ -1,17 +1,14 @@
 import scipy.sparse as sparse
 import numpy as np
-from os import path
 import matplotlib.pyplot as plt
-import time
 import csv
 import networkx as nx
 import copy
 from scipy.stats.stats import spearmanr
 import logging
-
-from cell_class import Cell
 from sklearn import preprocessing
 
+from cell_class import Cell
 from node_class import Node
 from kegg_parser import *
 from rule_determination import RuleDetermination
@@ -91,8 +88,8 @@ class RuleInference:
         # Create Cell objects
         self.create_cells()
 
-        # Runs the genetic algorithm and rule refinement
-        self.best_ruleset = self.genetic_algorithm(self.graph)
+        # Runs the rule refinement
+        self.ruleset = self.create_ruleset(self.graph)
 
     def _extract_data(self, data_file, sep, sample_cells, node_indices):
         """
@@ -168,13 +165,13 @@ class RuleInference:
         else:
             self.cv_genes = copy.deepcopy(self.gene_names)
     
-    def genetic_algorithm(self, net):
+    def create_ruleset(self, net):
         """
         Runs the genetic algorithm and rule refinement method to find the best ruleset for the model
         """
 
         # Genetic algorithm
-        custom_deap = RuleDetermination(
+        rule_determination = RuleDetermination(
             net,
             self.network_name,
             self.dataset_name,
@@ -183,9 +180,9 @@ class RuleInference:
             self.node_dict
             )
 
-        best_ruleset = custom_deap.rule_determination()
+        ruleset = rule_determination.infer_ruleset()
 
-        return best_ruleset
+        return ruleset
 
     def plot_graph_from_graphml(self, network):
         G = network
@@ -405,17 +402,6 @@ class RuleInference:
                 # Find the dataset row index of the gene
                 node.dataset_index = gene_name_to_index.get(node_name)
 
-                node.rvalues = self.rvalues[node_index]
-
-                # Find the start and end indices for where the rule combinations start and stop for this node in the
-                rule_length = len(node.bitstring)
-                if rule_length > 0:
-                    node.rule_start_index = rule_index
-                    rule_index += rule_length
-                    node.rule_end_index = rule_index
-                else:
-                    node.rule_start_index = None
-                    node.rule_end_index = None
                 nodes.append(node)
                 bar()
 

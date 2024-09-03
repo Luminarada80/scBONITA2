@@ -158,7 +158,7 @@ class CalculateImportanceScore():
         for node in self.nodes:
             incoming_nodes = node.best_rule[1][:]
             
-            node.calculation_function = node.find_calculation_function()
+            node.calculation_function = node.best_rule[2]
             node.incoming_node_indices = [index for index, name in node.predecessors.items() if name in incoming_nodes]
             
 
@@ -275,7 +275,7 @@ def run_full_importance_score(dataset_name, network_names):
             # Store the network information in a pickle file
             network = Network(name=f'{network_name}')
             network.nodes = ruleset.nodes
-            network.rulesets = ruleset.best_ruleset
+            network.rulesets = ruleset.ruleset
             network.network = ruleset.graph
             network.dataset = ruleset.binarized_matrix
 

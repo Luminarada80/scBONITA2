@@ -13,9 +13,6 @@ class Node:
         self.index = index # Index in the network
         self.dataset_index = None # Row index in the dataset
 
-        # Combining all of the combinations
-        self.rvalues = None
-
         # Inversion rules for each of the incoming node combinations
         self.inversions = inversions
 
@@ -28,21 +25,14 @@ class Node:
 
         # Finds the possible rules based on the number of predecessors and chooses one using one-hot encoding
         self.possibilities = self.enumerate_possibilities()
-        self.bitstring, self.selected_rule = self.choose_rule(self.possibilities)
-        self.node_rules = [self.name, [i for i in predecessors], self.selected_rule, self.inversions]
-
-        # Indices in the individuals where the rules for this node start and end
-        self.rule_start_index = None
-        self.rule_end_index = None
+        self.node_rules = None
 
         # Finds the best rule
         self.best_rule_index = None
         self.best_rule = None
         self.best_rule_error = None
 
-        self.logic_function = None
-
-        # Compressed best rule information
+        # The calculation function for the nodes best_rule
         self.calculation_function = None
 
         # Importance scores
@@ -115,67 +105,6 @@ class Node:
             assert IndexError('Num incoming nodes out of range')
 
         return possibilities
-
-    def choose_rule(self, possibilities):
-        # logging.debug(f'Node {self.name} choose_rule function:')
-
-        # Selects a random rule
-        random_rule_index = random.choice(range(len(possibilities)))
-        
-        # logging.debug(f'\tRandom rule index: {random_rule_index}')
-
-        # Creates a bitstring for the rule, where the index of the randomly selected rule is 1 and every other combination is 0
-        bitstring = np.array([1 if i == random_rule_index else 0 for i, _ in enumerate(possibilities)])
-        
-        # Finds the predicted rule from the bitstring
-        selected_rule = possibilities[bitstring == 1][0].replace("  "," ")
-        
-        # Formats the rule with not values
-        for i, invert_node in enumerate(self.inversions):
-            if invert_node == 1:
-                if i == 0:
-                    selected_rule = selected_rule.replace('A', 'not A')
-                if i == 1:
-                    selected_rule = selected_rule.replace('B', 'not B')
-                elif i == 2:
-                    selected_rule = selected_rule.replace('C', 'not C')
-                elif i == 3:
-                    selected_rule = selected_rule.replace('D', 'not D')
-
-        return bitstring, selected_rule
-    
-    def find_multiple_rule_predictions(self, individual_bitstring):
-        rule_predictions = []
-        # Extract the bitstring for this node from the individual
-        bitstring_length = self.rule_end_index - self.rule_start_index
-        if bitstring_length >= 1:
-            bitstring = np.array(individual_bitstring[self.rule_start_index:self.rule_end_index])
-
-        elif bitstring_length == 0:
-            bitstring = np.array(individual_bitstring[self.rule_start_index])
-        
-        selected_rules = [rule.replace("  ", " ") for rule in self.possibilities[bitstring == 1]]
-
-        # Add in the inversion rules
-        for rule in selected_rules:
-            for i, invert_node in enumerate(self.inversions.values()):
-                if invert_node == True:
-                    if i == 0:
-                        rule = rule.replace('A', 'not A')
-                    if i == 1:
-                        rule = rule.replace('B', 'not B')
-                    elif i == 2:
-                        rule = rule.replace('C', 'not C')
-            rule_predictions.append(rule)
-
-        # Update the predicted rules for this node
-        node_rules = []
-        for rule in rule_predictions:
-            node_rules.append([self.name, [i for i in self.predecessors], rule])
-
-        self.node_rules = node_rules
-        
-        return rule_predictions
     
     def find_all_rule_predictions(self):
         rule_predictions = []
@@ -198,22 +127,7 @@ class Node:
         node_rules = []
         for rule in rule_predictions:
             node_rules.append([self.name, [i for i in self.predecessors], rule])
+
+        self.node_rules = node_rules
         
         return node_rules
-
-    # Reset the state of the node
-    def reset_state(self):
-        """
-        Reset the state of the Node instance to clear any data that is specific to an individual's rule set.
-        This method should be called before processing a new individual.
-        """
-        self.rule_predictions = None
-        self.node_rules = []  # Clearing the list of rules
-
-        # Any other attributes that need to be reset can be added here
-    
-    def find_calculation_function(self):
-        return self.best_rule[2]
-
-
-
