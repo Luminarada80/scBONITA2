@@ -28,18 +28,16 @@ import statistics
 from user_input_prompts import attractor_analysis_arguments
 from file_paths import file_paths
 
-
-def evaluate_expression(data, expression):
-    expression = expression.replace('and', '&').replace('or', '|').replace('not', '~')
-    if any(op in expression for op in ['&', '|', '~']):
-        local_vars = {key: np.array(value).astype(bool) for key, value in data.items()}
-    else:
-        local_vars = {key: np.array(value) for key, value in data.items()}
-    return ne.evaluate(expression, local_dict=local_vars)
-
-
 def vectorized_run_simulation(nodes, starting_state, steps):
     total_simulation_states = []
+
+    def evaluate_expression(data, expression):
+        expression = expression.replace('and', '&').replace('or', '|').replace('not', '~')
+        if any(op in expression for op in ['&', '|', '~']):
+            local_vars = {key: np.array(value).astype(bool) for key, value in data.items()}
+        else:
+            local_vars = {key: np.array(value) for key, value in data.items()}
+        return ne.evaluate(expression, local_dict=local_vars)
 
     # Run the simulation
     for step in range(steps):

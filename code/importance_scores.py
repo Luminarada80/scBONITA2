@@ -9,6 +9,7 @@ from argparse import ArgumentParser
 import matplotlib.pyplot as plt
 from user_input_prompts import *
 import numexpr as ne
+import random
 
 from file_paths import file_paths
 
@@ -22,13 +23,11 @@ class CalculateImportanceScore():
         # Ensure you do not sample more columns than exist in the matrix
         n_cols = min(self.CELLS, binarized_matrix.shape[1])
 
-        import random
         # Sample the dataset for cells to simulate
         self.cell_sample_indices = random.sample(range(binarized_matrix.shape[1]), k=n_cols)
 
         # Check if the matrix is in CSR or CSC format
         if isinstance(binarized_matrix, (csr_matrix, csc_matrix)):
-        # Use fancy indexing for sparse matrices
             self.dataset = binarized_matrix[:, self.cell_sample_indices].todense()
         else:
             # Fallback for dense matrices (NumPy arrays)
@@ -36,21 +35,19 @@ class CalculateImportanceScore():
         
         self.zeros_array = np.array([[0] * self.dataset.shape[1]], dtype=bool)
         self.ones_array = np.array([[1] * self.dataset.shape[1]], dtype=bool)
-    
-    def evaluate_expression(self, data, expression):
-        expression = expression.replace('and', '&').replace('or', '|').replace('not', '~')
-        # Convert the arrays to boolean if the expression contains boolean operations
-        if any(op in expression for op in ['&', '|', '~']):
-            local_vars = {key: np.array(value).astype(bool) for key, value in data.items()}
-        else:
-            local_vars = {key: np.array(value) for key, value in data.items()}
-        return ne.evaluate(expression, local_dict=local_vars)
 
-    # logging.info(f'\tdata = {data}')
-    
 
     def vectorized_run_simulation(self,knockout_node=None, knockin_node=None):
         total_simulation_states = []
+
+        def evaluate_expression(data, expression):
+            expression = expression.replace('and', '&').replace('or', '|').replace('not', '~')
+            # Convert the arrays to boolean if the expression contains boolean operations
+            if any(op in expression for op in ['&', '|', '~']):
+                local_vars = {key: np.array(value).astype(bool) for key, value in data.items()}
+            else:
+                local_vars = {key: np.array(value) for key, value in data.items()}
+            return ne.evaluate(expression, local_dict=local_vars)
 
         # Run the simulation
         for step in range(self.STEPS):
@@ -93,15 +90,7 @@ class CalculateImportanceScore():
                         if len(incoming_node_indices) > 3:
                             data['D'] = total_simulation_states[step-1][incoming_node_indices[3]]
 
-                    # Apply the logic function to the data from the incoming nodes to get the predicted output
-
-                    # Get the row in the dataset for the node being evaluated
-                    # logging.info(f'\tNode {node.name}, Dataset index {node.index}')
-                    
-                    # Get the dataset row indices for the incoming nodes included in this rule
-                    # logging.info(f'\tPredicted rule: {predicted_rule}')
-
-                    next_step_node_expression = self.evaluate_expression(data, node.calculation_function)
+                    next_step_node_expression = evaluate_expression(data, node.calculation_function)
 
                 # Save the expression for the node for this step
                 step_expression.append(next_step_node_expression)
@@ -114,6 +103,7 @@ class CalculateImportanceScore():
         attractors = self.calculate_attractors(total_simulation_states)
 
         return attractors
+
 
     def calculate_attractors(self, total_simulation_states):
         # Transpose the matrix
@@ -135,6 +125,7 @@ class CalculateImportanceScore():
 
         return attractors
 
+    @staticmethod
     def find_attractors(self, total_simulation_states, cell, num_steps):        
         for i in range(num_steps):
             for j in range(i):
@@ -144,6 +135,7 @@ class CalculateImportanceScore():
                     attractor_end_index = i
                     return (attractor_start_index, attractor_end_index)
         return (None, None)
+
 
     def perform_knockouts_knockins(self):
         """
@@ -178,6 +170,7 @@ class CalculateImportanceScore():
                 bar()
         
         return normal_signaling, knockout_results, knockin_results
+
 
     def calculate_importance_scores(self):
         logging.info(f'\n-----RUNNING NETWORK SIMULATION-----')
@@ -240,6 +233,7 @@ class CalculateImportanceScore():
 
         return scaled_importance_scores
 
+    @staticmethod
     def align_attractors(self, ko_attractor, ki_attractor):
         """
         Align the knock-out and knock-in attractor arrays by the minimum size along both axes.
@@ -256,7 +250,21 @@ class CalculateImportanceScore():
 
         return ko_attractor_aligned, ki_attractor_aligned
 
-def run_full_importance_score(dataset_name, network_names): 
+
+def run_full_importance_score(dataset_name, network_names):
+    """
+    Runs the full importance score calculations for a given dataset and network names.
+
+    Simulates knock-in and knock-out in-silico perturbations for each gene and records the change in signaling.
+    Saves the importance scores to the Node objects and Network objects.
+
+    Parameters
+    ----------
+    dataset_name : str
+        The name of the dataset to generate importance scores for
+    network_names : list
+        The names of the networks to generate importance scores for
+    """
     # Path to the ruleset pickle file
     ruleset_pickle_file_path = f'{file_paths["pickle_files"]}/{dataset_name}_pickle_files/ruleset_pickle_files/'
 
@@ -279,22 +287,40 @@ def run_full_importance_score(dataset_name, network_names):
             network.network = ruleset.graph
             network.dataset = ruleset.binarized_matrix
 
-            # Specify the path to the importance score folder
-            importance_score_folder = f'{ruleset.dataset_name}_importance_scores/full_dataset_importance_score'
-            importance_score_file_name = f'{ruleset.network_name}_{ruleset.dataset_name}_importance_scores'
-
             # Run the importance score calculation for that ruleset and network
             logging.info(f'Calculating importance score for network {network_name}')
-            importance_score(ruleset, network, importance_score_folder, importance_score_file_name)
+            importance_score_calculator = CalculateImportanceScore(network.nodes, network.dataset.astype(bool))
+            importance_score_calculator.calculate_importance_scores()
 
+            # Save the importance scores to a text file
+            logging.info(f'Saving importance scores to file: {file_name}.txt')
+            text_file_path = f'{file_paths["importance_score_output"]}/{dataset_name}/text_files'
+            png_file_path = f'{file_paths["importance_score_output"]}/{dataset_name}/png_files'
+            svg_file_path = f'{file_paths["importance_score_output"]}/{dataset_name}/svg_files'
+
+            # Make sure all paths to the importance score output directories exist
+            os.makedirs(text_file_path, exist_ok=True)
+            os.makedirs(png_file_path, exist_ok=True)
+            os.makedirs(svg_file_path, exist_ok=True)
+
+            with open(f'{text_file_path}/{file_name}.txt', 'w') as file:
+                file.write("\n".join(f"{node.name} = {round(node.importance_score, 3)}" for node in network.nodes))
+
+            # Create and save the importance score figure
+            fig = ruleset.plot_graph_from_graphml(network.network)
+            logging.info(f'Saving importance score figures')
+            fig.savefig(f'{png_file_path}/{file_name}.png', bbox_inches='tight', format='png')
+            fig.savefig(f'{svg_file_path}/{file_name}.png', bbox_inches='tight', format='svg')
+            plt.close(fig)
+
+            # Save the network object to a pickle file
             logging.info(f'Saving network object as a pickle file')
             network_folder = f'{file_paths["pickle_files"]}/{dataset_name}_pickle_files/network_pickle_files'
             os.makedirs(network_folder, exist_ok=True)
-
             network_file_path = f'{network_folder}/{dataset_name}_{network_name}.network.pickle'
-
             pickle.dump(network, open(network_file_path, 'wb'))
             logging.info(f'\tSaved to {network_file_path}')
+
         else:
             logging.debug(f'Skipping {network_name}')
 
@@ -303,32 +329,6 @@ def run_full_importance_score(dataset_name, network_names):
     if len(common_items) == 0:
         raise Exception(f'ERROR: Pathways specific do not exist in the ruleset.pickle folder. Check spelling and try again')
 
-def importance_score(ruleset, network, folder_path, file_name):
-    importance_score_calculator = CalculateImportanceScore(network.nodes, network.dataset.astype(bool))
-    
-    importance_score_calculator.calculate_importance_scores()
-
-    # Save the importance scores to a file
-    logging.info(f'Saving importance scores to file: {file_name}.txt')
-    text_file_path = f'{file_paths["importance_score_output"]}/{dataset_name}/text_files'
-    png_file_path = f'{file_paths["importance_score_output"]}/{dataset_name}/png_files'
-    svg_file_path = f'{file_paths["importance_score_output"]}/{dataset_name}/svg_files'
-
-    os.makedirs(text_file_path, exist_ok=True)
-    os.makedirs(png_file_path, exist_ok=True)
-    os.makedirs(svg_file_path, exist_ok=True)
-
-    with open(f'{text_file_path}/{file_name}.txt', 'w') as file:
-        file.write("\n".join(f"{node.name} = {round(node.importance_score, 3)}" for node in network.nodes))
-
-    # Create and save the figure
-    fig = ruleset.plot_graph_from_graphml(network.network)
-
-    logging.info(f'Saving importance score figures')
-    fig.savefig(f'{png_file_path}/{file_name}.png', bbox_inches='tight', format='png')
-    fig.savefig(f'{svg_file_path}/{file_name}.png', bbox_inches='tight', format='svg')
-
-    plt.close(fig)
 
 if __name__ == '__main__':
     # Set the logging level for output
@@ -346,7 +346,7 @@ if __name__ == '__main__':
     network_names = args.list_of_kegg_pathways
     organism_code = args.organism
     
-    # If no network is specified, get all of the rulesets for the dataset
+    # If no network is specified, get all rulesets for the dataset
     if network_names[0] == "":
         network_names_list = []
         for filename in os.listdir(f'{file_paths["rules_output"]}/{dataset_name}_rules/'):
