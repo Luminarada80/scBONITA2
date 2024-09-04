@@ -681,6 +681,7 @@ def calculate_dtw(num_files: int, output_directory: str, num_cells_per_chunk: in
         title: str = f'Average Gene Expression Heatmap for Cluster {cluster}'
         path: str = f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/avg_chunks/cluster_{cluster}_summary'
 
+        # Write out df
         plot_average_trajectory(df, title, path)
 
 
