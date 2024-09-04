@@ -23,7 +23,7 @@ class RuleDetermination:
         _, num_columns = np.shape(self.binarized_matrix)
 
         # Chunk to reduce noise if there are a lot of cells, otherwise just use the columns
-        if num_columns > 10000:
+        if num_columns > 2000:
             self.num_chunks = round(num_columns / 10)
             self.chunked_data_numpy = np.array(self.chunk_data(num_chunks=self.num_chunks))
             self.coarse_chunked_dataset = np.array(self.chunk_data(num_chunks=round(self.num_chunks / 2, 1)))

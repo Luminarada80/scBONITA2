@@ -504,7 +504,7 @@ class Pathways:
         return graph
     
 
-    def write_all_organism_xml_files(self, organism): 
+    def write_xml_files(self, organism: str, pathway_list: list):
         """
         Reads in all xml files for the organism, faster to do this once at the start and just use
         the cached files. They aren't that big, so I'd rather store them at the beginning.
@@ -526,10 +526,9 @@ class Pathways:
             return kegg
     
         k = silent_kegg_initialization()  # read KEGG from bioservices
-        k.organism = organism     
-        pathway_list = list(k.pathwayIds)              
+        k.organism = organism
         
-        logging.info(f'\t\tDownloading any missing pathway xml files, this may take a while...')
+        logging.info(f'\t\tDownloading pathway files, this may take a while...')
         with alive_bar(len(pathway_list)) as bar:
             for pathway in pathway_list:
                 pathway = pathway.replace("path:", "")
@@ -691,8 +690,8 @@ class Pathways:
             except:
                 logging.info("Could not get library: " + organism)
 
-        # Write all xml files from the kegg api rather than requesting each one individually. Finds any missing xml files
-        self.write_all_organism_xml_files(organism)
+        # Writes xml files for the pathways in the pathway list
+        self.write_xml_files(organism, kegg_pathway_list)
 
         xml_file_path = os.listdir(f'{file_paths["pathway_xml_files"]}/{organism}')
 
