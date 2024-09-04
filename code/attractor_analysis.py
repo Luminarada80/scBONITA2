@@ -295,13 +295,6 @@ def compute_dtw_distance_pair(cell1: str, cell2: str, cell_trajectory_dict: dict
     total_distance = sum(distances.values()) if distances else float('inf')
     return (cell1, cell2, total_distance)
 
-def compute_dtw_chunk(pairs, cell_trajectory_dict):
-    chunk_dtw_distances = {}
-    for cell1, cell2 in pairs:
-        _, _, total_distance = compute_dtw_distance_pair(cell1, cell2, cell_trajectory_dict)
-        chunk_dtw_distances[(cell1, cell2)] = total_distance
-    return chunk_dtw_distances
-
 def compute_dtw_distances(cell_trajectory_dict: dict, output_directory: str):
     """
     Handles parallel processing of the dynamic time warping calculations.
@@ -325,7 +318,7 @@ def compute_dtw_distances(cell_trajectory_dict: dict, output_directory: str):
     total_combinations = len(cell_pairs)
 
     # Use multiprocessing to process pairs of cell trajectories
-    with mp.Pool(mp.cpu_count()) as pool:
+    with mp.Pool(mp.cpu_count()) as pool, alive_bar(total_combinations) as bar:
         # Compute DTW distances for all cell pairs in parallel
         tasks = [(cell1, cell2, cell_trajectory_dict) for cell1, cell2 in cell_pairs]
         results = pool.starmap(compute_dtw_distance_pair, tasks)
@@ -333,6 +326,7 @@ def compute_dtw_distances(cell_trajectory_dict: dict, output_directory: str):
         # Collect results and update progress bar
         for cell1, cell2, total_distance in results:
             dtw_distances[(cell1, cell2)] = total_distance
+            bar()  # Update progress bar
 
     # Write out each cell-cell distance to an outfile
     with open(f'{output_directory}/distances.csv', 'w') as outfile:
@@ -768,7 +762,9 @@ if __name__ == '__main__':
         num_files: int = len([file for file in os.listdir(text_dir) if file.endswith('_trajectory.csv')])
 
         logging.info(f'{num_files} trajectory files after simulation')
+
+        num_files_to_process = min(num_cells_to_analyze, num_existing_files)
         
         # Calculate the dynamic time warping
         logging.info(f'Calculating cell trajectory clusters and averaging the cluster trajectories')
-        calculate_dtw(num_cells_to_analyze, text_dir, num_cells_per_chunk)
+        calculate_dtw(num_files_to_process, text_dir, num_cells_per_chunk)
