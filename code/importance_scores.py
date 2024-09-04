@@ -126,7 +126,7 @@ class CalculateImportanceScore():
         return attractors
 
     @staticmethod
-    def find_attractors(self, total_simulation_states, cell, num_steps):        
+    def find_attractors(total_simulation_states, cell, num_steps):
         for i in range(num_steps):
             for j in range(i):
                 # Compare the states of each cell across all nodes at two different time steps
