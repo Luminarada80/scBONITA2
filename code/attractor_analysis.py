@@ -24,12 +24,20 @@ from scipy.cluster.hierarchy import linkage, dendrogram, fcluster
 from scipy.spatial.distance import squareform
 from alive_progress import alive_bar
 import statistics
+import multiprocessing as mp
+from itertools import combinations
 
 from user_input_prompts import attractor_analysis_arguments
 from file_paths import file_paths
 
-def vectorized_run_simulation(nodes, starting_state, steps):
-    total_simulation_states = []
+def vectorized_run_simulation(nodes: list, cell_column: list):
+    steps = 20
+
+    # Convert cell_column to NumPy array for faster processing
+    starting_state = np.array(cell_column)
+
+    # Preallocate simulation state matrix (steps, nodes)
+    total_simulation_states = np.zeros((steps, len(nodes)), dtype=int)
 
     def evaluate_expression(data, expression):
         expression = expression.replace('and', '&').replace('or', '|').replace('not', '~')
@@ -42,14 +50,9 @@ def vectorized_run_simulation(nodes, starting_state, steps):
     # Run the simulation
     for step in range(steps):
         step_expression = []
-        # print(f'Step {step}')
 
         # Iterate through each node in the network
-        for node in nodes:
-
-            # Initialize A, B, C to False by default (adjust according to what makes sense in context)
-            A, B, C = (False,) * 3
-
+        for node_idx, node in enumerate(nodes):
             data = {}
             incoming_node_indices = [predecessor_index for predecessor_index in node.predecessors]
 
@@ -64,61 +67,91 @@ def vectorized_run_simulation(nodes, starting_state, steps):
                 if len(incoming_node_indices) > 3:
                     data['D'] = starting_state[incoming_node_indices[3]]
             else:
+                prev_state = total_simulation_states[step - 1]
                 if len(incoming_node_indices) > 0:
-                    data['A'] = total_simulation_states[step - 1][incoming_node_indices[0]]
+                    data['A'] = prev_state[incoming_node_indices[0]]
                 if len(incoming_node_indices) > 1:
-                    data['B'] = total_simulation_states[step - 1][incoming_node_indices[1]]
+                    data['B'] = prev_state[incoming_node_indices[1]]
                 if len(incoming_node_indices) > 2:
-                    data['C'] = total_simulation_states[step - 1][incoming_node_indices[2]]
+                    data['C'] = prev_state[incoming_node_indices[2]]
                 if len(incoming_node_indices) > 3:
-                    data['D'] = total_simulation_states[step - 1][incoming_node_indices[3]]
+                    data['D'] = prev_state[incoming_node_indices[3]]
 
             next_step_node_expression = evaluate_expression(data, node.calculation_function)
 
             # Save the expression for the node for this step
             step_expression.append(next_step_node_expression)
 
-        # Save the expression
-        total_simulation_states.append(step_expression)
+        # Convert step expression to integer and save the result
+        total_simulation_states[step] = np.array(step_expression).astype(int)
 
-    return total_simulation_states
+    # Return the final matrix of simulation steps where rows are steps and columns are nodes
+    return total_simulation_states.tolist()
 
 
-def simulate_network(nodes: object, cell_column: list):
+def simulate_single_cell(cell_index: int, dataset_array: np.ndarray, network: object, dataset_name: str, network_name: str, lock):
     """
-    Simulates signal flow through a Boolean network starting from a cell's gene expression.
+    Simulates a single cell trajectory.
 
     Parameters
-    -----------
-    nodes : object
-        node_class objects for the genes in the network
-    cell_column : list
-        A list containing the gene expression for the cell to be simulated
-
-    Returns
-    -----------
-    simulation_results : list
-        A matrix containing the simulation results. Rows = genes, columns = simulation step
+    ---------
+    cell_index : int
+        Index of the cell to simulate
+    dataset_array : np.ndarray
+        Dense dataset for the cells
+    network : object
+        The network object containing the nodes
+    dataset_name : str
+        The name of the dataset
+    network_name : str
+        The name of the network
     """
-    steps = 20
+    # Reads in the network gene expression for the chosen cell column
+    cell_starting_state = np.array([int(gene_expr) for gene_expr in dataset_array[:, cell_index]])
 
-    # Set the starting state using the gene expression for the cell
-    starting_state = []
-    for gene_expression in cell_column:
-        starting_state.append(gene_expression)
+    # Simulate the network using the expression in the selected column as the starting state
+    trajectory = vectorized_run_simulation(network.nodes, cell_starting_state)
 
-    # Simulates the network model starting from the cell's gene expression values
-    total_simulation_states = vectorized_run_simulation(nodes, starting_state, steps)
-    
-    # Return a matrix of simulation steps where the rows are genes and columns are simulation steps
-    simulation_results = [[int(item) for item in sublist] for sublist in total_simulation_states]
+    # Save the attractor simulation to a csv file
+    attractor_sim_path = f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/text_files/cell_{cell_index}_trajectory.csv'
 
-    return simulation_results
+    with lock:
+        if os.path.exists(attractor_sim_path):
+            logging.warning(f"File {attractor_sim_path} already exists, skipping write for cell {cell_index}.")
+        else:
+            with open(attractor_sim_path, 'w') as file:
+                trajectory = np.array(trajectory).T
+                for gene_num, expression in enumerate(trajectory):
+                    file.write(f'{network.nodes[gene_num].name},{",".join([str(i) for i in list(expression)])}\n')
+
+    # Only saves 100 cell simulation trajectory graphs to save space
+    if len(os.listdir(f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/png_files/')) <= 100:
+        # Create a heatmap to visualize the trajectories
+        heatmap = create_heatmap(
+            f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/text_files/cell_{cell_index}_trajectory.csv',
+            f'Simulation for {dataset_name} {network_name} cell {cell_index} pathway ')
+
+        # Saves a png of the results
+        heatmap.savefig(
+            f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/png_files/cell_{cell_index}_trajectory.png',
+            format='png')
+        plt.close(heatmap)
 
 
-def simulate_cells(dataset_array: np.ndarray, num_simulations: int):
+def simulate_single_cell_wrapper(args):
     """
-    Simulates the cell trajectories using a network model.
+    Wrapper to call simulate_single_cell and return 1 for progress tracking.
+    This function needs to be in the global scope to be pickled by multiprocessing.
+    """
+    cell_index, dataset_array, network, dataset_name, network_name, lock = args
+    simulate_single_cell(cell_index, dataset_array, network, dataset_name, network_name, lock)
+    return 1  # Return 1 to indicate progress for the progress bar
+
+
+def simulate_cells(dataset_array: np.ndarray, num_simulations: int, network: object, dataset_name: str, network_name: str):
+    """
+    Simulates the cell trajectories using a network model with parallel processing
+    and a progress bar.
 
     Parameters
     ---------
@@ -126,50 +159,62 @@ def simulate_cells(dataset_array: np.ndarray, num_simulations: int):
         The dense dataset for the cells
     num_simulations : int
         The number of simulation steps to run
+    network : object
+        The network object containing the nodes
+    dataset_name : str
+        The name of the dataset
+    network_name : str
+        The name of the network
     """
-    # Simulate cell trajectories
     logging.info(f'\tSimulating {num_simulations} cell trajectories')
-    simulated_cells = []
+    # Get the list of existing trajectory files
+    trajectory_dir = f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/text_files'
+    existing_files = os.listdir(trajectory_dir)
+    existing_indices = set()
+
+    # Find the list of already simulated cell indices from existing files
+    for filename in existing_files:
+        if filename.startswith("cell_") and filename.endswith("_trajectory.csv"):
+            try:
+                index = int(filename.split('_')[1])
+                existing_indices.add(index)
+            except (IndexError, ValueError):
+                logging.warning(f"Skipping file {filename}: could not extract cell index.")
+
+    # Get all possible cell indices
+    all_indices = set(range(dataset_array.shape[1]))
+
+    # Remove existing indices from the pool of indices to simulate
+    indices_to_simulate = list(all_indices - existing_indices)
+
+    # If num_simulations exceeds remaining indices, adjust
+    if num_simulations > len(indices_to_simulate):
+        logging.warning(
+            f"Requested {num_simulations} simulations, but only {len(indices_to_simulate)} unsimulated cells available.")
+        num_simulations = len(indices_to_simulate)
+
+    # Randomly select `num_simulations` indices to simulate
+    cells_to_simulate = np.random.choice(indices_to_simulate, num_simulations, replace=False)
+
+    # Prepare multiprocessing pool
+    pool = mp.Pool(mp.cpu_count())
+    manager = mp.Manager()
+    lock = manager.Lock()
+
+    # Prepare arguments for each simulation
+    arguments = [(cell_index, dataset_array, network, dataset_name, network_name, lock) for cell_index in cells_to_simulate]
+
+    # Use parallel processing and update progress bar
     with alive_bar(num_simulations) as bar:
-        for i in range(num_simulations):
+        # Run simulations in parallel using starmap (blocking version)
+        results = pool.imap_unordered(simulate_single_cell_wrapper, arguments)
 
-            # Get the list of cells that have already been simulated
-            existing_files = os.listdir(f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/text_files')
-            existing_indices = set()
-            for filename in existing_files:
-                if filename.startswith("cell_") and filename.endswith("_trajectory.csv"):
-                    index = int(filename.split('_')[1])
-                    existing_indices.add(index)
+        for result in results:
+            bar()  # Update progress bar for each completed task
 
-            # Randomly select a cell index that is not in existing_indices
-            cell_index = np.random.choice(dataset_array.shape[1])
-            while cell_index in existing_indices:
-                cell_index = np.random.choice(dataset_array.shape[1])
-
-            # Reads in the network gene expression for the chosen cell column
-            cell_starting_state = np.array([int(gene_expr) for gene_expr in dataset_array[:, cell_index]])
-
-            # Record which cells were simulated
-            simulated_cells.append(cell_index)
-            
-            # Simulate the network using the expression in the selected column as the starting state
-            trajectory = simulate_network(network.nodes, cell_starting_state)
-
-            # Save the attractor simulation to a csv file
-            attractor_sim_path = f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/text_files/cell_{cell_index}_trajectory.csv'
-            with open(attractor_sim_path, 'w') as file:
-                    trajectory = np.array(trajectory).T
-                    for gene_num, expression in enumerate(trajectory):
-                        file.write(f'{network.nodes[gene_num].name},{",".join([str(i) for i in list(expression)])}\n')
-
-            # Create a heatmap to visualize the trajectories
-            heatmap = create_heatmap(f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/text_files/cell_{cell_index}_trajectory.csv',
-                                     f'Simulation for {dataset_name} {network_name} cell {cell_index} pathway ')
-
-            # Saves a png of the results
-            heatmap.savefig(f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/png_files/cell_{cell_index}_trajectory.png', format='png')
-            plt.close(heatmap)
-            bar()
+        # Close and join the pool after all tasks have been completed
+        pool.close()
+        pool.join()
 
 
 def create_heatmap(trajectory_path: str, title: str):
@@ -250,6 +295,12 @@ def compute_dtw_distance_pair(cell1: str, cell2: str, cell_trajectory_dict: dict
     total_distance = sum(distances.values()) if distances else float('inf')
     return (cell1, cell2, total_distance)
 
+def compute_dtw_chunk(pairs, cell_trajectory_dict):
+    chunk_dtw_distances = {}
+    for cell1, cell2 in pairs:
+        _, _, total_distance = compute_dtw_distance_pair(cell1, cell2, cell_trajectory_dict)
+        chunk_dtw_distances[(cell1, cell2)] = total_distance
+    return chunk_dtw_distances
 
 def compute_dtw_distances(cell_trajectory_dict: dict, output_directory: str):
     """
@@ -270,29 +321,23 @@ def compute_dtw_distances(cell_trajectory_dict: dict, output_directory: str):
     """
     dtw_distances = {}
     cell_names = list(cell_trajectory_dict.keys())
-    total_combinations = len(cell_names) * (len(cell_names) - 1) // 2
+    cell_pairs = list(combinations(cell_names, 2))  # Get all unique pairs of cells
+    total_combinations = len(cell_pairs)
 
-    tasks = []
-    # Compute the DTW distance between each pair of cells
-    with ProcessPoolExecutor() as executor, alive_bar(total_combinations) as bar:
-        for i in range(len(cell_names)):
-            for j in range(i + 1, len(cell_names)):
-                cell1 = cell_names[i]
-                cell2 = cell_names[j]
-                tasks.append(executor.submit(compute_dtw_distance_pair, cell1, cell2, cell_trajectory_dict))
+    # Use multiprocessing to process pairs of cell trajectories
+    with mp.Pool(mp.cpu_count()) as pool:
+        # Compute DTW distances for all cell pairs in parallel
+        tasks = [(cell1, cell2, cell_trajectory_dict) for cell1, cell2 in cell_pairs]
+        results = pool.starmap(compute_dtw_distance_pair, tasks)
 
-        # Once completed, add the distances for each cell to a dictionary
-        for future in as_completed(tasks):
-            cell1, cell2, total_distance = future.result()
+        # Collect results and update progress bar
+        for cell1, cell2, total_distance in results:
             dtw_distances[(cell1, cell2)] = total_distance
-            bar()
 
     # Write out each cell-cell distance to an outfile
     with open(f'{output_directory}/distances.csv', 'w') as outfile:
-        for (file1, file2), total_distance in dtw_distances.items():
-            file1_cell = file1.split('_trajectory')[0]
-            file2_cell = file2.split('_trajectory')[0]
-            outfile.write(f'{file1_cell},{file2_cell},{total_distance}\n')
+        for (cell1, cell2), total_distance in dtw_distances.items():
+            outfile.write(f'{cell1},{cell2},{total_distance}\n')
 
     return dtw_distances
 
@@ -571,8 +616,6 @@ def calculate_dtw(num_files: int, output_directory: str, num_cells_per_chunk: in
 
     cluster_chunks, cells_in_chunks, num_clusters = create_trajectory_chunks(num_chunks, num_clusters, output_directory)
 
-    logging.info(f'{len(trajectory_files_parsed)} cell trajectories compared, split into {num_chunks} chunks and {num_clusters} clusters')
-
     logging.info(f'\nComparing chunks')
     chunk_dtw_distances = compute_dtw_distances(cluster_chunks, output_directory)
 
@@ -669,7 +712,7 @@ if __name__ == '__main__':
     pickle_file_path = f'{file_paths["pickle_files"]}/{dataset_name}_pickle_files/network_pickle_files/'
     for pickle_file in glob.glob(pickle_file_path + str(dataset_name) + "_" + "*" + ".network.pickle"):
         if pickle_file:
-            logging.info(f'\t\tLoading data file: {pickle_file}')
+            logging.info(f'\tLoading data file: {pickle_file[-25:]}')
             network = pickle.load(open(pickle_file, "rb"))
             all_networks.append(network)
         else:
@@ -689,8 +732,8 @@ if __name__ == '__main__':
 
         logging.info(f'\n----- ATTRACTOR ANALYSIS -----')
 
-        num_cells_per_chunk: int = 50
-        num_cells_to_analyze: int = 1000
+        num_cells_per_chunk: int = 100
+        num_cells_to_analyze: int = 5000
 
         # Convert the network's sparse dataset to a dense one
         dataset = network.dataset
@@ -719,10 +762,11 @@ if __name__ == '__main__':
             num_simulations = 0
 
         # Simulates cells to create the cell trajectory files
-        simulate_cells(dense_dataset, num_simulations)
+        simulate_cells(dense_dataset, num_simulations, network, dataset_name, network_name)
 
         # Recalculates the number of trajectory files after simulating to ensure there are enough
         num_files: int = len([file for file in os.listdir(text_dir) if file.endswith('_trajectory.csv')])
+
         logging.info(f'{num_files} trajectory files after simulation')
         
         # Calculate the dynamic time warping
