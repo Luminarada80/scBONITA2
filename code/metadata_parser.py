@@ -87,7 +87,7 @@ def metadata_parser(metadata_file, metadata_sep, dataset_file, dataset_sep, cell
                                 cell_groups[group_name].append(cell_index)
 
                         except KeyError as e:
-                            print(e)
+                            print(f'KeyError appending {e} to cell_groups in metadata_parser, check metadata file')
                             continue
                 
                 line_count += 1

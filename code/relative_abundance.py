@@ -352,6 +352,8 @@ if __name__ == '__main__':
                         # Extract the data from each dataset
                         sample_cells = True
                         cell_names, gene_names, split_dataset = extract_data(dataset_path, dataset_sep, sample_cells, ruleset.node_indices, ruleset.max_samples)
+                        new_network.cells = cell_indices_per_group[group]
+
                         # Append the row index for each gene in the network to a list
                         gene_indices = []
                         for row_index, row in enumerate(split_dataset):

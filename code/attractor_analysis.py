@@ -536,7 +536,7 @@ def create_trajectory_chunks(num_chunks: int, num_clusters: int, output_director
     logging.info(f'Creating chunks, this may take a while depending on how many cells and the chunk size')
     for chunk in range(num_chunks):
         start = time.time()
-        logging.info(f'\tCreating chunk {chunk+1}')
+        logging.info(f'\tCreating chunk {chunk+1} / {num_chunks}')
         # Reads in the cell trajectories from the simulations and creates a dataframe from them
         cell_trajectory_dict = {}
 
@@ -620,7 +620,7 @@ def calculate_dtw(num_files: int, output_directory: str, num_cells_per_chunk: in
     # Ensures there is always one chunk
     if num_chunks == 0:
         num_chunks = 1
-
+    group_dict = {}
     cluster_chunks, cells_in_chunks, num_clusters = create_trajectory_chunks(num_chunks, num_clusters, output_directory)
 
     logging.info(f'\nComparing chunks')
@@ -660,7 +660,7 @@ def calculate_dtw(num_files: int, output_directory: str, num_cells_per_chunk: in
     plt.title("DTW Distance Heatmap")
     plt.tight_layout()
     plt.savefig(f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/png_files/distance_heatmap')
-    plt.show()
+    # plt.show()
     plt.close()
 
     # Tracks the identity of the cells and number of cells in each cluster and chunk so they can be compiled later
@@ -682,6 +682,7 @@ def calculate_dtw(num_files: int, output_directory: str, num_cells_per_chunk: in
             cells_in_cluster[cluster].extend(cells_in_chunks[int(chunk)][int(cluster)])
 
     # Summarize each cluster and plot the average trajectory to compare clusters
+
     for cluster, cluster_group in group_cluster_dict.items():
         logging.info(f'Summarizing cluster {cluster}')
 
@@ -701,6 +702,41 @@ def calculate_dtw(num_files: int, output_directory: str, num_cells_per_chunk: in
 
         # Write out df
         plot_average_trajectory(df, title, path)
+
+        # Load the different experimental group pickle files
+        groups = []
+        pickle_file_path = f'{file_paths["pickle_files"]}/{dataset_name}_pickle_files/network_pickle_files/{dataset_name}_*_pickle_files/'
+        for path in glob.glob(pickle_file_path):
+            for file in os.listdir(path):
+                groups.append(pickle.load(open(f'{path}{file}', 'rb')))
+
+        # Extract the cell numbers for the cells in the cluster
+        cell_nums = [str(cell.split('_')[1]) for cell in cells_in_cluster[str(cluster)]]
+
+        # Add the cluster to the group_dict
+        if cluster not in group_dict:
+            group_dict[cluster] = {}
+
+        # Find which cells are in which groups and add them to the dictionary
+        for group_network in groups:
+            for cell in group_network.cells:
+                cell_str = str(cell).strip()
+                if cell_str in cell_nums:
+                    if not group_network.name.split('_')[1] in group_dict[cluster]:
+                        group_dict[cluster][group_network.name.split('_')[1]] = 0
+
+                    group_dict[cluster][group_network.name.split('_')[1]] += 1
+
+    # Print which cells are in which groups
+    with open(f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/text_files/group_data.csv', 'w') as file:
+        file.write(f'cluster,group,num_cells\n')
+        for cluster, groups in group_dict.items():
+            logging.info(f'\nCluster {cluster}')
+            for group, num_cells in groups.items():
+                logging.info(f'\t{group}: {num_cells} cells')
+                file.write(f'{cluster},{group},{num_cells}\n')
+
+
 
 
 # If you want to run the attractor analysis by itself
@@ -725,7 +761,7 @@ if __name__ == '__main__':
     pickle_file_path = f'{file_paths["pickle_files"]}/{dataset_name}_pickle_files/network_pickle_files/'
     for pickle_file in glob.glob(pickle_file_path + str(dataset_name) + "_" + "*" + ".network.pickle"):
         if pickle_file:
-            logging.info(f'\tLoading data file: {pickle_file[-25:]}')
+            logging.info(f'\tLoading data file: ...{pickle_file[-50:]}')
             network = pickle.load(open(pickle_file, "rb"))
             all_networks.append(network)
         else:
@@ -745,8 +781,8 @@ if __name__ == '__main__':
 
         logging.info(f'\n----- ATTRACTOR ANALYSIS -----')
 
-        num_cells_per_chunk: int = 25
-        num_cells_to_analyze: int = 100
+        num_cells_per_chunk: int = 75
+        num_cells_to_analyze: int = 10000
 
         # Convert the network's sparse dataset to a dense one
         dataset = network.dataset
@@ -783,8 +819,9 @@ if __name__ == '__main__':
 
         logging.info(f'{num_files} trajectory files after simulation')
 
-        num_files_to_process = min(num_cells_to_analyze, num_existing_files)
+        num_files_to_process = min(num_cells_to_analyze, num_files)
         
         # Calculate the dynamic time warping
         logging.info(f'Calculating cell trajectory clusters and averaging the cluster trajectories')
         calculate_dtw(num_files_to_process, text_dir, num_cells_per_chunk)
+
