@@ -234,7 +234,7 @@ class CalculateImportanceScore():
         return scaled_importance_scores
 
     @staticmethod
-    def align_attractors(self, ko_attractor, ki_attractor):
+    def align_attractors(ko_attractor, ki_attractor):
         """
         Align the knock-out and knock-in attractor arrays by the minimum size along both axes.
         """
