@@ -6,8 +6,7 @@ class Cell:
         self.attractor_dict: dict = {}
         self.expression: dict = {}
         self.simulation_results: list= []
-        self.attractor_barcode: list = []
-        self.transcription_factors: dict = {}
+        self.attractor_analysis_cluster: int = -1
         self.groups: str = ""
 
 class CellPopulation:
