@@ -117,29 +117,34 @@ def simulate_single_cell(cell_index: int, dataset_array: np.ndarray, network: ob
 
     # Save the attractor simulation to a csv file
     attractor_sim_path = f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/text_files/cell_trajectories/cell_{cell_index}_trajectory.csv'
+    # Only saves 100 cell simulation trajectory graphs for each network to save space
+    png_dir = f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/png_files/cell_trajectories'
+    os.makedirs(png_dir, exist_ok=True)  # Ensure PNG directory exists
 
     # Makes sure that the cell is not being simulated by multiple threads at once
     with lock:
-        if os.path.exists(attractor_sim_path):
-            logging.warning(f"{attractor_sim_path.split('/')[-1]} already exists, skipping write for cell {cell_index}.")
-        else:
+        if not os.path.exists(attractor_sim_path):
             with open(attractor_sim_path, 'w') as file:
                 trajectory = np.array(trajectory).T
                 for gene_num, expression in enumerate(trajectory):
                     file.write(f'{network.nodes[gene_num].name},{",".join([str(i) for i in list(expression)])}\n')
 
     # Only saves 100 cell simulation trajectory graphs for each network to save space
-    if len(os.listdir(f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/png_files/cell_trajectories')) <= 100:
-        # Creates a heatmap to visualize the trajectories
-        heatmap = create_heatmap(
-            f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/text_files/cell_trajectories/cell_{cell_index}_trajectory.csv',
-            f'Simulation for {dataset_name} {network_name} cell {cell_index} pathway ')
+    if len(os.listdir(png_dir)) <= 100:
+        with lock:  # Lock around heatmap generation
+            # Check if the trajectory file exists before creating heatmap
+            if os.path.exists(attractor_sim_path):
+                # Creates a heatmap to visualize the trajectories
+                heatmap = create_heatmap(
+                    attractor_sim_path,
+                    f'Simulation for {dataset_name} {network_name} cell {cell_index} pathway')
 
-        # Saves a png of the results
-        heatmap.savefig(
-            f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/png_files/cell_trajectories/cell_{cell_index}_trajectory.png',
-            format='png')
-        plt.close(heatmap)
+                # Saves a png of the results
+                heatmap_path = f'{png_dir}/cell_{cell_index}_trajectory.png'
+                heatmap.savefig(heatmap_path, format='png')
+                plt.close(heatmap)
+            else:
+                logging.warning(f'Trajectory file for cell {cell_index} not found. Heatmap not created.')
 
 
 def simulate_single_cell_wrapper(args):
@@ -253,14 +258,9 @@ def create_heatmap(trajectory_path: str, title: str):
     # Adjusting the data to fit the provided shape
     data_array = np.array(data).reshape((num_genes, num_time_steps))
 
-    # Create a custom colormap
-    cmap = mcolors.ListedColormap(['grey', 'green'])
-    bounds = [0, 0.5, 1]
-    norm = mcolors.BoundaryNorm(bounds, cmap.N)
-
     # Create a heatmap
     plot = plt.figure(figsize=(12, 12))
-    sns.heatmap(data_array, cmap='Greys', yticklabels=gene_names, xticklabels=True)
+    sns.heatmap(data_array, cmap='Greys', yticklabels=gene_names, xticklabels=True, vmin=0, vmax=1)
     plt.title(title)
     plt.xlabel('Time Steps')
     plt.ylabel('Genes')
@@ -423,7 +423,7 @@ def hierarchical_clustering(dtw_distances: dict, num_clusters: int):
         logging.info(f'\n\t -----{"-" * len(txt)}----- '.center(20))
         logging.info(f'\t|     {txt.upper()}     |'.center(20))
         logging.info(f'\t -----{"-" * len(txt)}----- '.center(20))
-        num_clusters = int(input("Enter the number of clusters: "))
+        num_clusters = int(input("\tEnter the number of clusters: "))
     clusters = fcluster(Z, num_clusters, criterion='maxclust')
 
     # Organize cells by clusters
@@ -810,7 +810,6 @@ def cluster_cells(num_files: int, output_directory: str, num_cells_per_chunk: in
                 for group, num_cells in groups.items():
                     logging.info(f'\t\t{group}: {num_cells} cells')
                     file.write(f'{cluster},{group},{num_cells}\n')
-
 
 
 def create_cluster_combinations(cell_clusters: dict, cell_group_dict: dict):
