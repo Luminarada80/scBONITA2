@@ -28,6 +28,7 @@ import multiprocessing as mp
 from itertools import combinations
 import time
 
+from cell_class import CellPopulation, Cell
 from user_input_prompts import attractor_analysis_arguments
 from file_paths import file_paths
 
@@ -150,7 +151,7 @@ def simulate_single_cell_wrapper(args):
     return 1  # Return 1 to indicate progress for the progress bar
 
 
-def simulate_cells(dataset_array: np.ndarray, num_simulations: int, network: object, dataset_name: str, network_name: str):
+def simulate_cells(dataset_array: np.ndarray, cells_to_simulate: list, num_simulations: int, network: object, dataset_name: str, network_name: str):
     """
     Simulates the cell trajectories using a network model with parallel processing.
 
@@ -158,6 +159,8 @@ def simulate_cells(dataset_array: np.ndarray, num_simulations: int, network: obj
     ---------
     dataset_array : np.ndarray
         The dense dataset for the cells
+    cells_to_simulate : list
+        The list of cells to simulate to make sure that the same cells are simulated across networks
     num_simulations : int
         The number of simulation steps to run
     network : object
@@ -166,6 +169,11 @@ def simulate_cells(dataset_array: np.ndarray, num_simulations: int, network: obj
         The name of the dataset
     network_name : str
         The name of the network
+
+    Returns
+    -------
+    cells_to_simulate : list
+        Outputs the list of cells that were simulated for this network
     """
     logging.info(f'\tSimulating {num_simulations} cell trajectories')
     # Get the list of existing trajectory files
@@ -194,8 +202,11 @@ def simulate_cells(dataset_array: np.ndarray, num_simulations: int, network: obj
             f"Requested {num_simulations} simulations, but only {len(indices_to_simulate)} unsimulated cells available.")
         num_simulations = len(indices_to_simulate)
 
-    # Randomly select `num_simulations` indices to simulate
-    cells_to_simulate = np.random.choice(indices_to_simulate, num_simulations, replace=False)
+    # If this is the first network and no cells were chosen to be simulated yet, pick randomly
+    # Otherwise, uses the same cell indices as the other networks
+    if len(cells_to_simulate) == 0:
+        # Randomly select `num_simulations` indices to simulate
+        cells_to_simulate: list = np.random.choice(indices_to_simulate, num_simulations, replace=False)
 
     # Prepare multiprocessing pool
     pool = mp.Pool(mp.cpu_count())
@@ -216,6 +227,8 @@ def simulate_cells(dataset_array: np.ndarray, num_simulations: int, network: obj
         # Close and join the pool after all tasks have been completed
         pool.close()
         pool.join()
+
+    return cells_to_simulate
 
 
 def create_heatmap(trajectory_path: str, title: str):
@@ -719,7 +732,7 @@ def cluster_cells(num_files: int, output_directory: str, num_cells_per_chunk: in
             cells_in_cluster[cluster].extend(cells_in_chunks[int(chunk)][int(cluster)])
 
     # Summarize each cluster and plot the average trajectory to compare clusters
-
+    cell_identities = {}
     for cluster, cluster_group in group_cluster_dict.items():
         logging.info(f'Summarizing cluster {cluster}')
 
@@ -745,7 +758,10 @@ def cluster_cells(num_files: int, output_directory: str, num_cells_per_chunk: in
         pickle_file_path = f'{file_paths["pickle_files"]}/{dataset_name}_pickle_files/network_pickle_files/{dataset_name}_*_pickle_files/'
         for path in glob.glob(pickle_file_path):
             for file in os.listdir(path):
-                groups.append(pickle.load(open(f'{path}{file}', 'rb')))
+                file_path = f'{path}{file}'
+                with open(file_path, 'rb') as f:
+                    group_network = pickle.load(f)
+                    groups.append((group_network, file_path))  # Store the file path along with the loaded object
 
         # Extract the cell numbers for the cells in the cluster
         cell_nums = [str(cell.split('_')[1]) for cell in cells_in_cluster[str(cluster)]]
@@ -755,14 +771,24 @@ def cluster_cells(num_files: int, output_directory: str, num_cells_per_chunk: in
             group_dict[cluster] = {}
 
         # Find which cells are in which groups and add them to the dictionary
-        for group_network in groups:
+        for group_network, file_path in groups:
             for cell in group_network.cells:
                 cell_str = str(cell).strip()
                 if cell_str in cell_nums:
-                    if not group_network.name.split('_')[1] in group_dict[cluster]:
-                        group_dict[cluster][group_network.name.split('_')[1]] = 0
+                    group_name = group_network.name.split('_')[1]
+                    if not group_name in group_dict[cluster]:
+                        group_dict[cluster][group_name] = 0
 
                     group_dict[cluster][group_network.name.split('_')[1]] += 1
+
+                    if cell not in cell_identities:
+                        cell_identities[cell] = 0
+
+                    cell_identities[cell] = cluster
+
+            # Write the updated network back to the same file
+            with open(file_path, 'wb') as f:
+                pickle.dump(group_network, f)
 
     # Print which cells are in which groups
     with open(f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/text_files/group_data.csv', 'w') as file:
@@ -772,6 +798,10 @@ def cluster_cells(num_files: int, output_directory: str, num_cells_per_chunk: in
             for group, num_cells in groups.items():
                 logging.info(f'\t{group}: {num_cells} cells')
                 file.write(f'{cluster},{group},{num_cells}\n')
+
+    return cell_identities
+
+
 
 
 if __name__ == '__main__':
@@ -811,9 +841,12 @@ if __name__ == '__main__':
         raise Exception(error_message)
     
     # Run the pathway analysis for each of the networks
+    cell_clusters = {}
+    cells_to_simulate = []
     for network in all_networks:
 
         logging.info(f'\n----- ATTRACTOR ANALYSIS -----')
+        logging.info(f'ANALYZING NETWORK: {network.name}')
 
         # Convert the network's sparse dataset to a dense one
         dataset = network.dataset
@@ -843,7 +876,7 @@ if __name__ == '__main__':
             num_simulations = 0
 
         # Simulates cells to create the cell trajectory files
-        simulate_cells(dense_dataset, num_simulations, network, dataset_name, network_name)
+        cells_to_simulate = simulate_cells(dense_dataset, cells_to_simulate, num_simulations, network, dataset_name, network_name)
 
         # Recalculates the number of trajectory files after simulating to ensure there are enough
         num_files: int = len([file for file in os.listdir(txt_traj_dir) if file.endswith('_trajectory.csv')])
@@ -854,5 +887,29 @@ if __name__ == '__main__':
         
         # Calculate the dynamic time warping
         logging.info(f'Calculating cell trajectory clusters and averaging the cluster trajectories')
-        cluster_cells(num_files_to_process, text_dir, num_cells_per_chunk)
+        cell_identities = cluster_cells(num_files_to_process, text_dir, num_cells_per_chunk)
+
+        for cell in cell_identities:
+            if cell not in cell_clusters:
+                cell_clusters[cell] = {}
+
+            if network.name not in cell_clusters[cell]:
+                cell_clusters[cell][network.name] = 0
+
+            cell_clusters[cell][network.name] = cell_identities[cell]
+
+        # Cell : {network : cluster, network : cluster}
+
+    for cell in cell_clusters:
+        print(f'Cell: {cell}')
+        for network, cluster in cell_clusters[cell].items():
+            logging.info(f'\tNetwork: {network}, Cluster: {cluster}')
+
+    # # Iterates through each network for the dataset and saves the clusters for each pathway for each cell to a dictionary
+    # pickle_file_path = f'{file_paths["pickle_files"]}/{dataset_name}_pickle_files/network_pickle_files/{dataset_name}_*_pickle_files/'
+    # for path in glob.glob(pickle_file_path):
+    #     for file in os.listdir(path):
+    #         file_path = f'{path}{file}'
+    #         with open(file_path, 'rb') as f:
+    #             group_network = pickle.load(f)
 

@@ -35,6 +35,10 @@ GROUP_INDICES=(2)
 CONTROL_GROUPS=("Healthy")
 EXPERIMENTAL_GROUPS=("HIV")
 
+# Attractor Analysis Arguments
+NUM_CELLS_PER_CHUNK=25 # The number of cells in each chunk to summarize the cluster trajectories
+NUM_CELLS_TO_ANALYZE=1000 # The total number of cells to analyze
+
 # -------------- End of user input, shouldn't have to change anything below here --------------
 
 # Define your Docker image name
@@ -222,8 +226,10 @@ fi
 if [ "$RUN_ATTRACTOR_ANALYSIS" = "True" ]; then
     echo "Running Attractor Analysis..."
 
-    $CONDA_ENVIRONMENT_PYTHON -u code/attractor_analysis.py \
-        --dataset_name "$DATASET_NAME"
+    $CONDA_ENVIRONMENT_PYTHON code/attractor_analysis.py \
+        --dataset_name "$DATASET_NAME" \
+        --num_cells_per_chunk $NUM_CELLS_PER_CHUNK \
+        --num_cells_to_analyze $NUM_CELLS_TO_ANALYZE
 fi
 
 # Stop and remove the Docker container if it was started by this script
