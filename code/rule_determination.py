@@ -403,6 +403,7 @@ class RuleDetermination:
         # Generate all 'not' combinations for each rule
         not_combinations = [self.generate_not_combinations(rule[2]) for rule in rules]
 
+        
         for combination in not_combinations:
             for rule in combination:
                 incoming_node_indices = [predecessor_index for predecessor_index in node.predecessors]
