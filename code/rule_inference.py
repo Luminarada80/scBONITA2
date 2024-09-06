@@ -14,7 +14,6 @@ from node_class import Node
 from kegg_parser import *
 from rule_determination import RuleDetermination
 
-
 class RuleInference:
 
     """Class for single-cell experiments"""
