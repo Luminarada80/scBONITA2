@@ -239,13 +239,11 @@ class RuleInference:
         # Find correlation between the predecessors and the node
         node_positions = [self.gene_names.index(node) for node in self.gene_names]
 
-        node_expression_data = (
-            self.binarized_matrix[node_positions[node], :].todense().tolist()[0]
+        # find binarized expression data for node "i"
+        node_expression_data = self.binarized_matrix[node_positions[node], :].todense().tolist()[0]
 
-        )  # find binarized expression data for node "i"
-        predecessor_correlations = (
-            []
-        )  # temporarily store correlations between node "i" and all its predecessors
+        # temporarily store correlations between node "i" and all its predecessors
+        predecessor_correlations = []
 
         for predecessor_gene in predecessors_temp:
             # find index of predecessor in the node_list from the data
