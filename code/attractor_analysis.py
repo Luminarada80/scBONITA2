@@ -121,7 +121,7 @@ def simulate_single_cell(cell_index: int, dataset_array: np.ndarray, network: ob
     # Makes sure that the cell is not being simulated by multiple threads at once
     with lock:
         if os.path.exists(attractor_sim_path):
-            logging.warning(f"File {attractor_sim_path} already exists, skipping write for cell {cell_index}.")
+            logging.warning(f"{attractor_sim_path.split('/')[-1]} already exists, skipping write for cell {cell_index}.")
         else:
             with open(attractor_sim_path, 'w') as file:
                 trajectory = np.array(trajectory).T
@@ -419,8 +419,11 @@ def hierarchical_clustering(dtw_distances: dict, num_clusters: int):
 
     # Set a threshold and get the clusters
     if num_clusters == 0:
-        logging.info(f'Please open "scBONITA_output/trajectories/{dataset_name}_{network_name}/png_files/dendrogram.png"')
-        num_clusters = int(input('How many clusters?: '))
+        txt = f'Check the number of clusters in: "{dataset_name}_{network_name}/png_files/dendrogram.png"'
+        logging.info(f'\n\t -----{"-" * len(txt)}----- '.center(20))
+        logging.info(f'\t|     {txt.upper()}     |'.center(20))
+        logging.info(f'\t -----{"-" * len(txt)}----- '.center(20))
+        num_clusters = int(input("Enter the number of clusters: "))
     clusters = fcluster(Z, num_clusters, criterion='maxclust')
 
     # Organize cells by clusters
@@ -570,10 +573,9 @@ def create_trajectory_chunks(num_chunks: int, num_clusters: int, output_director
     # Chunk the data down to create smaller averaged trajectory clusters
     cluster_chunks = {}
     cells_in_chunks = {}
-    logging.info(f'Creating chunks, this may take a while depending on how many cells and the chunk size')
+    logging.info(f'\t\tCreating chunks, this may take a while depending on how many cells and the chunk size')
     for chunk in range(num_chunks):
         start = time.time()
-        logging.info(f'\tCreating chunk {chunk+1} / {num_chunks}')
         # Reads in the cell trajectories from the simulations and creates a dataframe from them
         cell_trajectory_dict = {}
 
@@ -640,7 +642,7 @@ def create_trajectory_chunks(num_chunks: int, num_clusters: int, output_director
         length = end - start
         if chunk > 0:
             print(
-                f'\t\tCompleted in {round(length, 2)} seconds (Est remaining: {round(length * (num_chunks - chunk))}s)')
+                f'\t\tCreating chunk {chunk+1} / {num_chunks} (Est remaining: {round(length * (num_chunks - chunk))}s)')
 
 
 
@@ -663,7 +665,7 @@ def cluster_cells(num_files: int, output_directory: str, num_cells_per_chunk: in
     num_clusters: int = 0
     num_chunks: int = round(num_files / (num_cells_per_chunk))
 
-    logging.info(f'Creating {num_chunks} chunks ({num_files} cells / {num_cells_per_chunk} cells per chunk)')
+    logging.info(f'\t\tCreating {num_chunks} chunks ({num_files} cells / {num_cells_per_chunk} cells per chunk)')
 
     # Ensures there is always one chunk
     if num_chunks == 0:
@@ -674,7 +676,7 @@ def cluster_cells(num_files: int, output_directory: str, num_cells_per_chunk: in
     cluster_chunks, cells_in_chunks, num_clusters = create_trajectory_chunks(num_chunks, num_clusters, output_directory)
 
     # Computes the dynamic time warping distance between each representative cluster trajectory across all chunks
-    logging.info(f'\nComparing chunks')
+    logging.info(f'\t\tComparing chunks')
     chunk_dtw_distances = compute_dtw_distances(cluster_chunks)
 
     # Calculates pairwise distance matrix between the cells
@@ -733,10 +735,8 @@ def cluster_cells(num_files: int, output_directory: str, num_cells_per_chunk: in
             cells_in_cluster[cluster].extend(cells_in_chunks[int(chunk)][int(cluster)])
 
     # Summarize each cluster and plot the average trajectory to compare clusters
-    cell_cluster_dict = {}
-    cell_group_dict = {}
     for cluster, cluster_group in group_cluster_dict.items():
-        logging.info(f'Summarizing cluster {cluster}')
+        logging.info(f'\t\tSummarizing cluster {cluster}')
 
         # Finds the average signaling state of each gene at each simulation step
         df: pd.DataFrame = summarize_clusters(f'{output_directory}/cell_trajectories', cells_in_cluster[str(cluster)])
@@ -768,21 +768,26 @@ def cluster_cells(num_files: int, output_directory: str, num_cells_per_chunk: in
         # Extract the cell numbers for the cells in the cluster
         cell_nums = [str(cell.split('_')[1]) for cell in cells_in_cluster[str(cluster)]]
 
-        # Add the cluster to the group_dict
-        if cluster not in group_dict:
-            group_dict[cluster] = {}
-        
-
         # Find which cells are in which groups and add them to the dictionary
+        cells_seen = []
         for group_network, file_path in groups:
             for cell in group_network.cells:
                 cell_str = str(cell).strip()
-                if cell_str in cell_nums:
+                if cell_str in cell_nums and cell_str not in cells_seen:
+                    cells_seen.append(cell_str)
                     group_name = group_network.name.split('_')[1]
-                    if not group_name in group_dict[cluster]:
-                        group_dict[cluster][group_name] = 0
 
-                    group_dict[cluster][group_network.name.split('_')[1]] += 1
+                    # Add the cluster to the group_dict
+                    if network_name not in group_dict:
+                        group_dict[network_name] = {}
+
+                    if cluster not in group_dict[network_name]:
+                        group_dict[network_name][cluster] = {}
+
+                    if not group_name in group_dict[network_name][cluster]:
+                        group_dict[network_name][cluster][group_name] = 0
+
+                    group_dict[network_name][cluster][group_name] += 1
                     
                     cell_group_dict[cell] = group_name
                     
@@ -798,16 +803,17 @@ def cluster_cells(num_files: int, output_directory: str, num_cells_per_chunk: in
     # Print which cells are in which groups
     with open(f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/text_files/group_data.csv', 'w') as file:
         file.write(f'cluster,group,num_cells\n')
-        for cluster, groups in group_dict.items():
-            logging.info(f'\nCluster {cluster}')
-            for group, num_cells in groups.items():
-                logging.info(f'\t{group}: {num_cells} cells')
-                file.write(f'{cluster},{group},{num_cells}\n')
+        for network in group_dict:
+            logging.info(f'\nNetwork: {network}')
+            for cluster, groups in group_dict[network].items():
+                logging.info(f'\tCluster {cluster}')
+                for group, num_cells in groups.items():
+                    logging.info(f'\t\t{group}: {num_cells} cells')
+                    file.write(f'{cluster},{group},{num_cells}\n')
 
-    return cell_cluster_dict, cell_group_dict
 
 
-def create_cluster_combinations(cell_clusters: dict):
+def create_cluster_combinations(cell_clusters: dict, cell_group_dict: dict):
     """
     Enumerates the combinations of network clusters and counts the number of cells in each combination by group
 
@@ -815,6 +821,8 @@ def create_cluster_combinations(cell_clusters: dict):
     ----------
     cell_clusters : dict
         A dictionary of the cells where the values are a dictionary of network names and the cells corresponding cluster
+    cell_group_dict : dict
+        A dictionary of the groups where the values are a dictionary of cells and the value is the group the cell is in
     """
     # List to store the rows
     rows = []
@@ -887,16 +895,18 @@ if __name__ == '__main__':
     cell_clusters = {}
     cells_to_simulate = []
     cell_group_dict = {}
+    cell_cluster_dict = {}
+    logging.info(f'\n----- ATTRACTOR ANALYSIS -----')
     for network in all_networks:
 
-        logging.info(f'\n----- ATTRACTOR ANALYSIS -----')
-        logging.info(f'ANALYZING NETWORK: {network.name}')
+
+        logging.info(f'\tANALYZING NETWORK: {network.name}')
 
         # Convert the network's sparse dataset to a dense one
         dataset = network.dataset
         dense_dataset: np.ndarray = np.array(dataset.todense())
         num_cells_in_dataset = dense_dataset.shape[1]
-        logging.info(f'There are {num_cells_in_dataset} cells in dataset')
+        logging.info(f'\tThere are {num_cells_in_dataset} cells in dataset')
         network_name: str = network.name
 
         # Specify outfile path for the simulation results
@@ -911,8 +921,9 @@ if __name__ == '__main__':
         os.makedirs(png_traj_dir, exist_ok=True)
 
         # Find the number of trajectory files
+        logging.info(f'\n\tSIMULATING CELL TRAJECTORIES')
         num_existing_files: int = len([file for file in os.listdir(txt_traj_dir) if file.endswith('_trajectory.csv')])
-        logging.info(f'Found {num_existing_files} trajectory files')
+        logging.info(f'\t\tFound {num_existing_files} trajectory files')
 
         # Finds the number of cells to simulate based on the number of existing trajectory files
         num_simulations: int = min((num_cells_to_analyze - num_existing_files), num_cells_in_dataset - num_existing_files)
@@ -925,13 +936,14 @@ if __name__ == '__main__':
         # Recalculates the number of trajectory files after simulating to ensure there are enough
         num_files: int = len([file for file in os.listdir(txt_traj_dir) if file.endswith('_trajectory.csv')])
 
-        logging.info(f'{num_files} trajectory files after simulation')
+        logging.info(f'\t\t{num_files} trajectory files after simulation')
 
         num_files_to_process = min(num_cells_to_analyze, num_files)
         
         # Calculate the dynamic time warping
-        logging.info(f'Calculating cell trajectory clusters and averaging the cluster trajectories')
-        cell_cluster_dict, cell_group_dict = cluster_cells(num_files_to_process, text_dir, num_cells_per_chunk)
+        logging.info(f'\n\tCLUSTERING CELLS')
+        logging.info(f'\t\tCalculating cell trajectory clusters and averaging the cluster trajectories')
+        cluster_cells(num_files_to_process, text_dir, num_cells_per_chunk)
 
         # Create a dictionary for each cell containing the clusters it belongs to for each network
         for cell in cell_cluster_dict:
@@ -944,4 +956,4 @@ if __name__ == '__main__':
             cell_clusters[cell][network.name] = cell_cluster_dict[cell]
 
     # Enumerates the combinations of network clusters and counts the number of cells in each combination by group
-    create_cluster_combinations(cell_clusters)
+    create_cluster_combinations(cell_clusters, cell_group_dict)
