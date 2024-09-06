@@ -27,6 +27,7 @@ import statistics
 import multiprocessing as mp
 from itertools import combinations
 import time
+from sklearn.cluster import KMeans
 
 from cell_class import CellPopulation, Cell
 from user_input_prompts import attractor_analysis_arguments
@@ -732,7 +733,8 @@ def cluster_cells(num_files: int, output_directory: str, num_cells_per_chunk: in
             cells_in_cluster[cluster].extend(cells_in_chunks[int(chunk)][int(cluster)])
 
     # Summarize each cluster and plot the average trajectory to compare clusters
-    cell_identities = {}
+    cell_cluster_dict = {}
+    cell_group_dict = {}
     for cluster, cluster_group in group_cluster_dict.items():
         logging.info(f'Summarizing cluster {cluster}')
 
@@ -769,6 +771,7 @@ def cluster_cells(num_files: int, output_directory: str, num_cells_per_chunk: in
         # Add the cluster to the group_dict
         if cluster not in group_dict:
             group_dict[cluster] = {}
+        
 
         # Find which cells are in which groups and add them to the dictionary
         for group_network, file_path in groups:
@@ -780,11 +783,13 @@ def cluster_cells(num_files: int, output_directory: str, num_cells_per_chunk: in
                         group_dict[cluster][group_name] = 0
 
                     group_dict[cluster][group_network.name.split('_')[1]] += 1
-
-                    if cell not in cell_identities:
-                        cell_identities[cell] = 0
-
-                    cell_identities[cell] = cluster
+                    
+                    cell_group_dict[cell] = group_name
+                    
+                    if cell not in cell_cluster_dict:
+                        cell_cluster_dict[cell] = 0
+                    
+                    cell_cluster_dict[cell] = cluster
 
             # Write the updated network back to the same file
             with open(file_path, 'wb') as f:
@@ -799,9 +804,47 @@ def cluster_cells(num_files: int, output_directory: str, num_cells_per_chunk: in
                 logging.info(f'\t{group}: {num_cells} cells')
                 file.write(f'{cluster},{group},{num_cells}\n')
 
-    return cell_identities
+    return cell_cluster_dict, cell_group_dict
 
 
+def create_cluster_combinations(cell_clusters: dict):
+    """
+    Enumerates the combinations of network clusters and counts the number of cells in each combination by group
+
+    Parameters
+    ----------
+    cell_clusters : dict
+        A dictionary of the cells where the values are a dictionary of network names and the cells corresponding cluster
+    """
+    # List to store the rows
+    rows = []
+
+    # Get all unique networks
+    all_networks = set()
+    for cell in cell_clusters:
+        all_networks.update(cell_clusters[cell].keys())
+
+    # Convert dictionaries to rows
+    for cell in cell_clusters:
+        row = {'Cell': cell, 'Group': cell_group_dict[cell]}
+        for network in all_networks:
+            row[network] = cell_clusters[cell].get(network, None)
+        rows.append(row)
+
+    # Create a DataFrame
+    df = pd.DataFrame(rows)
+
+    # Identify all network columns (dynamically)
+    network_columns = [col for col in df.columns if col.startswith('hsa')]
+
+    # Group by all network columns and 'Group' (HIV/Healthy)
+    grouped = df.groupby(network_columns + ['Group']).size().reset_index(name='Count')
+
+    # Display the result
+    logging.info(f'\nCluster combinations for the different networks')
+    logging.info(grouped)
+
+    grouped.to_csv(f'{file_paths["trajectories"]}/{dataset_name}_cluster_by_group.csv')
 
 
 if __name__ == '__main__':
@@ -843,6 +886,7 @@ if __name__ == '__main__':
     # Run the pathway analysis for each of the networks
     cell_clusters = {}
     cells_to_simulate = []
+    cell_group_dict = {}
     for network in all_networks:
 
         logging.info(f'\n----- ATTRACTOR ANALYSIS -----')
@@ -887,29 +931,17 @@ if __name__ == '__main__':
         
         # Calculate the dynamic time warping
         logging.info(f'Calculating cell trajectory clusters and averaging the cluster trajectories')
-        cell_identities = cluster_cells(num_files_to_process, text_dir, num_cells_per_chunk)
+        cell_cluster_dict, cell_group_dict = cluster_cells(num_files_to_process, text_dir, num_cells_per_chunk)
 
-        for cell in cell_identities:
+        # Create a dictionary for each cell containing the clusters it belongs to for each network
+        for cell in cell_cluster_dict:
             if cell not in cell_clusters:
                 cell_clusters[cell] = {}
 
             if network.name not in cell_clusters[cell]:
                 cell_clusters[cell][network.name] = 0
 
-            cell_clusters[cell][network.name] = cell_identities[cell]
+            cell_clusters[cell][network.name] = cell_cluster_dict[cell]
 
-        # Cell : {network : cluster, network : cluster}
-
-    for cell in cell_clusters:
-        print(f'Cell: {cell}')
-        for network, cluster in cell_clusters[cell].items():
-            logging.info(f'\tNetwork: {network}, Cluster: {cluster}')
-
-    # # Iterates through each network for the dataset and saves the clusters for each pathway for each cell to a dictionary
-    # pickle_file_path = f'{file_paths["pickle_files"]}/{dataset_name}_pickle_files/network_pickle_files/{dataset_name}_*_pickle_files/'
-    # for path in glob.glob(pickle_file_path):
-    #     for file in os.listdir(path):
-    #         file_path = f'{path}{file}'
-    #         with open(file_path, 'rb') as f:
-    #             group_network = pickle.load(f)
-
+    # Enumerates the combinations of network clusters and counts the number of cells in each combination by group
+    create_cluster_combinations(cell_clusters)
