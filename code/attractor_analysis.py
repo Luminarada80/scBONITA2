@@ -581,7 +581,7 @@ def create_trajectory_chunks(num_chunks: int, num_clusters: int, output_director
                 num_cells_parsed += 1
 
         # Computes the pairwise DTW distances between cells
-        dtw_distances = compute_dtw_distances(cell_trajectory_dict, cell_txt_traj_dir)
+        dtw_distances = compute_dtw_distances(cell_trajectory_dict)
 
         # Write out the distances or append them if its a different cluster
         if chunk == 0:
@@ -633,8 +633,19 @@ def create_trajectory_chunks(num_chunks: int, num_clusters: int, output_director
     return cluster_chunks, cells_in_chunks, num_clusters
 
 
-def calculate_dtw(num_files: int, output_directory: str, num_cells_per_chunk: int):
-    trajectory_files_parsed = []
+def cluster_cells(num_files: int, output_directory: str, num_cells_per_chunk: int):
+    """
+    Handles executing the steps in the clustering process.
+
+    Parameters
+    ----------
+    num_files : int
+        The number of cell trajectory files.
+    output_directory : str
+        The directory to save the text files to.
+    num_cells_per_chunk : int
+        The number of cells in each chunk.
+    """
     num_clusters: int = 0
     num_chunks: int = round(num_files / (num_cells_per_chunk))
 
@@ -644,10 +655,13 @@ def calculate_dtw(num_files: int, output_directory: str, num_cells_per_chunk: in
     if num_chunks == 0:
         num_chunks = 1
     group_dict = {}
+
+    # Creates representative trajectories for each cluster using smaller sub-sets of cells to reduce processing
     cluster_chunks, cells_in_chunks, num_clusters = create_trajectory_chunks(num_chunks, num_clusters, output_directory)
 
+    # Computes the dynamic time warping distance between each representative cluster trajectory across all chunks
     logging.info(f'\nComparing chunks')
-    chunk_dtw_distances = compute_dtw_distances(cluster_chunks, output_directory)
+    chunk_dtw_distances = compute_dtw_distances(cluster_chunks)
 
     # Calculates pairwise distance matrix between the cells
     chunk_names: list = list(cluster_chunks.keys())
@@ -760,9 +774,6 @@ def calculate_dtw(num_files: int, output_directory: str, num_cells_per_chunk: in
                 file.write(f'{cluster},{group},{num_cells}\n')
 
 
-
-
-# If you want to run the attractor analysis by itself
 if __name__ == '__main__':
 
     # Set the logging level for output
@@ -772,7 +783,7 @@ if __name__ == '__main__':
     parser: argparse.ArgumentParser = argparse.ArgumentParser()
 
     # Read in the user arguments from the command line or bash script
-    dataset_name, show_simulation = attractor_analysis_arguments(parser)
+    dataset_name, num_cells_per_chunk, num_cells_to_analyze = attractor_analysis_arguments(parser)
 
     # Load the cell and network objects for the dataset
     cell_population = pickle.load(open(f'{file_paths["pickle_files"]}/{dataset_name}_pickle_files/cells_pickle_file/{dataset_name}.cells.pickle', "rb"))
@@ -803,9 +814,6 @@ if __name__ == '__main__':
     for network in all_networks:
 
         logging.info(f'\n----- ATTRACTOR ANALYSIS -----')
-
-        num_cells_per_chunk: int = 75
-        num_cells_to_analyze: int = 10000
 
         # Convert the network's sparse dataset to a dense one
         dataset = network.dataset
@@ -846,5 +854,5 @@ if __name__ == '__main__':
         
         # Calculate the dynamic time warping
         logging.info(f'Calculating cell trajectory clusters and averaging the cluster trajectories')
-        calculate_dtw(num_files_to_process, text_dir, num_cells_per_chunk)
+        cluster_cells(num_files_to_process, text_dir, num_cells_per_chunk)
 

@@ -26,7 +26,7 @@ ORGANISM_CODE="hsa" # Organism code in front of KEGG pathway numbers
 METADATA_FILE="input/tutorial_data/tutorial_metadata.txt"
 METADATA_SEP=" "
 HEADER="n" # Does the metadata file contain a header before the entries start?
-OVERWRITE="y" # Do you want to overwrite the files generated for each of your different experimental groups?
+OVERWRITE="n" # Do you want to overwrite the files generated for each of your different experimental groups?
 CELL_NAME_COL=1 # What column contains the cell names (first column = 0)
 GROUP_INDICES=(2)
 
@@ -34,6 +34,10 @@ GROUP_INDICES=(2)
     # 1st entry in control is compared to 1st entry in experimental, 2nd entry compared to 2nd entry, etc.
 CONTROL_GROUPS=("Healthy")
 EXPERIMENTAL_GROUPS=("HIV")
+
+# Attractor Analysis Arguments
+NUM_CELLS_PER_CHUNK=25 # The number of cells in each chunk to summarize the cluster trajectories
+NUM_CELLS_TO_ANALYZE=1000 # The total number of cells to analyze
 
 # -------------- End of user input, shouldn't have to change anything below here --------------
 
@@ -175,5 +179,7 @@ if [ "$RUN_ATTRACTOR_ANALYSIS" = "True" ]; then
     echo "Running Attractor Analysis..."
 
     $CONDA_ENVIRONMENT_PYTHON code/attractor_analysis.py \
-        --dataset_name "$DATASET_NAME"
+        --dataset_name "$DATASET_NAME" \
+        --num_cells_per_chunk $NUM_CELLS_PER_CHUNK \
+        --num_cells_to_analyze $NUM_CELLS_TO_ANALYZE
 fi

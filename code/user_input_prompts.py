@@ -352,14 +352,30 @@ def attractor_analysis_arguments(parser):
     """
     add_dataset_name_arg(parser)
     add_network_name(parser)
-    add_show_figure_arg(parser)
+
+    parser.add_argument(
+        '--num_cells_per_chunk',
+        type=int,
+        required=False,
+        default=1,
+        help='Number of cells per chunk used for attractor analysis'
+    )
+
+    parser.add_argument(
+        '--num_cells_to_analyze',
+        type=int,
+        required=False,
+        default=1,
+        help='Number of cells to analyze for attractor analysis'
+    )
 
     args = parser.parse_args()
 
     dataset_name = check_dataset_name(args.dataset_name)
-    show_simulation = args.show_figure
+    num_cells_per_chunk = args.num_cells_per_chunk
+    num_cells_to_analyze = args.num_cells_to_analyze
     
-    return dataset_name, show_simulation
+    return dataset_name, num_cells_per_chunk, num_cells_to_analyze
 
 def cell_attractor_mapping_arguments(parser):
     add_dataset_name_arg(parser)

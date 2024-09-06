@@ -16,7 +16,6 @@ efficiency when simulating a large number of cells. Once a cell's trajectory has
 is stored as a csv file.
 
 ## Clustering the cells
-
 The goal of this process is to group cells by how similar their simulation trajectories are, which shows different cell
 signaling states. Now that the cells have been simulated and the resulting trajectories recorded, we can compare how
 similar each cell's trajectory is to each other cell's trajectory. 
