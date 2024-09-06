@@ -116,6 +116,7 @@ def simulate_single_cell(cell_index: int, dataset_array: np.ndarray, network: ob
     # Save the attractor simulation to a csv file
     attractor_sim_path = f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/text_files/cell_trajectories/cell_{cell_index}_trajectory.csv'
 
+    # Makes sure that the cell is not being simulated by multiple threads at once
     with lock:
         if os.path.exists(attractor_sim_path):
             logging.warning(f"File {attractor_sim_path} already exists, skipping write for cell {cell_index}.")
@@ -125,9 +126,9 @@ def simulate_single_cell(cell_index: int, dataset_array: np.ndarray, network: ob
                 for gene_num, expression in enumerate(trajectory):
                     file.write(f'{network.nodes[gene_num].name},{",".join([str(i) for i in list(expression)])}\n')
 
-    # Only saves 100 cell simulation trajectory graphs to save space
+    # Only saves 100 cell simulation trajectory graphs for each network to save space
     if len(os.listdir(f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/png_files/cell_trajectories')) <= 100:
-        # Create a heatmap to visualize the trajectories
+        # Creates a heatmap to visualize the trajectories
         heatmap = create_heatmap(
             f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/text_files/cell_trajectories/cell_{cell_index}_trajectory.csv',
             f'Simulation for {dataset_name} {network_name} cell {cell_index} pathway ')
@@ -151,8 +152,7 @@ def simulate_single_cell_wrapper(args):
 
 def simulate_cells(dataset_array: np.ndarray, num_simulations: int, network: object, dataset_name: str, network_name: str):
     """
-    Simulates the cell trajectories using a network model with parallel processing
-    and a progress bar.
+    Simulates the cell trajectories using a network model with parallel processing.
 
     Parameters
     ---------
@@ -296,7 +296,7 @@ def compute_dtw_distance_pair(cell1: str, cell2: str, cell_trajectory_dict: dict
     total_distance = sum(distances.values()) if distances else float('inf')
     return (cell1, cell2, total_distance)
 
-def compute_dtw_distances(cell_trajectory_dict: dict, output_directory: str):
+def compute_dtw_distances(cell_trajectory_dict: dict):
     """
     Handles parallel processing of the dynamic time warping calculations.
 
@@ -305,8 +305,6 @@ def compute_dtw_distances(cell_trajectory_dict: dict, output_directory: str):
     cell_trajectory_dict: dict
         A dictionary containing the cell names as keys and a dictionary of genes paired to trajectories
         as the values
-    output_directory: str
-        Path to write the DTW distances between each cell pair
 
     Returns
     -------
@@ -358,7 +356,7 @@ def create_distance_matrix(dtw_distances: dict, file_names: list):
 
 
 def hierarchical_clustering(dtw_distances: dict, num_clusters: int):
-    """ Performs hierarchical clustering on a distance matrix.
+    """ Performs hierarchical clustering on the pairwise DTW distance matrix.
 
     Parameters
     ----------
@@ -424,6 +422,22 @@ def hierarchical_clustering(dtw_distances: dict, num_clusters: int):
 
 
 def summarize_clusters(directory: str, cell_names: list):
+    """
+    Opens each trajectory files for all cells in the cluster and finds the average gene state at each simulation step.
+
+    Parameters
+    ----------
+    directory: str
+        The path to the trajectory files.
+    cell_names: list
+        A list of the cell names in the cluster.
+
+    Returns
+    -------
+    avg_expr_df: pd.DataFrame
+        A dataframe containing the average expression at each simulation step for the cells in the cluster.
+
+    """
     gene_expr_dict = {}
 
     # Finds the path to all trajectory csv files
@@ -482,6 +496,15 @@ def plot_average_trajectory(df: pd.DataFrame, title: str, path: str):
     Creates a trajectory simulation figure where the gene expression darkness at each step
     corresponds to how many of the cells in that cluster were expressing the gene at
     that step.
+
+    Parameters
+    ----------
+    df: pd.DataFrame
+        A dataframe containing the average expression at each simulation step.
+    title: str
+        The title of the figure.
+    path: str
+        The path specifying where to save the figure.
     """
     # Create the heatmap
     plt.figure(figsize=(8, 10))
