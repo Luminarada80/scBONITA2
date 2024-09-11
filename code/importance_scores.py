@@ -293,7 +293,7 @@ def run_full_importance_score(dataset_name, network_names):
             importance_score_calculator.calculate_importance_scores()
 
             # Save the importance scores to a text file
-            logging.info(f'Saving importance scores to file: {file_name}.txt')
+            logging.info(f'Saving importance scores to file: {network_name}_importance_score.txt')
             text_file_path = f'{file_paths["importance_score_output"]}/{dataset_name}/text_files'
             png_file_path = f'{file_paths["importance_score_output"]}/{dataset_name}/png_files'
             svg_file_path = f'{file_paths["importance_score_output"]}/{dataset_name}/svg_files'
@@ -303,8 +303,9 @@ def run_full_importance_score(dataset_name, network_names):
             os.makedirs(png_file_path, exist_ok=True)
             os.makedirs(svg_file_path, exist_ok=True)
 
-            with open(f'{text_file_path}/{file_name}.txt', 'w') as file:
-                file.write("\n".join(f"{node.name} = {round(node.importance_score, 3)}" for node in network.nodes))
+            with open(f'{text_file_path}/{network_name}_importance_score.txt', 'w') as file:
+                file.write("gene\timportance_score\n")
+                file.write("\n".join(f"{node.name}\t{round(node.importance_score, 3)}" for node in network.nodes))
 
             # Create and save the importance score figure
             fig = ruleset.plot_graph_from_graphml(network.network)

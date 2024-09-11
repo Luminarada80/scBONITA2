@@ -46,11 +46,12 @@ class RuleDetermination:
             node.find_all_rule_predictions()
 
         # Refine the rules
-        best_ruleset, ruleset_errors = self.refine_rules()
+        best_ruleset, ruleset_errors, node_errors = self.refine_rules()
 
         # Write the ruleset out to a file
         logging.info(f'\n-----RULESET-----')
-        self.write_ruleset(best_ruleset, ruleset_errors[0])
+        logging.info(f'(Genes that signal to themselves not shown)')
+        self.write_ruleset(best_ruleset, ruleset_errors[0], node_errors)
         
         # Set the best rules for the nodes based on which ruleset has the lowest error
         for node_index, node in enumerate(self.nodes):
@@ -62,11 +63,13 @@ class RuleDetermination:
             logging.debug(f'Node {node.name}')
             logging.debug(f'\tnode best rule {node.best_rule}')
             logging.debug(f'\tnode best rule index {node.best_rule_index}')
+
+        logging.info(f'Note: rules with high error likely have incoming nodes from other pathways')
         
         return best_ruleset
 
 
-    def write_ruleset(self, ruleset, error):
+    def write_ruleset(self, ruleset, error, node_errors):
         # Write out the rules to an output file
         rule_path = f'{file_paths["rules_output"]}/{self.dataset_name}_rules/{self.network_name}_{self.dataset_name}_rules.txt'
         os.makedirs(f'{file_paths["rules_output"]}/{self.dataset_name}_rules/', exist_ok=True)
@@ -77,6 +80,7 @@ class RuleDetermination:
             for key, value in self.node_dict.items():   
                 reversed_node_dict[value] = key         
 
+            rule_index = 0
             for rule, _, _ in ruleset:
                 rule_name = rule[0]
                 incoming_nodes = rule[1]
@@ -104,12 +108,16 @@ class RuleDetermination:
                     return temp_rule
 
                 rule_with_gene_names = replace_placeholders(logic, incoming_node_names)
-                
-                line = f'{rule_name} = {rule_with_gene_names}'
 
-                logging.info(line)
+                line = f'error: {round(node_errors[rule_index]*100)}%\t{rule_name} = {rule_with_gene_names}'
+
+                # Don't write out self-loops
+                if not rule_name == rule_with_gene_names:
+                    logging.info(line)
                 rule_file.write(line)
                 rule_file.write('\n')
+
+                rule_index += 1
 
             avg_error = error[0]
             stdev_error = error[1]
@@ -148,9 +156,15 @@ class RuleDetermination:
                 # If the rule has multiple incoming nodes, calculate the minimum error rule
                 else:
                     equivalent_best_rules = self.calculate_refined_errors(node, self.chunked_data_numpy)
-                    best_rules.append(equivalent_best_rules[0]) # Add the first equivalent rule to the best_rules
-                bar()
 
+                    # If the best rule has a high error, it likely responds to a gene not in the KEGG pathway
+                    # It's better to use its expression for other rules, but not use upstream genes to change it
+                    if equivalent_best_rules[0][2] > 0.20:
+                        best_rule = self.handle_self_loop(node)
+                    else:
+                        best_rule = equivalent_best_rules[0]
+                    best_rules.append(best_rule) # Add the first equivalent rule to the best_rules
+                bar()
 
             # Calculates summary stats for the rules
             errors = [error for _, _, error in best_rules]
@@ -161,7 +175,7 @@ class RuleDetermination:
             ruleset_error.append([average_error, stdev_error, max_error, min_error, num_self_loops])
             
 
-        return (best_rules, ruleset_error)
+        return (best_rules, ruleset_error, errors)
 
 
     def chunk_data(self, num_chunks):
@@ -313,8 +327,8 @@ class RuleDetermination:
         except ZeroDivisionError:
             logging.warning(f'\n\n\t\t\tERROR: No rules follow the inversion rules for node {node.name}')
 
-        # If the average error is less than 85% for the rules that follow the inversion rules, use those
-        if average_error < 0.85:
+        # If the average error is less than 20% for the rules that follow the inversion rules, use those
+        if average_error < 0.20:
             rules = [i[0] for i in follows_inversion_rules]
             prediction_errors = [i[1] for i in follows_inversion_rules]
 
@@ -381,6 +395,53 @@ class RuleDetermination:
 
         return max_incoming_node_rules, best_rule_indices, best_rule_errors
 
+    @staticmethod
+    def minimize_incoming_connections(min_error_indices, rules, prediction_errors):
+        """
+        For each of the rules with a minimum error, finds the rules with the greatest incoming node connections
+
+        return max_incoming_node_rules, best_rule_indices, best_rule_errors
+        """
+        min_incoming_node_rules = []
+        best_rule_errors = []
+        best_rule_indices = []
+        num_incoming_nodes_list = []
+
+        # Create a list of the number of incoming nodes for each of the minimum rules
+        for index in min_error_indices:
+            num_incoming_nodes = 0
+            if 'A' in rules[index][2]:
+                num_incoming_nodes += 1
+            if 'B' in rules[index][2]:
+                num_incoming_nodes += 1
+            if 'C' in rules[index][2]:
+                num_incoming_nodes += 1
+            num_incoming_nodes_list.append(num_incoming_nodes)
+
+        # Find the maximum number of incoming nodes
+        min_incoming_nodes = min(num_incoming_nodes_list)
+
+        # Compare to see if the current node has the same number of nodes as the max
+        for i, index in enumerate(min_error_indices):
+
+            num_incoming_nodes = num_incoming_nodes_list[i]
+
+            def append_best_rule(index):
+                min_incoming_node_rules.append(rules[index])
+                best_rule_indices.append(index)
+                best_rule_errors.append(prediction_errors[index])
+
+            # Find the rules with the same number of rules as the max
+            if min_incoming_nodes == 1 and num_incoming_nodes == 1:
+                append_best_rule(index)
+
+            elif min_incoming_nodes == 2 and num_incoming_nodes == 2:
+                append_best_rule(index)
+
+            elif min_incoming_nodes == 3 and num_incoming_nodes == 3:
+                append_best_rule(index)
+
+        return min_incoming_node_rules, best_rule_indices, best_rule_errors
 
     def calculate_refined_errors(self, node, chunked_dataset):
         """
@@ -406,22 +467,29 @@ class RuleDetermination:
         
         for combination in not_combinations:
             for rule in combination:
+                # Find the incoming nodes for the current rule
                 incoming_node_indices = [predecessor_index for predecessor_index in node.predecessors]
+                # Format the rule
                 formatted_rule = [node.name, incoming_node_indices, rule]
                 if formatted_rule not in rules:
                     rules.append([node.name, incoming_node_indices, rule])
 
-
+        logging.debug(f'{node.name}')
         for rule in rules:
+            # Calculate the error of each rule and append it to a list
             difference, count = self.calculate_error(node, rule[2], chunked_dataset)
             prediction_error = difference / count
             prediction_errors.append(prediction_error)
+            logging.debug(f'\terror: {round(prediction_error,2)}\t{rule[2]}')
+        logging.debug(f'\tmin_error: {round(min(prediction_errors),2)}')
 
         # Find all rules that have the minimum error
         if len(prediction_errors) > 0:  # Excludes nodes with no predictions
 
+            # Prioritizes rules that follow the inversion rules for the gene
             rules, prediction_errors = self.prioritize_pkn_inversion_rules(node, rules, prediction_errors)
 
+            # Finds the rule with the minimum error
             min_error_indices, min_error = self.find_min_error_indices(prediction_errors)
 
             # Now that we have found the rules with the minimum error, we want to maximize the number of connections
@@ -434,6 +502,7 @@ class RuleDetermination:
                 if rule.count("and") == min_rules:
                     best_rules.append((max_incoming_node_rules[i], best_rule_indices[i], best_rule_errors[i]))
 
+        logging.debug(f'\tbest_rule: {round(best_rules[0][2],2)}')
 
         return best_rules
 
