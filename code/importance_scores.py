@@ -363,26 +363,7 @@ def run_full_importance_score(dataset_name, network_names):
         network_name_check.append(network_name)
         if network_name in network_names:
 
-            # Check to make sure the ruleset pickle file exists
-            logging.info(f'\nLoading: {dataset_name}_{network_name}.ruleset.pickle')
-
-            # Load the ruleset object for the network
-            ruleset = pickle.load(open(f'{ruleset_pickle_file_path}/{file_name}', "rb"))
-
-            # Store the network information in a pickle file
-            network = Network(name=f'{network_name}')
-            network.nodes = ruleset.nodes
-            network.rulesets = ruleset.ruleset
-            network.network = ruleset.graph
-            network.dataset = ruleset.binarized_matrix
-
-            # Run the importance score calculation for that ruleset and network
-            logging.info(f'Calculating importance score for network {network_name}')
-            importance_score_calculator = CalculateImportanceScore(network.nodes, network.dataset.astype(bool), network_name, dataset_name)
-            importance_score_calculator.calculate_importance_scores()
-
             # Save the importance scores to a text file
-            logging.info(f'Saving importance scores to file: {network_name}_importance_score.txt')
             text_file_path = f'{file_paths["importance_score_output"]}/{dataset_name}/text_files'
             png_file_path = f'{file_paths["importance_score_output"]}/{dataset_name}/png_files'
             svg_file_path = f'{file_paths["importance_score_output"]}/{dataset_name}/svg_files'
@@ -392,24 +373,48 @@ def run_full_importance_score(dataset_name, network_names):
             os.makedirs(png_file_path, exist_ok=True)
             os.makedirs(svg_file_path, exist_ok=True)
 
-            with open(f'{text_file_path}/{network_name}_importance_score.txt', 'w') as file:
-                file.write("gene\timportance_score\n")
-                file.write("\n".join(f"{node.name}\t{round(node.importance_score, 3)}" for node in network.nodes))
+            if not os.path.exists(f'{text_file_path}/{network_name}_importance_score.txt'):
 
-            # Create and save the importance score figure
-            fig = ruleset.plot_graph_from_graphml(network.network)
-            logging.info(f'Saving importance score figures')
-            fig.savefig(f'{png_file_path}/{file_name}.png', bbox_inches='tight', format='png')
-            fig.savefig(f'{svg_file_path}/{file_name}.png', bbox_inches='tight', format='svg')
-            plt.close(fig)
+                # Check to make sure the ruleset pickle file exists
+                logging.info(f'\nLoading: {dataset_name}_{network_name}.ruleset.pickle')
 
-            # Save the network object to a pickle file
-            logging.info(f'Saving network object as a pickle file')
-            network_folder = f'{file_paths["pickle_files"]}/{dataset_name}_pickle_files/network_pickle_files'
-            os.makedirs(network_folder, exist_ok=True)
-            network_file_path = f'{network_folder}/{dataset_name}_{network_name}.network.pickle'
-            pickle.dump(network, open(network_file_path, 'wb'))
-            logging.info(f'\tSaved to {network_file_path}')
+                # Load the ruleset object for the network
+                ruleset = pickle.load(open(f'{ruleset_pickle_file_path}/{file_name}', "rb"))
+
+                # Store the network information in a pickle file
+                network = Network(name=f'{network_name}')
+                network.nodes = ruleset.nodes
+                network.rulesets = ruleset.ruleset
+                network.network = ruleset.graph
+                network.dataset = ruleset.binarized_matrix
+
+                # Run the importance score calculation for that ruleset and network
+                logging.info(f'Calculating importance score for network {network_name}')
+                importance_score_calculator = CalculateImportanceScore(network.nodes, network.dataset.astype(bool), network_name, dataset_name)
+                importance_score_calculator.calculate_importance_scores()
+
+                logging.info(f'Saving importance scores to file: {network_name}_importance_score.txt')
+                with open(f'{text_file_path}/{network_name}_importance_score.txt', 'w') as file:
+                    file.write("gene\timportance_score\n")
+                    file.write("\n".join(f"{node.name}\t{round(node.importance_score, 3)}" for node in network.nodes))
+
+                # Create and save the importance score figure
+                fig = ruleset.plot_graph_from_graphml(network.network)
+                logging.info(f'Saving importance score figures')
+                fig.savefig(f'{png_file_path}/{file_name}.png', bbox_inches='tight', format='png')
+                fig.savefig(f'{svg_file_path}/{file_name}.png', bbox_inches='tight', format='svg')
+                plt.close(fig)
+
+                # Save the network object to a pickle file
+                logging.info(f'Saving network object as a pickle file')
+                network_folder = f'{file_paths["pickle_files"]}/{dataset_name}_pickle_files/network_pickle_files'
+                os.makedirs(network_folder, exist_ok=True)
+                network_file_path = f'{network_folder}/{dataset_name}_{network_name}.network.pickle'
+                pickle.dump(network, open(network_file_path, 'wb'))
+                logging.info(f'\tSaved to {network_file_path}')
+
+            else:
+                logging.info(f'Importance scores for {network_name} already exist, using cached files')
 
         else:
             logging.debug(f'Skipping {network_name}')
