@@ -10,15 +10,22 @@ import matplotlib.pyplot as plt
 from user_input_prompts import *
 import numexpr as ne
 import random
+import gc
+import multiprocessing as mp
 
 from file_paths import file_paths
 
 class CalculateImportanceScore():
-    def __init__(self, nodes, binarized_matrix):
+    def __init__(self, nodes, binarized_matrix, network_name, dataset_name):
         self.binarized_matrix = binarized_matrix
         self.nodes = nodes
         self.STEPS = 50
         self.CELLS = 500
+        self.network_name = network_name
+        self.dataset_name = dataset_name
+
+        self.intermediate_dir = f'{file_paths["importance_score_output"]}/{self.dataset_name}/intermediate_files/{self.network_name}'
+        os.makedirs(self.intermediate_dir, exist_ok=True)
 
         # Ensure you do not sample more columns than exist in the matrix
         n_cols = min(self.CELLS, binarized_matrix.shape[1])
@@ -55,7 +62,6 @@ class CalculateImportanceScore():
 
             # Iterate through each node in the network
             for node in self.nodes:
-                
                 # Find the next step's expression for each cell in the dataset
                 if node.name == knockout_node:
                     next_step_node_expression = self.zeros_array
@@ -136,64 +142,147 @@ class CalculateImportanceScore():
                     return (attractor_start_index, attractor_end_index)
         return (None, None)
 
+    @staticmethod
+    def save_to_disk(data, filename):
+        with open(filename, 'wb') as f:
+            pickle.dump(data, f)
+    @staticmethod
+    def load_from_disk(filename):
+        with open(filename, 'rb') as f:
+            return pickle.load(f)
+
+    # def perform_knockouts_knockins(self):
+    #     """
+    #     Runs the simulation for each node, knocking in and out each of the nodes sequentially
+    #     """
+    #     knockout_results = {}
+    #     knockin_results = {}
+    #
+    #     script_dir = os.path.dirname(os.path.abspath(__file__))
+    #
+    #     os.makedirs(f'{script_dir}/intermediate_files', exist_ok=True)
+    #
+    #     for node in self.nodes:
+    #         incoming_nodes = node.best_rule[1][:]
+    #
+    #         node.calculation_function = node.best_rule[2]
+    #         node.incoming_node_indices = [index for index, name in node.predecessors.items() if name in incoming_nodes]
+    #
+    #
+    #     # Calculate normal signaling
+    #     normal_signaling = self.vectorized_run_simulation(knockout_node=None)
+    #     self.save_to_disk(normal_signaling, f'{script_dir}/intermediate_files/normal_signaling_{node.name}.pkl')
+    #
+    #     # Calculate knockins and knockouts for each node
+    #     with alive_bar(len(self.nodes)) as bar:
+    #         for node in self.nodes:
+    #             # Perform knock-out simulation
+    #             knockout_results[node.name] = self.vectorized_run_simulation(knockout_node=node.name) # A list of the attractors calculated for each cell
+    #
+    #             # Perform knock-in simulation
+    #             knockin_results[node.name] = self.vectorized_run_simulation(knockin_node=node.name) # A list of the start and stop of each attractor
+    #
+    #             # Save intermediate results to disk to reduce memory footprint
+    #             self.save_to_disk(knockout_results[node.name], f'{script_dir}/intermediate_files/knockout_results_{node.name}.pkl')
+    #             self.save_to_disk(knockin_results[node.name], f'{script_dir}/intermediate_files/knockin_results_{node.name}.pkl')
+    #
+    #             # Clear in-memory results to free up space
+    #             del knockout_results[node.name], knockin_results[node.name]
+    #             gc.collect()
+    #
+    #             bar()
+
+    def process_node(self, node):
+        """
+        This function performs knock-out and knock-in simulations for a single node
+        and returns the results to be saved.
+        """
+        knockout_results = self.vectorized_run_simulation(knockout_node=node.name)
+        knockin_results = self.vectorized_run_simulation(knockin_node=node.name)
+
+        # Return results for saving
+        return (node.name, knockout_results, knockin_results)
 
     def perform_knockouts_knockins(self):
         """
-        Runs the simulation for each node, knocking in and out each of the nodes sequentially
+        Runs the simulation for each node, knocking in and out each of the nodes sequentially.
+        Uses multiprocessing to speed up the simulation. Skips nodes if intermediate results
+        already exist.
         """
-        normal_signaling = {}
-        knockout_results = {}
-        knockin_results = {}
-
-        count = 1
-
+        # Precompute incoming node indices and calculation functions for all nodes
         for node in self.nodes:
             incoming_nodes = node.best_rule[1][:]
-            
             node.calculation_function = node.best_rule[2]
             node.incoming_node_indices = [index for index, name in node.predecessors.items() if name in incoming_nodes]
-            
 
-        # Calculate knockins and knockouts
-        with alive_bar(len(self.nodes)) as bar:
-            for node in self.nodes:
-                # Calculate normal signaling
-                normal_signaling[node.name] = self.vectorized_run_simulation(knockout_node=None)
+        # Precompute normal signaling for all nodes and save to disk if not already saved
+        normal_signaling_path = f'{self.intermediate_dir}/normal_signaling.pkl'
+        if not os.path.exists(normal_signaling_path):
+            normal_signaling = self.vectorized_run_simulation(knockout_node=None)
+            self.save_to_disk(normal_signaling, normal_signaling_path)
 
-                # Perform knock-out simulation
-                knockout_results[node.name] = self.vectorized_run_simulation(knockout_node=node.name) # A list of the attractors calculated for each cell
+        # Filter nodes to only process those that don't already have saved results
+        nodes_to_process = []
+        for node in self.nodes:
+            knockout_path = f'{self.intermediate_dir}/knockout_results_{node.name}.pkl'
+            knockin_path = f'{self.intermediate_dir}/knockin_results_{node.name}.pkl'
 
-                # Perform knock-in simulation
-                knockin_results[node.name] = self.vectorized_run_simulation(knockin_node=node.name) # A list of the start and stop of each attractor 
+            if not os.path.exists(knockout_path) or not os.path.exists(knockin_path):
+                nodes_to_process.append(node)
 
-                count += 1
-                bar()
-        
-        return normal_signaling, knockout_results, knockin_results
+        if not nodes_to_process:
+            print("All nodes already processed. No further calculations needed.")
+            return
+
+        # Create a multiprocessing pool
+        with mp.Pool(processes=mp.cpu_count()) as pool:
+            # Start parallel processing for knockouts and knockins for each node
+            with alive_bar(len(nodes_to_process)) as bar:
+                for result in pool.imap_unordered(self.process_node, nodes_to_process):
+                    node_name, knockout_results, knockin_results = result
+
+                    # Save intermediate results to disk to reduce memory footprint
+                    self.save_to_disk(knockout_results, f'{self.intermediate_dir}/knockout_results_{node_name}.pkl')
+                    self.save_to_disk(knockin_results, f'{self.intermediate_dir}/knockin_results_{node_name}.pkl')
+
+                    # Progress bar update
+                    bar()
+
+        # Close the pool and wait for the workers to finish
+        pool.close()
+        pool.join()
 
 
     def calculate_importance_scores(self):
         logging.info(f'\n-----RUNNING NETWORK SIMULATION-----')
 
         # Perform the knock-out and knock-in simulations for each node
-        normal_signaling, knockout_results, knockin_results = self.perform_knockouts_knockins()
+        self.perform_knockouts_knockins()
+
 
         logging.info(f'\n-----CALCULATING IMPORTANCE SCORES-----')
         with alive_bar(len(self.nodes)) as bar:
+            normal_signaling = self.load_from_disk(f'{self.intermediate_dir}/normal_signaling.pkl')
 
             raw_importance_scores = {}
             for node in self.nodes:
+
+                # Load in the signaling pickle files
+                knockout_results = self.load_from_disk(f'{self.intermediate_dir}/knockout_results_{node.name}.pkl')
+                knockin_results = self.load_from_disk(f'{self.intermediate_dir}/knockin_results_{node.name}.pkl')
+
                 total_difference = 0
                 
                 # For each cell in the sample cell indices
                 for cell, _ in enumerate(self.cell_sample_indices):
-                    if cell in knockin_results[node.name] and cell in knockout_results[node.name] and cell in normal_signaling[node.name]:
+                    if cell in knockin_results and cell in knockout_results:
                         # Set the attractors to a NumPy array so they can be aligned
-                        normal_attractors = np.array(normal_signaling[node.name][cell])
 
-                        knockin_attractors = np.array(knockin_results[node.name][cell])
+                        normal_attractors = np.array(normal_signaling[cell])
 
-                        knockout_attractors = np.array(knockout_results[node.name][cell])
+                        knockin_attractors = np.array(knockin_results[cell])
+
+                        knockout_attractors = np.array(knockout_results[cell])
 
                         # Align the attractors for the knock-in and knock-out conditions based on the shortest list
                         knockin_attractors_aligned, normal_attractors_aligned = self.align_attractors(knockin_attractors, normal_attractors)
@@ -289,7 +378,7 @@ def run_full_importance_score(dataset_name, network_names):
 
             # Run the importance score calculation for that ruleset and network
             logging.info(f'Calculating importance score for network {network_name}')
-            importance_score_calculator = CalculateImportanceScore(network.nodes, network.dataset.astype(bool))
+            importance_score_calculator = CalculateImportanceScore(network.nodes, network.dataset.astype(bool), network_name, dataset_name)
             importance_score_calculator.calculate_importance_scores()
 
             # Save the importance scores to a text file
