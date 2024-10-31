@@ -28,10 +28,15 @@ import multiprocessing as mp
 from itertools import combinations
 import time
 from sklearn.cluster import KMeans
+from functools import lru_cache
+from scipy.spatial.distance import euclidean
 
 from cell_class import CellPopulation, Cell
 from user_input_prompts import attractor_analysis_arguments
 from file_paths import file_paths
+
+# Set your Euclidean distance threshold
+EUCLIDEAN_THRESHOLD = 5  # Adjust this value based on desired precision
 
 def vectorized_run_simulation(nodes: list, cell_column: list):
     steps = 20
@@ -279,34 +284,62 @@ def create_heatmap(trajectory_path: str, title: str):
     return plot
 
 
-def compute_dtw_distance_pair(cell1: str, cell2: str, cell_trajectory_dict: dict):
+def downsample(ts, factor=2):
+    """Reduces the length of the time series by the downsampling factor."""
+    return np.array(ts[::factor]).flatten()  # Ensure 1-D after downsampling
+
+@lru_cache(maxsize=None)
+def cached_dtw(ts1_tuple, ts2_tuple, radius=1):
+    """Cached DTW calculation with a custom pointwise distance function."""
+    ts1 = np.array(ts1_tuple).flatten()
+    ts2 = np.array(ts2_tuple).flatten()
+    
+    # Use fastdtw with custom pointwise squared difference function
+    distance, _ = fastdtw(ts1, ts2, radius=radius, dist=lambda x, y: (x - y) ** 2)
+    return distance
+
+def compute_dtw_distance_pair(cell1: str, cell2: str, cell_trajectory_dict: dict, radius=1, downsample_factor=2):
     """
-    Computes the dynamic time warping distance between two cell trajectories for each gene.
+    Computes the optimized distance between cell trajectories for each gene.
+    Uses squared difference as a first pass, then applies DTW if needed.
 
     Parameters
     ----------
-    cell1: str
-        The name of the first cell to be compared
-    cell2: str
-        The name of the second cell to be compared
-    cell_trajectory_dict: dict
-        A dictionary with cell names as keys and a dictionary of gene names with trajectories as values
+    cell1 : str
+        Name of the first cell.
+    cell2 : str
+        Name of the second cell.
+    cell_trajectory_dict : dict
+        Dictionary with cell names as keys and gene trajectory dictionaries as values.
+    radius : int
+        Radius for DTW approximation.
+    downsample_factor : int
+        Factor for downsampling time series.
 
     Returns
     -------
-    cell1, cell2 : Str, Str
-        Cell names
-    total_distance : int | float
-        The summed DTW distances between the trajectory of each gene
+    tuple
+        Contains cell1, cell2, and the total distance.
     """
     distances = {}
 
-    for gene in cell_trajectory_dict[cell1].keys():
-        if gene in cell_trajectory_dict[cell2].keys():
-            ts1 = cell_trajectory_dict[cell1][gene]
+    for gene, ts1 in cell_trajectory_dict[cell1].items():
+        if gene in cell_trajectory_dict[cell2]:
             ts2 = cell_trajectory_dict[cell2][gene]
-            distance, _ = fastdtw(ts1, ts2, radius=1, dist=2)
-            distances[gene] = distance
+
+            # Downsample the time series
+            ts1_downsampled = downsample(np.array(ts1), downsample_factor)
+            ts2_downsampled = downsample(np.array(ts2), downsample_factor)
+
+            # First pass: use squared differences
+            squared_diff = np.sum((ts1_downsampled - ts2_downsampled) ** 2)
+            if squared_diff < EUCLIDEAN_THRESHOLD:
+                distances[gene] = squared_diff
+            else:
+                # Otherwise, use DTW with custom pointwise squared difference
+                dtw_distance = cached_dtw(tuple(ts1_downsampled), tuple(ts2_downsampled), radius)
+                distances[gene] = dtw_distance
+
     total_distance = sum(distances.values()) if distances else float('inf')
     return (cell1, cell2, total_distance)
 
@@ -327,19 +360,20 @@ def compute_dtw_distances(cell_trajectory_dict: dict):
     """
     dtw_distances = {}
     cell_names = list(cell_trajectory_dict.keys())
-    cell_pairs = list(combinations(cell_names, 2))  # Get all unique pairs of cells
+    cell_pairs = list(combinations(cell_names, 2))
 
-    # Use multiprocessing to process pairs of cell trajectories
-    with mp.Pool(mp.cpu_count()) as pool:
-        # Compute DTW distances for all cell pairs in parallel
+    # Limit the number of CPUs used for multiprocessing if needed
+    num_cpus = min(8, mp.cpu_count())  # Adjust based on HPC or laptop specs
+
+    with mp.Pool(num_cpus) as pool:
         tasks = [(cell1, cell2, cell_trajectory_dict) for cell1, cell2 in cell_pairs]
         results = pool.starmap(compute_dtw_distance_pair, tasks)
 
-        # Collect results and update progress bar
         for cell1, cell2, total_distance in results:
             dtw_distances[(cell1, cell2)] = total_distance
 
     return dtw_distances
+
 
 
 def create_distance_matrix(dtw_distances: dict, file_names: list):
@@ -574,6 +608,7 @@ def create_trajectory_chunks(num_chunks: int, num_clusters: int, output_director
     cluster_chunks = {}
     cells_in_chunks = {}
     logging.info(f'\t\tCreating chunks, this may take a while depending on how many cells and the chunk size')
+    
     for chunk in range(num_chunks):
         start = time.time()
         # Reads in the cell trajectories from the simulations and creates a dataframe from them
@@ -941,6 +976,7 @@ if __name__ == '__main__':
         
         # Calculate the dynamic time warping
         logging.info(f'\n\tCLUSTERING CELLS')
+        logging.info(f'\t\tUsing {mp.cpu_count()} CPUs')
         logging.info(f'\t\tCalculating cell trajectory clusters and averaging the cluster trajectories')
         cluster_cells(num_files_to_process, text_dir, num_cells_per_chunk)
 
