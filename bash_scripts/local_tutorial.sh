@@ -7,9 +7,9 @@
 # Which parts do you want to run? Set True to run or False to skip
     # Rule determination must be run prior to importance score, importance score must be run prior to relative abundance
 RUN_RULE_DETERMINATION=True
-RUN_IMPORTANCE_SCORE=False
-RUN_RELATIVE_ABUNDANCE=False
-RUN_ATTRACTOR_ANALYSIS=False
+RUN_IMPORTANCE_SCORE=True
+RUN_RELATIVE_ABUNDANCE=True
+RUN_ATTRACTOR_ANALYSIS=True
 
 # General Arguments (Required for all steps)
 # HIV_dataset_normalized_integrated_counts
@@ -66,22 +66,8 @@ if [ "$RUN_RULE_DETERMINATION" = "True" ]; then
             --binarize_threshold $BINARIZE_THRESHOLD \
             --organism $ORGANISM_CODE \
             --minimum_overlap $MINIMUM_OVERLAP
-    else
-        echo "No KEGG pathways specified, finding kegg pathways with overlapping genes..."
-        $CONDA_ENVIRONMENT_PYTHON code/pipeline_class.py \
-        --data_file "$DATA_FILE" \
-        --dataset_name "$DATASET_NAME" \
-        --datafile_sep "$DATAFILE_SEP" \
-        --get_kegg_pathways True \
-        --binarize_threshold $BINARIZE_THRESHOLD \
-        --organism $ORGANISM_CODE \
-        --minimum_overlap $MINIMUM_OVERLAP
-    fi
-
-    # Using a custom network saved to the scBONITA directory:
-
-    # Check and execute for Custom Pathways if the array is not empty
-    if [ ${#CUSTOM_PATHWAYS[@]} -gt 0 ]; then
+    elif [ ${#CUSTOM_PATHWAYS[@]} -gt 0 ]; then
+        # Check and execute for Custom Pathways if the array is not empty
         echo "Running with Custom Pathways..."
         
         CUSTOM_PATHWAYS_ARGS=""
@@ -98,8 +84,18 @@ if [ "$RUN_RULE_DETERMINATION" = "True" ]; then
         --get_kegg_pathways "False" \
         --minimum_overlap $MINIMUM_OVERLAP
     else
-        echo "No Custom Pathways specified, skipping this part..."
+        echo "No KEGG pathways specified, finding kegg pathways with overlapping genes..."
+        $CONDA_ENVIRONMENT_PYTHON code/pipeline_class.py \
+        --data_file "$DATA_FILE" \
+        --dataset_name "$DATASET_NAME" \
+        --datafile_sep "$DATAFILE_SEP" \
+        --get_kegg_pathways True \
+        --binarize_threshold $BINARIZE_THRESHOLD \
+        --organism $ORGANISM_CODE \
+        --minimum_overlap $MINIMUM_OVERLAP
     fi
+
+    # Using a custom network saved to the scBONITA directory:
 fi
 
 #  --------------------------------------
