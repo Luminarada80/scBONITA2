@@ -75,7 +75,7 @@ if [ "$RUN_RULE_DETERMINATION" = "True" ]; then
             CUSTOM_PATHWAYS_ARGS+="--network_files $pathway "
         done
 
-        $CONDA_ENVIRONMENT_PYTHON pipeline_class.py \
+        $CONDA_ENVIRONMENT_PYTHON code/pipeline_class.py \
         --data_file "$DATA_FILE" \
         --dataset_name "$DATASET_NAME" \
         --datafile_sep "$DATAFILE_SEP" \
