@@ -20,7 +20,7 @@ from fastdtw import fastdtw
 import os
 from argparse import ArgumentParser
 from concurrent.futures import ProcessPoolExecutor, as_completed
-from scipy.cluster.hierarchy import linkage, dendrogram, fcluster
+from scipy.cluster.hierarchy import linkage, dendrogram, fcluster, inconsistent
 from scipy.spatial.distance import squareform
 from alive_progress import alive_bar
 import statistics
@@ -765,7 +765,7 @@ def cluster_cells(num_files: int, output_directory: str, num_cells_per_chunk: in
             num_cells_in_cluster += len(cells_in_chunks[int(chunk)][int(cluster)])
 
             if cluster not in cells_in_cluster:
-                cells_in_cluster[cluster]: list = []
+                cells_in_cluster[cluster] = []
             
             cells_in_cluster[cluster].extend(cells_in_chunks[int(chunk)][int(cluster)])
 

@@ -101,12 +101,8 @@ def figure_graph(experimental_network, dataset_name, relative_abundances):
     cmap = plt.cm.coolwarm
     norm = TwoSlopeNorm(vmin=-3, vcenter=0, vmax=3)
 
-    # Clamp the values between -5 and 5 to not drown out smaller changes with huge outliers
-    for value in log_fold_changes:
-        if value > 3:
-            value = 3
-        elif value < -3:
-            value = -3
+    # Clamp the values between -3 and 3 to not drown out smaller changes with huge outliers
+    log_fold_changes = np.clip(log_fold_changes, -3, 3)
 
     colors = [cmap(norm(value)) for value in log_fold_changes]
 
@@ -201,7 +197,13 @@ def bubble_plot(network_names, p_values):
 
     # Create the bubble plot
     figure, ax = plt.subplots(figsize=(10, 8))
-    ax.scatter(neg_log10_bonferroni_corrected_p_values, range(len(network_names)), s=bubble_sizes)
+    ax.scatter(
+        neg_log10_bonferroni_corrected_p_values,
+        range(len(network_names)),
+        s=bubble_sizes,
+        c=neg_log10_bonferroni_corrected_p_values,
+        cmap="viridis"
+)
 
     # Set the y-axis to show the network names
     ax.set_yticks(range(len(network_names)))
