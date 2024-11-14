@@ -98,8 +98,6 @@ def plot_cell_distance_kmeans_elbow(combined_df, pathways, output_dir):
         plt.savefig(f"{elbow_plots_dir}/elbow_plot_{pathway}.png", dpi=300)
         plt.close()
         
-        print(f"Elbow plot saved for pathway {pathway}")
-
 def plot_cell_distance_umap(embedding, combined_df, group_color_map, cell_distance_output_dir):
     print("Plotting UMAP embedding...")
     
@@ -111,10 +109,53 @@ def plot_cell_distance_umap(embedding, combined_df, group_color_map, cell_distan
     plt.legend(title="Group")
     plt.xlabel('UMAP Dimension 1')
     plt.ylabel('UMAP Dimension 2')
-    plt.title('UMAP Projection of Cells Based on Combined Pathway Distances, Colored by Group')
+    plt.title('UMAP Projection of Cells Based on Combined Pathway Cell-Cell Distances, Colored by Group')
     plt.grid(False)
     plt.savefig(f'{cell_distance_output_dir}/umap_cell_distance.png', dpi=300)
+
+def plot_cell_distance_umap_by_pathway(embedding, combined_df, pathway, cell_distance_output_dir):
+    """
+    Plot UMAP embedding for each pathway with cells colored by the dominant group in each cluster.
     
+    Args:
+        embedding (np.ndarray): UMAP embedding for the cells.
+        combined_df (pd.DataFrame): DataFrame containing cell distance and cluster information.
+        pathway (str): The pathway identifier for the specific pathway column.
+        cell_distance_output_dir (str): Directory to save the UMAP plot images.
+    """
+    print(f"\tPlotting UMAP embedding for pathway {pathway}...")
+    
+    # Setup output directory
+    cell_distance_umap_pathway_dir = f'{cell_distance_output_dir}/umap_pathways_by_cluster'
+    if not os.path.exists(cell_distance_umap_pathway_dir):
+        os.makedirs(cell_distance_umap_pathway_dir)
+
+    # Calculate the dominant group for each cluster
+    cluster_groups = combined_df.groupby(pathway)['Group'].value_counts().unstack().fillna(0)
+    cluster_colors = {}
+    for cluster, counts in cluster_groups.iterrows():
+        if counts.get('HIV', 0) > counts.get('Healthy', 0):
+            cluster_colors[cluster] = '#ff7f0e'  # Orange for HIV-dominant clusters
+        else:
+            cluster_colors[cluster] = '#1f77b4'  # Blue for Healthy-dominant clusters
+
+    # Map colors to clusters
+    pathway_clusters = combined_df[pathway]
+    colors = pathway_clusters.map(cluster_colors)
+
+    # Plotting
+    plt.figure(figsize=(10, 6))
+    plt.scatter(embedding[:, 0], embedding[:, 1], c=colors, alpha=0.7, s=1)
+    for cluster, color in cluster_colors.items():
+        plt.scatter([], [], color=color, label=f'Cluster {cluster}', s=50)
+    plt.legend(title="Cluster (Dominant Group)")
+    plt.xlabel('UMAP Dimension 1')
+    plt.ylabel('UMAP Dimension 2')
+    plt.title(f'UMAP Projection Colored by Dominant Group in {pathway} Clusters')
+    plt.grid(False)
+    plt.savefig(f'{cell_distance_umap_pathway_dir}/umap_{pathway}_color_by_cluster.png', dpi=300)
+    plt.close()
+
 def plot_cell_distance_tsne(embedding, combined_df, group_color_map, cell_distance_output_dir):
     print("Plotting t-SNE embedding...")
     colors = combined_df['Cell1_group'].map(group_color_map)
@@ -523,6 +564,7 @@ def run_cell_distance_analysis():
     for pathway in pathways:
         pathway_col = f'hsa{pathway}'
         
+        plot_cell_distance_umap_by_pathway(umap_embedding, cell_distance_df, pathway_col, cell_distance_output_dir)
         plot_cell_distance_tsne_by_pathway(tsne_embedding, cell_distance_df, pathway_col, cell_distance_output_dir)
     
     # Random Forest classification
