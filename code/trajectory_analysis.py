@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import logging
 import argparse
+import umap
 import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
@@ -13,6 +14,36 @@ from sklearn.cluster import KMeans
 
 from file_paths import file_paths
 
+def load_cell_distance_data(cell_group_file, pathway_distance_files):
+    print("Loading cell-cell distance data for each pathway...")
+    cell_group_df = pd.read_csv(cell_group_file, sep=',', header=0, index_col=0)
+    combined_df = None
+    for i, file_path in enumerate(pathway_distance_files):
+        pathway_id = pathways[i]  # Use pathway identifier from the pathways list
+        print(f"\tReading distance file {i+1}/{len(pathway_distance_files)}: {file_path}")
+        df = pd.read_csv(file_path, header=None, names=['Cell1', 'Cell2', f'distance_{pathway_id}'])
+        combined_df = df if combined_df is None else pd.merge(combined_df, df, on=['Cell1', 'Cell2'], how='outer')
+    combined_df = combined_df.dropna()
+    return combined_df, cell_group_df
+
+def prepare_combined_df(combined_df, cell_group_df):
+    print("Preparing combined dataframe by merging cell group information...")
+    cell_group_df['Cell'] = cell_group_df['Cell'].astype(str).str.strip()
+    
+    combined_df['Cell1_number'] = combined_df['Cell1'].str.split('_').str[1]
+    combined_df['Cell2_number'] = combined_df['Cell2'].str.split('_').str[1]
+    
+    cell_group_map = cell_group_df.set_index('Cell')['Group'].to_dict()
+    
+    combined_df['Cell1_group'] = combined_df['Cell1_number'].map(cell_group_map)
+    combined_df['Cell2_group'] = combined_df['Cell2_number'].map(cell_group_map)
+    
+    columns_to_merge = ['Cell', 'Group'] + [f'hsa{pathway}' for pathway in pathways]
+    
+    combined_df = combined_df.merge(cell_group_df[columns_to_merge], left_on='Cell1_number', right_on='Cell', suffixes=('', '_group'))
+    combined_df = combined_df.drop(columns=['Cell'])
+    return combined_df
+
 def load_cluster_summary(cluster_file):
     # Load cluster summary and filter based on genes
     cluster_data = pd.read_csv(cluster_file, header=None)
@@ -20,8 +51,154 @@ def load_cluster_summary(cluster_file):
     cluster_values = cluster_data.iloc[:, 1:].values
     return cluster_genes, cluster_values
 
+def plot_cell_distance_kmeans_elbow(combined_df, pathways, output_dir):
+    """
+    Generate K-means elbow plots for each pathway based on cell-cell distances.
+    
+    Args:
+        combined_df (pd.DataFrame): DataFrame with cell-cell distance data for each pathway.
+        pathways (list of str): List of pathway identifiers (e.g., pathway names or IDs).
+        output_dir (str): Directory to save the elbow plot images.
+        max_clusters (int): Maximum number of clusters to test for the elbow plot (default is 10).
+    """
+    print("Generating K-means elbow plots for each pathway...")
+    
+    # Directory setup for saving plots
+    elbow_plots_dir = f"{output_dir}/kmeans_elbow_plots"
+    if not os.path.exists(elbow_plots_dir):
+        os.makedirs(elbow_plots_dir)
+        
+    max_clusters = 10
+    
+    # Loop over each pathway and generate an elbow plot
+    for pathway in pathways:
+        # Extract the specific pathway distance column
+        distance_column = f'distance_{pathway}'
+        pathway_distances = combined_df[[distance_column]].values
+        
+        # Calculate inertia for different numbers of clusters
+        inertia = []
+        cluster_range = range(1, max_clusters + 1)
+        
+        for k in cluster_range:
+            # Initialize and fit K-means
+            kmeans = KMeans(n_clusters=k, random_state=42, n_init='auto')
+            kmeans.fit(pathway_distances)
+            inertia.append(kmeans.inertia_)
+        
+        # Plot the elbow curve for the current pathway
+        plt.figure(figsize=(8, 5))
+        plt.plot(cluster_range, inertia, marker='o')
+        plt.xlabel("Number of Clusters (k)")
+        plt.ylabel("Inertia (Within-Cluster Sum of Squares)")
+        plt.title(f"Elbow Plot for Pathway {pathway}")
+        plt.grid(True)
+        
+        # Save the plot
+        plt.savefig(f"{elbow_plots_dir}/elbow_plot_{pathway}.png", dpi=300)
+        plt.close()
+        
+        print(f"Elbow plot saved for pathway {pathway}")
 
-def calculate_closest_cluster(cell_file, cluster_1_values, cluster_2_values):
+def plot_cell_distance_umap(embedding, combined_df, group_color_map, cell_distance_output_dir):
+    print("Plotting UMAP embedding...")
+    
+    colors = combined_df['Cell1_group'].map(group_color_map)
+    plt.figure(figsize=(10, 6))
+    plt.scatter(embedding[:, 0], embedding[:, 1], c=colors, alpha=0.7, s=1)
+    for group, color in group_color_map.items():
+        plt.scatter([], [], color=color, label=group, s=50)
+    plt.legend(title="Group")
+    plt.xlabel('UMAP Dimension 1')
+    plt.ylabel('UMAP Dimension 2')
+    plt.title('UMAP Projection of Cells Based on Combined Pathway Distances, Colored by Group')
+    plt.grid(False)
+    plt.savefig(f'{cell_distance_output_dir}/umap_cell_distance.png', dpi=300)
+    
+def plot_cell_distance_tsne(embedding, combined_df, group_color_map, cell_distance_output_dir):
+    print("Plotting t-SNE embedding...")
+    colors = combined_df['Cell1_group'].map(group_color_map)
+    plt.figure(figsize=(10, 6))
+    plt.scatter(embedding[:, 0], embedding[:, 1], c=colors, alpha=0.7, s=1)
+    for group, color in group_color_map.items():
+        plt.scatter([], [], color=color, label=group, s=50)
+    plt.legend(title="Group")
+    plt.xlabel('t-SNE Dimension 1')
+    plt.ylabel('t-SNE Dimension 2')
+    plt.title('t-SNE Projection of Cells Colored by Group')
+    plt.grid(False)
+    plt.savefig(f'{cell_distance_output_dir}/tsne_cell_distance_color_by_group.png', dpi=300)
+    
+def plot_cell_distance_tsne_by_pathway(embedding, combined_df, pathway, cell_distance_output_dir):
+    print(f"\tPlotting t-SNE embedding for pathway {pathway}...")
+    
+    cell_distance_tsne_pathway_dir = f'{cell_distance_output_dir}/tsne_pathways_by_cluster'
+    
+    if not os.path.exists(cell_distance_tsne_pathway_dir):
+        os.makedirs(cell_distance_tsne_pathway_dir)
+
+    # Calculate the dominant group for each cluster
+    cluster_groups = combined_df.groupby(pathway)['Group'].value_counts().unstack().fillna(0)
+    cluster_colors = {}
+    for cluster, counts in cluster_groups.iterrows():
+        if counts.get('HIV', 0) > counts.get('Healthy', 0):
+            cluster_colors[cluster] = '#ff7f0e'  # Orange for HIV-dominant clusters
+        else:
+            cluster_colors[cluster] = '#1f77b4'  # Blue for Healthy-dominant clusters
+
+    # Map colors to clusters
+    pathway_clusters = combined_df[pathway]
+    colors = pathway_clusters.map(cluster_colors)
+
+    # Plotting
+    plt.figure(figsize=(10, 6))
+    plt.scatter(embedding[:, 0], embedding[:, 1], c=colors, alpha=0.7, s=1)
+    for cluster, color in cluster_colors.items():
+        plt.scatter([], [], color=color, label=f'Cluster {cluster}', s=50)
+    plt.legend(title="Cluster (Dominant Group)")
+    plt.xlabel('t-SNE Dimension 1')
+    plt.ylabel('t-SNE Dimension 2')
+    plt.title(f't-SNE Projection Colored by Dominant Group in {pathway} Clusters')
+    plt.grid(False)
+    plt.savefig(f'{cell_distance_tsne_pathway_dir}/tsne_{pathway}_color_by_cluster', dpi=300)
+    plt.close()
+    
+def plot_cell_distance_roc_curve(y_test, y_proba, output_dir):
+    """Plots and saves the ROC curve."""
+    print("Generating ROC curve...")
+    fpr, tpr, _ = roc_curve(y_test, y_proba)
+    roc_auc = auc(fpr, tpr)
+
+    plt.figure(figsize=(8, 6))
+    plt.plot(fpr, tpr, color='darkorange', lw=2, label=f'ROC curve (AUC = {roc_auc:.2f})')
+    plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')  # Diagonal line for random chance
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title('Receiver Operating Characteristic (ROC) Curve')
+    plt.legend(loc="lower right")
+    plt.grid(False)
+    plt.savefig(f'{output_dir}/roc_cell_distance_random_forest.png', dpi=300)
+    print(f"ROC AUC: {roc_auc:.2f}\n")
+
+def plot_cell_distance_pr_curve(y_test, y_proba, output_dir):
+    """Plots and saves the Precision-Recall curve."""
+    print("Generating Precision-Recall (PR) curve...")
+    precision, recall, _ = precision_recall_curve(y_test, y_proba)
+    average_precision = average_precision_score(y_test, y_proba)
+
+    plt.figure(figsize=(8, 6))
+    plt.plot(recall, precision, color='purple', lw=2, label=f'PR curve (AP = {average_precision:.2f})')
+    plt.xlabel('Recall')
+    plt.ylabel('Precision')
+    plt.title('Precision-Recall (PR) Curve')
+    plt.legend(loc="upper right")
+    plt.grid(False)
+    plt.savefig(f'{output_dir}/pr_cell_distance_random_forest.png', dpi=300)
+    print(f"Average Precision (AP): {average_precision:.2f}\n")
+
+def calculate_closest_cluster(cell_file, cluster_1_genes, cluster_2_genes, cluster_1_values, cluster_2_values):
     """
     For each cell, the euclidean distance between the cell’s simulation trajectory
     and the average cluster trajectory for each pathway is calculated. The cell is
@@ -49,8 +226,6 @@ def calculate_closest_cluster(cell_file, cluster_1_values, cluster_2_values):
     closest_cluster = "Cluster 1" if distance_to_cluster_1 < distance_to_cluster_2 else "Cluster 2"
     return closest_cluster, distance_to_cluster_1, distance_to_cluster_2
 
-
-# Function to plot cells colored by group
 def plot_group_colored_scatter(results_df, pathway, organism, output_dir):
     print(f"\tPlotting group-colored scatter for pathway {pathway}...")
     
@@ -87,8 +262,6 @@ def plot_group_colored_scatter(results_df, pathway, organism, output_dir):
     plt.savefig(f"{single_path_cluster_dist_dir}/{organism}{pathway}_cell_trajectory_clustering.png", dpi=300)
     plt.close()
 
-
-# Function to plot cells colored by closest cluster
 def plot_cluster_colored_scatter(results_df, pathway, organism, output_dir):
     print(f"\tPlotting cluster-colored scatter for pathway {pathway}...")
     
@@ -129,8 +302,7 @@ def plot_cluster_colored_scatter(results_df, pathway, organism, output_dir):
     plt.savefig(f"{single_path_cluster_dist_dir}/{organism}{pathway}_cell_trajectory_clustering.png", dpi=300)
     plt.close()
 
-# Function to determine optimal number of clusters using the Elbow Method
-def plot_elbow_method(results_df, pathway, organism, output_dir):
+def plot_cluster_elbow_method(results_df, pathway, organism, output_dir):
     print(f"\tCalculating the optimal number of clusters for pathway {pathway} using the Elbow Method...")
     
     elbow_plot_dir = f'{output_dir}/pathway_elbow_plots'
@@ -159,8 +331,7 @@ def plot_elbow_method(results_df, pathway, organism, output_dir):
     plt.savefig(f"{elbow_plot_dir}/{organism}{pathway}_num_clusters_kmeans_elbow_plot.png", dpi=300)
     plt.close()
 
-
-def plot_roc_curve(y_test, y_proba, output_dir):
+def plot_cluster_roc_curve(y_test, y_proba, output_dir):
     """Plots and saves the ROC curve."""
     print("\tGenerating ROC curve...")
     fpr, tpr, _ = roc_curve(y_test, y_proba)
@@ -179,8 +350,7 @@ def plot_roc_curve(y_test, y_proba, output_dir):
     plt.savefig(f'{output_dir}/random_forest_classifier_roc_curve.png', dpi=300)
     print(f"\t\tROC AUC: {roc_auc:.2f}\n")
 
-
-def plot_pr_curve(y_test, y_proba, output_dir):
+def plot_cluster_pr_curve(y_test, y_proba, output_dir):
     """Plots and saves the Precision-Recall curve."""
     print("\tGenerating Precision-Recall (PR) curve...")
     precision, recall, _ = precision_recall_curve(y_test, y_proba)
@@ -196,8 +366,7 @@ def plot_pr_curve(y_test, y_proba, output_dir):
     plt.savefig(f'{output_dir}/random_forest_classifier_pr_curve.png', dpi=300)
     print(f"\t\tAverage Precision (AP): {average_precision:.2f}\n")
 
-
-def plot_feature_importances(rf_model, X, output_dir):
+def plot_cluster_feature_importances(rf_model, X, output_dir):
     print("\tPlotting feature importances from Random Forest model...")
     feature_importances = rf_model.feature_importances_ * 100  # Convert to percentage
     sorted_indices = np.argsort(feature_importances)[::-1]
@@ -211,9 +380,13 @@ def plot_feature_importances(rf_model, X, output_dir):
     plt.tight_layout()
     plt.savefig(f'{output_dir}/random_forest_pathway_cluster_importance.png', dpi=300)
 
-
-# Define function to train Random Forest model and evaluate pathway importance
 def train_and_evaluate_rf(combined_df, distance_columns, output_dir):
+    
+    random_forest_cluster_distance_dir = f'{output_dir}/random_forest_cluster_distance'
+    
+    if not os.path.exists(random_forest_cluster_distance_dir):
+        os.makedirs(random_forest_cluster_distance_dir)
+    
     # Define the feature matrix (X) and target vector (y)
     X = combined_df[distance_columns]
     y = combined_df['Group'].map({'HIV': 1, 'Healthy': 0})
@@ -232,16 +405,16 @@ def train_and_evaluate_rf(combined_df, distance_columns, output_dir):
     y_proba = rf_model.predict_proba(X_test)[:, 1]  # Probability for the positive class (HIV)
     
     # Plot ROC and PR curves
-    plot_roc_curve(y_test, y_proba, output_dir)
-    plot_pr_curve(y_test, y_proba, output_dir)
+    plot_cluster_roc_curve(y_test, y_proba, random_forest_cluster_distance_dir)
+    plot_cluster_pr_curve(y_test, y_proba, random_forest_cluster_distance_dir)
     
     # Generate and print classification report
     report = classification_report(y_test, y_pred, target_names=['Healthy', 'HIV'], output_dict=True)
     print("Classification Report for Random Forest Model:\n")
-    print_classification_report(report, y_test, y_pred)
+    print_classification_report(report, y_test, y_pred, random_forest_cluster_distance_dir)
     
     # Plot feature importances
-    plot_feature_importances(rf_model, X, output_dir)
+    plot_cluster_feature_importances(rf_model, X, random_forest_cluster_distance_dir)
     
     # Identify and summarize pathways with the best predictive power
     feature_importances = rf_model.feature_importances_
@@ -252,8 +425,7 @@ def train_and_evaluate_rf(combined_df, distance_columns, output_dir):
     
     return rf_model, importance_df
 
-
-def plot_tsne(combined_df, distance_columns, output_dir, group_column='Group'):
+def plot_cluster_tsne(combined_df, distance_columns, output_dir, group_column='Group'):
     """Generates a t-SNE plot for the combined distances and colors by group."""
     print("Generating t-SNE plot for combined pathway distances...")
     
@@ -287,40 +459,174 @@ def plot_tsne(combined_df, distance_columns, output_dir, group_column='Group'):
     # Save the plot
     plt.savefig(f'{output_dir}/tsne_combined_distance_to_cluster_by_group.png', dpi=300)
 
-
-# Function to print classification report with detailed formatting
-def print_classification_report(report, y_test, y_pred):
+def print_classification_report(report, y_test, y_pred, output_dir):
     
     # Calculate the TP, TN, FP, FN scores from the predictions
     tn, fp, fn, tp = confusion_matrix(y_test, y_pred).ravel()
     
-    print(f"Confusion matrix:")
-    print(f"  True Positives: {tp} of HIV cases were correctly predicted to be HIV")
-    print(f"  False Positives: {fp} of HIV cases were incorrectly predicted to be Healthy")
-    print(f"  True Negatives: {tn} of Healthy cases are correctly predicted to be Healthy")
-    print(f"  False Negatives: {fn} of Healthy cases were incorrectly predicted to be HIV")
+    with open(f'{output_dir}/random_forest_classification_report.txt', 'w') as file:
     
-    # Class 0 (Healthy)
-    print("Class 0 (Healthy):")
-    print(f"  Precision: {report['Healthy']['precision']:.2%} — When the model predicts a cell as Healthy, it is correct {report['Healthy']['precision']:.2%} of the time.")
-    print(f"  Recall: {report['Healthy']['recall']:.2%} — Out of all actual Healthy cells, the model correctly identifies {report['Healthy']['recall']:.2%}.")
-    print(f"  F1-Score: {report['Healthy']['f1-score']:.2%} — The harmonic mean of precision and recall, indicating overall effectiveness for the Healthy class.\n")
+        file.write(f"Confusion matrix:\n")
+        file.write(f"  True Positives: {tp} of HIV cases were correctly predicted to be HIV\n")
+        file.write(f"  False Positives: {fp} of HIV cases were incorrectly predicted to be Healthy\n")
+        file.write(f"  True Negatives: {tn} of Healthy cases are correctly predicted to be Healthy\n")
+        file.write(f"  False Negatives: {fn} of Healthy cases were incorrectly predicted to be HIV\n")
+        
+        # Class 0 (Healthy)
+        file.write("Class 0 (Healthy):\n")
+        file.write(f"  Precision: {report['Healthy']['precision']:.2%} — When the model predicts a cell as Healthy, it is correct {report['Healthy']['precision']:.2%} of the time.\n")
+        file.write(f"  Recall: {report['Healthy']['recall']:.2%} — Out of all actual Healthy cells, the model correctly identifies {report['Healthy']['recall']:.2%}.\n")
+        file.write(f"  F1-Score: {report['Healthy']['f1-score']:.2%} — The harmonic mean of precision and recall, indicating overall effectiveness for the Healthy class.\n\n")
 
-    # Class 1 (HIV)
-    print("Class 1 (HIV):")
-    print(f"  Precision: {report['HIV']['precision']:.2%} — When the model predicts a cell as HIV, it is correct {report['HIV']['precision']:.2%} of the time.")
-    print(f"  Recall: {report['HIV']['recall']:.2%} — Out of all actual HIV cells, the model correctly identifies {report['HIV']['recall']:.2%}.")
-    print(f"  F1-Score: {report['HIV']['f1-score']:.2%} — Indicates overall effectiveness for the HIV class.\n")
+        # Class 1 (HIV)
+        file.write("Class 1 (HIV):\n")
+        file.write(f"  Precision: {report['HIV']['precision']:.2%} — When the model predicts a cell as HIV, it is correct {report['HIV']['precision']:.2%} of the time.\n")
+        file.write(f"  Recall: {report['HIV']['recall']:.2%} — Out of all actual HIV cells, the model correctly identifies {report['HIV']['recall']:.2%}.\n")
+        file.write(f"  F1-Score: {report['HIV']['f1-score']:.2%} — Indicates overall effectiveness for the HIV class.\n\n")
 
-    # Overall metrics
-    print("Overall (Accuracy, Macro, and Weighted Averages):")
-    print(f"  Accuracy: {report['accuracy']:.2%} — The proportion of all correctly classified cells.")
-    print(f"  Macro Average Precision: {report['macro avg']['precision']:.2%}")
-    print(f"  Macro Average Recall: {report['macro avg']['recall']:.2%}")
-    print(f"  Macro Average F1-Score: {report['macro avg']['f1-score']:.2%}")
-    print(f"  Weighted Average Precision: {report['weighted avg']['precision']:.2%}")
-    print(f"  Weighted Average Recall: {report['weighted avg']['recall']:.2%}")
-    print(f"  Weighted Average F1-Score: {report['weighted avg']['f1-score']:.2%}\n")
+        # Overall metrics
+        file.write("Overall (Accuracy, Macro, and Weighted Averages):\n")
+        file.write(f"  Accuracy: {report['accuracy']:.2%} — The proportion of all correctly classified cells.\n")
+        file.write(f"  Macro Average Precision: {report['macro avg']['precision']:.2%}\n")
+        file.write(f"  Macro Average Recall: {report['macro avg']['recall']:.2%}\n")
+        file.write(f"  Macro Average F1-Score: {report['macro avg']['f1-score']:.2%}\n")
+        file.write(f"  Weighted Average Precision: {report['weighted avg']['precision']:.2%}\n")
+        file.write(f"  Weighted Average Recall: {report['weighted avg']['recall']:.2%}\n")
+        file.write(f"  Weighted Average F1-Score: {report['weighted avg']['f1-score']:.2%}")
+
+def run_cell_distance_analysis():
+    # Create a subdirectory to store cell-cell distance analysis results
+    cell_distance_output_dir = f'{output_dir}/cell_distance_analysis'
+    if not os.path.exists(cell_distance_output_dir):
+        os.makedirs(cell_distance_output_dir)
+    
+    cell_distance_df, cell_group_df = load_cell_distance_data(cell_group_file, pathway_distance_files)
+    cell_distance_df = prepare_combined_df(cell_distance_df, cell_group_df)
+
+    cell_distance_columns = [col for col in cell_distance_df.columns if 'distance_' in col]
+    features = cell_distance_df[cell_distance_columns].values
+    
+    plot_cell_distance_kmeans_elbow(cell_distance_df, pathways, cell_distance_output_dir)
+    
+    # Generate UMAP and t-SNE embeddings
+    print("Generating UMAP and t-SNE embeddings from cell-cell distances for each pathway...")
+    umap_embedding = umap.UMAP(metric='euclidean', n_jobs=-1).fit_transform(features)
+    tsne_embedding = TSNE(n_components=2, n_jobs=-1).fit_transform(features)
+    
+    # Color map for groups
+    group_color_map = {'HIV': '#ff7f0e', 'Healthy': '#1f77b4'}
+    plot_cell_distance_umap(umap_embedding, cell_distance_df, group_color_map, cell_distance_output_dir)
+    plot_cell_distance_tsne(tsne_embedding, cell_distance_df, group_color_map, cell_distance_output_dir)
+
+    # Plot t-SNE by each pathway cluster
+    cluster_colors = {1: '#1f77b4', 2: '#ff7f0e'}
+    for pathway in pathways:
+        pathway_col = f'hsa{pathway}'
+        
+        plot_cell_distance_tsne_by_pathway(tsne_embedding, cell_distance_df, pathway_col, cell_distance_output_dir)
+    
+    # Random Forest classification
+    print("Training Random Forest classifier...")
+    X = cell_distance_df[cell_distance_columns]
+    y = cell_distance_df['Group'].map({'HIV': 1, 'Healthy': 0})
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+    rf_model = RandomForestClassifier(n_estimators=100, n_jobs=-1)
+    rf_model.fit(X_train, y_train)
+
+    # Evaluate and plot feature importances
+    print("Evaluating model performance...")
+    y_pred = rf_model.predict(X_test)
+    y_proba = rf_model.predict_proba(X_test)[:, 1]  # Probability for the positive class (HIV)
+
+    plot_cell_distance_roc_curve(y_test, y_proba, cell_distance_output_dir)
+    plot_cell_distance_pr_curve(y_test, y_proba, cell_distance_output_dir)
+
+    report = classification_report(y_test, y_pred, target_names=['Healthy', 'HIV'], output_dict=True)
+    
+    print_classification_report(report, y_test, y_pred, cell_distance_output_dir)
+
+def run_cell_cluster_analysis():
+    # Create a subdirectory to store cluster distance analysis results
+    cluster_distance_output_dir = f'{output_dir}/cluster_distance_analysis'
+    if not os.path.exists(cluster_distance_output_dir):
+        os.makedirs(cluster_distance_output_dir)
+    
+    combined_results = None
+    
+    # ----- Cluster distance analysis results -----
+    for pathway in pathways:
+        print(f'Clustering for pathway {pathway}')
+        
+        # Path to the trajectory files for the current pathway
+        pathway_dir = f'{file_paths["trajectories"]}/{dataset_name}_{organism}{pathway}/text_files'
+        
+        cell_trajectory_dir = f'{pathway_dir}/cell_trajectories/'
+
+        # Set paths for cluster summaries
+        cluster_1_file = f"{pathway_dir}/cluster_summaries/cluster_1_summary.csv"
+        cluster_2_file = f"{pathway_dir}/cluster_summaries/cluster_2_summary.csv"
+
+        # Load cluster summaries
+        cluster_1_genes, cluster_1_values = load_cluster_summary(cluster_1_file)
+        cluster_2_genes, cluster_2_values = load_cluster_summary(cluster_2_file)
+
+        # Load the cell groups
+        cell_group_df = pd.read_csv(cell_group_file, sep=',', header=0, index_col=0)
+
+        # Collect distances for each cell in this pathway
+        results = []
+        for cell_file in os.listdir(cell_trajectory_dir):
+            if cell_file.endswith(".csv"):
+                cell_path = os.path.join(cell_trajectory_dir, cell_file)
+                cell_num = int(cell_file.split('_')[1:2][0])
+                group = str(cell_group_df.loc[cell_group_df['Cell'] == cell_num, 'Group'].values[0])
+                
+                # Calculate distances to each cluster
+                closest_cluster, dist_cluster_1, dist_cluster_2 = calculate_closest_cluster(cell_path, cluster_1_genes, cluster_2_genes, cluster_1_values, cluster_2_values)
+                
+                # Append pathway-specific distances
+                results.append({
+                    "Cell": cell_num,
+                    "Group": group,
+                    f"Closest Cluster ({pathway})": closest_cluster,
+                    f"Distance to Cluster 1 ({pathway})": dist_cluster_1,
+                    f"Distance to Cluster 2 ({pathway})": dist_cluster_2
+                })
+
+        # Convert pathway-specific results to DataFrame
+        results_df = pd.DataFrame(results)
+        
+        # Plot group-colored scatter plot
+        plot_group_colored_scatter(results_df, pathway, organism, output_dir=cluster_distance_output_dir)
+        
+        # Plot cluster-colored scatter plot
+        plot_cluster_colored_scatter(results_df, pathway, organism, output_dir=cluster_distance_output_dir)
+        
+        # Plot the Elbow Method for determining optimal k
+        plot_cluster_elbow_method(results_df, pathway, organism, output_dir=cluster_distance_output_dir)
+        
+        # Merge results with combined_results on Cell and Group, handling the initial None case
+        if combined_results is None:
+            combined_results = results_df  # First assignment
+        else:
+            combined_results = pd.merge(combined_results, results_df, on=["Cell", "Group"], how="outer")
+
+    # Final combined DataFrame with all pathways' distances
+    combined_df = pd.DataFrame(combined_results)
+    combined_df = combined_df.dropna()
+
+    # Identify the distance columns for further analysis (if needed)
+    distance_columns = [col for col in combined_df.columns if 'Distance' in col]
+
+    # Save combined DataFrame to CSV
+    combined_df.to_csv(f"{cluster_distance_output_dir}/combined_pathway_distances.csv", index=False)
+    print("Combined results saved to 'combined_pathway_distances.csv'")
+
+    plot_cluster_tsne(combined_df, distance_columns, cluster_distance_output_dir, group_column='Group')
+
+    # Run the function for training and evaluating the Random Forest model
+    rf_model, importance_df = train_and_evaluate_rf(combined_df, distance_columns, cluster_distance_output_dir)
+
 
 
 if __name__ == "__main__":
@@ -359,80 +665,17 @@ if __name__ == "__main__":
     dataset_name = args.dataset_name
     pathways = args.list_of_kegg_pathways
     organism = args.organism
-    
-    combined_results = None
 
-    output_dir = f"{file_paths['trajectories']}/trajectory_analysis"
+    output_dir = file_paths['trajectory_analysis']
     os.makedirs(output_dir, exist_ok=True)
+    
+    # Load the cell-cell distances for each patthway
+    pathway_distance_files = [f'{file_paths["trajectories"]}/{dataset_name}_{organism}{pathway}/text_files/distances.csv'for pathway in pathways]
+    
+    # Load the cell clustering file, which contains the cell number, its group, and the cluster it belongs to for each pathway
+    cell_group_file = f'{file_paths["trajectories"]}/{dataset_name}_cell_groups.csv'
+    
+    run_cell_distance_analysis()
+    
+    run_cell_cluster_analysis()
 
-    for pathway in pathways:
-        print(f'Clustering for pathway {pathway}')
-        
-        pathway_dir = f'{file_paths["trajectories"]}/{dataset_name}_{organism}{pathway}/text_files'
-        cell_group_file = f'{file_paths["trajectories"]}/{dataset_name}_cell_groups.csv'
-        cell_trajectory_dir = f'{pathway_dir}/cell_trajectories/'
-
-        # Set paths for cluster summaries
-        cluster_1_file = f"{pathway_dir}/cluster_summaries/cluster_1_summary.csv"
-        cluster_2_file = f"{pathway_dir}/cluster_summaries/cluster_2_summary.csv"
-
-        # Load cluster summaries
-        cluster_1_genes, cluster_1_values = load_cluster_summary(cluster_1_file)
-        cluster_2_genes, cluster_2_values = load_cluster_summary(cluster_2_file)
-
-        # Load the cell groups
-        cell_group_df = pd.read_csv(cell_group_file, sep=',', header=0, index_col=0)
-
-        # Collect distances for each cell in this pathway
-        results = []
-        for cell_file in os.listdir(cell_trajectory_dir):
-            if cell_file.endswith(".csv"):
-                cell_path = os.path.join(cell_trajectory_dir, cell_file)
-                cell_num = int(cell_file.split('_')[1:2][0])
-                group = str(cell_group_df.loc[cell_group_df['Cell'] == cell_num, 'Group'].values[0])
-                
-                # Calculate distances to each cluster
-                closest_cluster, dist_cluster_1, dist_cluster_2 = calculate_closest_cluster(cell_path, cluster_1_values, cluster_2_values)
-                
-                # Append pathway-specific distances
-                results.append({
-                    "Cell": cell_num,
-                    "Group": group,
-                    f"Closest Cluster ({pathway})": closest_cluster,
-                    f"Distance to Cluster 1 ({pathway})": dist_cluster_1,
-                    f"Distance to Cluster 2 ({pathway})": dist_cluster_2
-                })
-
-        # Convert pathway-specific results to DataFrame
-        results_df = pd.DataFrame(results)
-        
-        # Plot group-colored scatter plot
-        plot_group_colored_scatter(results_df, pathway, organism, output_dir=output_dir)
-        
-        # Plot cluster-colored scatter plot
-        plot_cluster_colored_scatter(results_df, pathway, organism, output_dir=output_dir)
-        
-        # Plot the Elbow Method for determining optimal k
-        plot_elbow_method(results_df, pathway, organism, output_dir=output_dir)
-        
-        # Merge results with combined_results on Cell and Group, handling the initial None case
-        if combined_results is None:
-            combined_results = results_df  # First assignment
-        else:
-            combined_results = pd.merge(combined_results, results_df, on=["Cell", "Group"], how="outer")
-
-    # Final combined DataFrame with all pathways' distances
-    combined_df = pd.DataFrame(combined_results)
-    combined_df = combined_df.dropna()
-
-    # Identify the distance columns for further analysis (if needed)
-    distance_columns = [col for col in combined_df.columns if 'Distance' in col]
-
-    # Save combined DataFrame to CSV
-    combined_df.to_csv(f"{output_dir}/combined_pathway_distances.csv", index=False)
-    print("Combined results saved to 'combined_pathway_distances.csv'")
-
-    plot_tsne(combined_df, distance_columns, output_dir, group_column='Group')
-
-    # Run the function for training and evaluating the Random Forest model
-    rf_model, importance_df = train_and_evaluate_rf(combined_df, distance_columns, output_dir)
