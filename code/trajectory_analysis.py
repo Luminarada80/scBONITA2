@@ -145,7 +145,7 @@ def plot_cell_distance_umap_by_pathway(embedding, combined_df, pathway, cell_dis
 
     # Plotting
     plt.figure(figsize=(10, 6))
-    plt.scatter(embedding[:, 0], embedding[:, 1], c=colors, alpha=0.7, s=1)
+    plt.scatter(embedding[:, 0], embedding[:, 1], c=colors, alpha=0.5, s=1)
     for cluster, color in cluster_colors.items():
         plt.scatter([], [], color=color, label=f'Cluster {cluster}', s=50)
     plt.legend(title="Cluster (Dominant Group)")
