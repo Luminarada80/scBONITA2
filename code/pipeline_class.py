@@ -32,7 +32,6 @@ class Pipeline():
         self.datafile_sep = getattr(parser_argument, 'datafile_sep', ',')
         self.get_kegg_pathways = self._convert_string_to_boolean(getattr(parser_argument, 'get_kegg_pathways', True))
         self.list_of_kegg_pathways = getattr(parser_argument, 'list_of_kegg_pathways', [])
-        self.pathway_list = getattr(parser_argument, 'pathway_list', [])
         self.organism = getattr(parser_argument, 'organism', 'hsa')
         self.cv_threshold = getattr(parser_argument, 'cv_threshold', 0.001)
         self.sample_cells = self._convert_string_to_boolean(getattr(parser_argument, 'sample_cells', True))
@@ -77,8 +76,6 @@ class Pipeline():
         else:
             logging.info(f'\tKEGG pathways = {self.list_of_kegg_pathways}')
 
-        # If the user specifies to look for overlapping pathways, find all KEGG pathways matching genes in the dataset
-        if self.get_kegg_pathways == True:
             logging.info(f'\tFinding and formatting KEGG Pathways...')
 
             # Find and load the KEGG pathways
@@ -95,32 +92,6 @@ class Pipeline():
                 minOverlap=self.minOverlap,
                 organism=self.organism
             )
-        
-        # Use the pathway(s) specified by pathway_list
-        else:
-            # If the pathway list is type "str"
-            if isinstance(self.pathway_list, str):
-                logging.info(f'\tPathways = {self.pathway_list}')
-                pathways.add_pathways(
-                    pathway_list=list(self.pathway_list),
-                    minOverlap=self.minOverlap,
-                    organism=self.organism
-                )
-
-            # If the pathway list is type "list"
-            elif isinstance(self.pathway_list, list):
-                logging.info(f'\tPathways = {self.pathway_list}')
-                pathways.add_pathways(
-                    pathway_list=self.pathway_list,
-                    minOverlap=self.minOverlap,
-                    organism=self.organism
-                )
-
-            # Else throw an exception if no pathways are specified
-            else:
-                msg = f'ERROR: get_kegg_pathways = {self.get_kegg_pathways} and pathway_list = {self.pathway_list}. ' \
-                    f'If get_kegg_pathways is False, specify a list or string of pathways to use'
-                assert Exception(msg)
 
         # Adds any custom graphml files
         if len(self.network_files) > 0:
