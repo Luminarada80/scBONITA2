@@ -886,6 +886,7 @@ def create_cluster_combinations(cell_clusters: dict, cell_group_dict: dict):
     logging.info(grouped)
 
     grouped.to_csv(f'{file_paths["trajectories"]}/{dataset_name}_cluster_by_group.csv')
+    df.to_csv(f'{file_paths["trajectories"]}/{dataset_name}_cell_groups.csv')
 
 
 if __name__ == '__main__':
