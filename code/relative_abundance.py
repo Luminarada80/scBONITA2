@@ -201,9 +201,8 @@ def bubble_plot(network_names, p_values):
         neg_log10_bonferroni_corrected_p_values,
         range(len(network_names)),
         s=bubble_sizes,
-        c=neg_log10_bonferroni_corrected_p_values,
         cmap="viridis"
-)
+    )
 
     # Set the y-axis to show the network names
     ax.set_yticks(range(len(network_names)))
