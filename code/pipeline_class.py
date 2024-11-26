@@ -159,8 +159,13 @@ class Pipeline():
         # Specify the path to the ruleset pickle directory, ensures the directory exists
         data_pickle_folder = f'{file_paths["pickle_files"]}/{self.dataset_name}_pickle_files/ruleset_pickle_files'
         os.makedirs(data_pickle_folder, exist_ok=True)
-        data_pickle_file_path = f'{data_pickle_folder}/{self.dataset_name}_{self.organism}{pathway_num}.ruleset.pickle'
+        if self.organism not in pathway_num:
+            data_pickle_file_path = f'{data_pickle_folder}/{self.dataset_name}_{self.organism}{pathway_num}.ruleset.pickle'
+        else:
+            data_pickle_file_path = f'{data_pickle_folder}/{self.dataset_name}_{pathway_num}.ruleset.pickle'
+        logging.info(f'\tSaving to {data_pickle_file_path.split("/")[-1]}')
 
+        
         # Save the ruleset object as a binary pickle file
         pickle.dump(ruleset, open(data_pickle_file_path, "wb"))
 

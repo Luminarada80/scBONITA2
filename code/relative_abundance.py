@@ -313,7 +313,8 @@ if __name__ == '__main__':
     if len(network_names) > 0:
 
         for network_name in network_names:
-            network_name = organism + network_name
+            if organism not in network_name:
+                network_name = organism + network_name
             # Path to the ruleset pickle file
             ruleset_pickle_file_path = f'{file_paths["pickle_files"]}/{dataset_name}_pickle_files/ruleset_pickle_files/{dataset_name}_{network_name}.ruleset.pickle'
             network_pickle_file_path = f'{file_paths["pickle_files"]}/{dataset_name}_pickle_files/network_pickle_files/{dataset_name}_{network_name}.network.pickle'
