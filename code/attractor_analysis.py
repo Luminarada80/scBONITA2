@@ -21,7 +21,9 @@ import os
 from argparse import ArgumentParser
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from scipy.cluster.hierarchy import linkage, dendrogram, fcluster, inconsistent
+from kneed import KneeLocator 
 from scipy.spatial.distance import squareform
+from sklearn.manifold import MDS
 from alive_progress import alive_bar
 import statistics
 import multiprocessing as mp
@@ -403,7 +405,7 @@ def create_distance_matrix(dtw_distances: dict, file_names: list):
     return distance_matrix
 
 
-def hierarchical_clustering(dtw_distances: dict, num_clusters: int):
+def hierarchical_clustering(dtw_distances: dict, num_clusters: int = 2):
     """ Performs hierarchical clustering on the pairwise DTW distance matrix.
 
     Parameters
@@ -451,13 +453,33 @@ def hierarchical_clustering(dtw_distances: dict, num_clusters: int):
 
     plt.savefig(f'{file_paths["trajectories"]}/{dataset_name}_{network_name}/png_files/dendrogram.png')
 
+    
+    
     # Set a threshold and get the clusters
     if num_clusters == 0:
-        txt = f'Check the number of clusters in: "{dataset_name}_{network_name}/png_files/dendrogram.png"'
-        logging.info(f'\n\t -----{"-" * len(txt)}----- '.center(20))
-        logging.info(f'\t|     {txt.upper()}     |'.center(20))
-        logging.info(f'\t -----{"-" * len(txt)}----- '.center(20))
-        num_clusters = int(input("\tEnter the number of clusters: "))
+        # Find the maximum finite value in the distance matrix
+        finite_max = distance_matrix[distance_matrix != np.inf].max().max()
+
+        # Replace infinity with the maximum finite value found
+        distance_matrix = distance_matrix.replace(np.inf, finite_max)
+        
+        mds = MDS(n_components=2, dissimilarity="precomputed", n_init=4, n_jobs=4, normalized_stress='auto')
+        mds_coordinates = mds.fit_transform(distance_matrix)
+
+        # Compute inertia for a range of cluster numbers
+        inertia = []
+        k_range = range(1, 11)
+
+        for k in k_range:
+            kmeans = KMeans(n_clusters=k, random_state=42, n_init='auto')
+            kmeans.fit(mds_coordinates)
+            inertia.append(kmeans.inertia_)
+
+        # Automatically detect the elbow point
+        kneedle = KneeLocator(k_range, inertia, S=1.0, curve="convex", direction="decreasing")
+        num_clusters = kneedle.elbow
+        logging.info(f'\t\tUsing {num_clusters} clusters (determined by K-Means clustering)')
+    
     clusters = fcluster(Z, num_clusters, criterion='maxclust')
 
     # Organize cells by clusters

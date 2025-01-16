@@ -2,4 +2,7 @@
 scBONITA_output/*
 *.pyc
 *.csv
+*.txt
+bash_scripts/run_george_hiv.sh
 __pycache__/
+input/custom_graphml_files/

@@ -113,8 +113,23 @@ if [ "$RUN_IMPORTANCE_SCORE" = "True" ]; then
         $CONDA_ENVIRONMENT_PYTHON code/importance_scores.py \
             --dataset_name "$DATASET_NAME" \
             --list_of_kegg_pathways $KEGG_PATHWAYS_ARGS
+    
+    elif [ ${#CUSTOM_PATHWAYS[@]} -gt 0 ]; then
+        # Check and execute for Custom Pathways if the array is not empty
+        echo "Running with Custom Pathways..."
+        
+        CUSTOM_PATHWAYS_ARGS=""
+        for pathway in "${CUSTOM_PATHWAYS[@]}"; do
+            CUSTOM_PATHWAYS_ARGS+="--list_of_kegg_pathways $pathway "
+        done
+
+        $CONDA_ENVIRONMENT_PYTHON code/importance_scores.py \
+            --dataset_name "$DATASET_NAME" \
+            $CUSTOM_PATHWAYS_ARGS
+
     else
         echo "No KEGG Pathways specified"
+        
     fi
 fi
 
@@ -137,11 +152,41 @@ if [ "$RUN_RELATIVE_ABUNDANCE" = "True" ]; then
         echo "Running with KEGG pathways"
         # Using a list of KEGG pathways:
         KEGG_PATHWAYS_ARGS="${KEGG_PATHWAYS[@]}"
-    else
-        echo "No KEGG Pathways specified"
-    fi
 
-    # Loop through the control and experimental groups
+        # Loop through the control and experimental groups
+        for (( i=0; i<${#CONTROL_GROUPS[@]}; i++ )); do
+
+            # Extract the current pair of control and experimental group
+            CONTROL_GROUP=${CONTROL_GROUPS[$i]}
+            EXPERIMENTAL_GROUP=${EXPERIMENTAL_GROUPS[$i]}
+
+            # Execute the command with the current pair of control and experimental group
+            $CONDA_ENVIRONMENT_PYTHON code/relative_abundance.py \
+                --dataset_name "$DATASET_NAME" \
+                --dataset_file "$DATA_FILE" \
+                --metadata_file "$METADATA_FILE" \
+                --metadata_sep "$METADATA_SEP" \
+                --dataset_sep "$DATAFILE_SEP" \
+                --control_group "$CONTROL_GROUP" \
+                --experimental_group "$EXPERIMENTAL_GROUP" \
+                --cell_name_index $CELL_NAME_COL \
+                --group_indices $GROUP_INDICES_ARGS \
+                --header "$HEADER" \
+                --overwrite "$OVERWRITE" \
+                --organism "$ORGANISM_CODE" \
+                --list_of_kegg_pathways $KEGG_PATHWAYS_ARGS
+            done
+
+    elif [ ${#CUSTOM_PATHWAYS[@]} -gt 0 ]; then
+        # Check and execute for Custom Pathways if the array is not empty
+        echo "Running with Custom Pathways..."
+        
+        CUSTOM_PATHWAYS_ARGS=""
+        for pathway in "${CUSTOM_PATHWAYS[@]}"; do
+            CUSTOM_PATHWAYS_ARGS+="--list_of_kegg_pathways $pathway "
+        done
+
+        # Loop through the control and experimental groups
     for (( i=0; i<${#CONTROL_GROUPS[@]}; i++ )); do
 
         # Extract the current pair of control and experimental group
@@ -162,8 +207,13 @@ if [ "$RUN_RELATIVE_ABUNDANCE" = "True" ]; then
             --header "$HEADER" \
             --overwrite "$OVERWRITE" \
             --organism "$ORGANISM_CODE" \
-            --list_of_kegg_pathways $KEGG_PATHWAYS_ARGS
+            $CUSTOM_PATHWAYS_ARGS
         done
+    else
+        echo "No KEGG Pathways specified"
+    fi
+
+    
 fi
 
 #  --------------------------------------

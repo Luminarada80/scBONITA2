@@ -793,8 +793,22 @@ class Pathways:
                 filtered_overlap = len(set(G.nodes()).intersection(pathway_genes))
 
                 if write_graphml and filtered_overlap > minOverlap:
+                    # Start the output file path with the otuput path
+                    output_file_name = self.output_path
+                    
+                    # Add the organism to the pathway file if its not already there
+                    if organism not in pathway:
+                        output_file_name = output_file_name + organism
+                    
+                    # Add the pathway name to the output name
+                    output_file_name = output_file_name + pathway
+                    
+                    # Only adds if not using _processed.graphml
+                    if "_processed.graphml" not in output_file_name:
+                        output_file_name = output_file_name + "_processed.graphml"
+
                     nx.write_graphml(
-                        G, self.output_path + organism + pathway + "_processed.graphml", infer_numeric_types=True
+                        G, output_file_name, infer_numeric_types=True
                     )
                 
                 
