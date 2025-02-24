@@ -284,7 +284,7 @@ check_pipeline_steps
 determine_num_cpus
 activate_conda_env
 
-if [ "$RUN_RULE_DETERMINATION" = true]; then run_rule_determination; fi
+if [ "$RUN_RULE_DETERMINATION" = true ]; then run_rule_determination; fi
 if [ "$RUN_IMPORTANCE_SCORE" = true ]; then run_importance_score; fi
 if [ "$RUN_RELATIVE_ABUNDANCE" = true ]; then run_relative_abundance; fi
 if [ "$RUN_ATTRACTOR_ANALYSIS" = true ]; then run_attractor_analysis; fi
