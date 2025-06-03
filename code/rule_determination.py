@@ -109,7 +109,7 @@ class RuleDetermination:
 
                 rule_with_gene_names = replace_placeholders(logic, incoming_node_names)
 
-                line = f'error: {round(node_errors[rule_index]*100)}%\t{rule_name} = {rule_with_gene_names}'
+                line = f'{rule_name} = {rule_with_gene_names}'
 
                 # Don't write out self-loops
                 if not rule_name == rule_with_gene_names:
@@ -129,7 +129,7 @@ class RuleDetermination:
             logging.info(f'\tStdev = {stdev_error}')
             logging.info(f'\tMax = {max_error}')
             logging.info(f'\tMin = {min_error}')
-            rule_file.write(f'Refined_error:\tavg={avg_error}|stdev={stdev_error}|max={max_error}|min={min_error}')
+            # rule_file.write(f'Refined_error:\tavg={avg_error}|stdev={stdev_error}|max={max_error}|min={min_error}')
 
 
     def refine_rules(self):
